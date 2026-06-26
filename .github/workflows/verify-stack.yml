@@ -9,66 +9,95 @@ on:
     branches:
       - main
 
+
 permissions:
   contents: read
+
 
 jobs:
 
   discover:
+
     name: Discover Compose Stacks
+
     runs-on: ubuntu-latest
 
     outputs:
       stacks: ${{ steps.discover.outputs.stacks }}
 
+
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
+
 
       - name: Discover stacks
         id: discover
         shell: bash
+
         run: |
+
           stacks=$(find . \
-            -mindepth 1 \
-            -maxdepth 1 \
-            -type d \
-            ! -name ".git" \
-            ! -name ".github" \
+            -mindepth 2 \
+            -maxdepth 3 \
+            \( \
+              -name "docker-compose.yml" \
+              -o \
+              -name "compose.yml" \
+            \) \
+            -printf '%h\n' \
             | sed 's|^\./||' \
+            | sort -u \
             | jq -R -s -c 'split("\n")[:-1]')
+
 
           echo "Detected stacks:"
           echo "$stacks"
 
+
           echo "stacks=$stacks" >> "$GITHUB_OUTPUT"
+
 
 
   verify:
 
+
     name: Verify ${{ matrix.stack }}
+
 
     needs:
       - discover
 
+
+    if: needs.discover.outputs.stacks != '[]'
+
+
     runs-on: ubuntu-latest
 
+
     strategy:
+
       fail-fast: false
 
       matrix:
         stack: ${{ fromJson(needs.discover.outputs.stacks) }}
 
 
+
     defaults:
+
       run:
         working-directory: ${{ matrix.stack }}
 
 
+
     steps:
+
 
       - name: Checkout repository
         uses: actions/checkout@v4
+
 
 
       - name: Validate compose file
@@ -76,62 +105,111 @@ jobs:
           docker compose config
 
 
+
       - name: Start stack
         run: |
-          docker compose up -d
+          docker compose up -d --wait
 
-
-      - name: Wait for startup
-        run: |
-          sleep 20
 
 
       - name: Check container status
         run: |
+
           docker compose ps
 
-          if docker compose ps --status exited | grep -q .; then
-            echo "Container failed to start"
+
+          FAILED=$(docker compose ps --format json |
+            jq -r '
+              .[]
+              | select(
+                  .State != "running"
+                  or (.Health != "" and .Health != "healthy")
+                )
+              | .Name
+            ')
+
+
+          if [ -n "$FAILED" ]; then
+
+            echo "The following containers failed:"
+            echo "$FAILED"
+
             exit 1
+
           fi
 
 
-      - name: Run healthcheck
+
+      - name: Run healthcheck script
         run: |
+
           if [ -f healthcheck.sh ]; then
+
             chmod +x healthcheck.sh
+
             ./healthcheck.sh
+
           else
-            echo "No healthcheck defined"
+
+            echo "No custom healthcheck defined"
+
           fi
+
 
 
       - name: Show logs on failure
         if: failure()
+
         run: |
-          docker compose logs
+
+          docker compose logs --no-color
+
 
 
       - name: Cleanup
         if: always()
+
         run: |
-          docker compose down -v
+
+          docker compose down \
+            --volumes \
+            --remove-orphans
 
 
 
-  # Dieser Job ist der einzige Required Check
+
+
   verify-success:
 
+
     name: Verify Compose Stacks
+
 
     needs:
       - verify
 
+
+    if: always()
+
+
     runs-on: ubuntu-latest
+
 
 
     steps:
 
-      - name: Verification successful
+
+      - name: Check verification result
         run: |
+
+          if [ "${{ needs.verify.result }}" != "success" ] \
+             && [ "${{ needs.verify.result }}" != "skipped" ]; then
+
+            echo "Compose verification failed"
+
+            exit 1
+
+          fi
+
+
           echo "All compose stacks verified successfully"

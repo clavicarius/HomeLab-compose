@@ -77,7 +77,7 @@ jobs:
             jq -r '
               select(
                 .State != "running"
-                or (.Health != null and .Health != "healthy")
+                or (.Health? != null and .Health != "healthy")
               )
               | .Name
             ')

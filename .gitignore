@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+
+# Database volume
+mysql_data/
+
+# Logs
+logs/
+
+# Composer
+vendor/
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+*.log

@@ -16,6 +16,12 @@ services:
     ports:
       - "53:53/tcp"
       - "53:53/udp" # dns
+      - "67:67/udp"
+      - "80:80/tcp"
+      - "443:443/tcp"
+      - "3000:3000/tcp"
+      - "853:853/tcp"
+      - "784:784/udp"
       - "${ADGUARD_PORT}:9080" # web-ui
 
     environment:
@@ -24,13 +30,18 @@ services:
       - TZ=${TZ}
     
     labels:
-    
+      - "traefik.enable=${TRAEFIK_ENABLED}"
+      - "traefik.http.routers.adguard.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.routers.adguard.entrypoints=websecure"
+      - "traefik.http.routers.adguard.rule=Host(`${ADGUARD_HOST}.${HOMELAB_DOMAIN}`)"      
+      - "traefik.http.routers.adguard.loadbalancer.server.port=3000"
       
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:9080/ || exit 1"] 
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:9080/control/status >/dev/null || exit 1"] 
       interval: 30s
       timeout: 10s
       retries: 8
+      start_period: 30s
 
 networks:
   adguard_net:

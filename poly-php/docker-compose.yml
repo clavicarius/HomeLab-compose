@@ -1,0 +1,118 @@
+services:
+
+  php56:
+    build: ./php56
+    container_name: lamp-php56
+    ports:
+      - "8056:80"
+    volumes:
+      - ./html:/var/www/html
+      - ./php-config/php.ini:/usr/local/etc/php/php.ini
+      - ./php-config/xdebug-php56.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - ./logs/php56:/var/log/apache2
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
+      interval: 30s
+      timeout: 12s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  php74:
+    build: ./php74
+    container_name: lamp-php74
+    ports:
+      - "8074:80"
+    volumes:
+      - ./html:/var/www/html
+      - ./php-config/php.ini:/usr/local/etc/php/php.ini
+      - ./logs/php74:/var/log/apache2
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
+      interval: 30s
+      timeout: 12s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  php85:
+    build: ./php85
+    container_name: lamp-php85
+    ports:
+      - "8085:80"
+    volumes:
+      - ./html:/var/www/html
+      - ./php-config/php.ini:/usr/local/etc/php/php.ini
+      - ./logs/php85:/var/log/apache2
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
+      interval: 30s
+      timeout: 12s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: mariadb:10.3
+    container_name: lamp-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: lamp_db
+      MYSQL_USER: lamp_user
+      MYSQL_PASSWORD: lamp_password
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: lamp-phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s

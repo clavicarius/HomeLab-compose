@@ -1,4 +1,4 @@
-name: Verify Compose Stacks
+name: Verify Stack
 
 on:
   pull_request:
@@ -9,66 +9,129 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
+
   discover:
+    name: Discover Compose Stacks
     runs-on: ubuntu-latest
+
     outputs:
       stacks: ${{ steps.discover.outputs.stacks }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - id: discover
+      - name: Discover stacks
+        id: discover
+        shell: bash
         run: |
-          stacks=$(find . -mindepth 1 -maxdepth 1 -type d \
+          stacks=$(find . \
+            -mindepth 1 \
+            -maxdepth 1 \
+            -type d \
             ! -name ".git" \
             ! -name ".github" \
-            | jq -R -s -c 'split("\n")[:-1] | map(sub("^./"; ""))')
+            | sed 's|^\./||' \
+            | jq -R -s -c 'split("\n")[:-1]')
+
+          echo "Detected stacks:"
+          echo "$stacks"
 
           echo "stacks=$stacks" >> "$GITHUB_OUTPUT"
 
+
   verify:
-    needs: discover
+
+    name: Verify ${{ matrix.stack }}
+
+    needs:
+      - discover
+
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
+
       matrix:
         stack: ${{ fromJson(needs.discover.outputs.stacks) }}
 
-    runs-on: ubuntu-latest
 
     defaults:
       run:
         working-directory: ${{ matrix.stack }}
 
+
     steps:
-      - uses: actions/checkout@v4
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Validate compose file
+        run: |
+          docker compose config
+
 
       - name: Start stack
-        run: docker compose up -d
+        run: |
+          docker compose up -d
 
-      - name: Wait
-        run: sleep 20
 
-      - name: Show status
-        run: docker compose ps
+      - name: Wait for startup
+        run: |
+          sleep 20
 
-      - name: Verify containers are running
+
+      - name: Check container status
         run: |
           docker compose ps
-          docker compose ps --status running
 
-      - name: Custom health check
+          if docker compose ps --status exited | grep -q .; then
+            echo "Container failed to start"
+            exit 1
+          fi
+
+
+      - name: Run healthcheck
         run: |
           if [ -f healthcheck.sh ]; then
             chmod +x healthcheck.sh
             ./healthcheck.sh
+          else
+            echo "No healthcheck defined"
           fi
 
-      - name: Collect logs
-        if: failure()
-        run: docker compose logs
 
-      - name: Shutdown
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          docker compose logs
+
+
+      - name: Cleanup
         if: always()
-        run: docker compose down -v
+        run: |
+          docker compose down -v
+
+
+
+  # Dieser Job ist der einzige Required Check
+  verify-success:
+
+    name: Verify Compose Stacks
+
+    needs:
+      - verify
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+      - name: Verification successful
+        run: |
+          echo "All compose stacks verified successfully"

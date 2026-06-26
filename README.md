@@ -1,10 +1,10 @@
-# homelab-compose
+# HomeLab-compose
 
-A collection of Docker Compose configurations for self-hosted services and homelab environments.
+A collection of (Docker) Compose configurations for self-hosted services and homelab environments.
 
 ## Overview
 
-This repository contains Docker Compose stacks for running and maintaining various self-hosted applications. Each service is organized in its own directory and can be deployed independently.
+This repository contains Compose stacks for running and maintaining various self-hosted applications. Each service is organized in its own directory and can be deployed independently.
 
 The goal is to provide:
 
@@ -12,6 +12,7 @@ The goal is to provide:
 * Reusable service definitions
 * Simple deployment and updates
 * A central place for homelab infrastructure
+
 
 ## Repository Structure
 
@@ -29,9 +30,18 @@ The goal is to provide:
 
 Each service directory should contain:
 
-* `compose.yaml` – Docker Compose configuration
+* `compose.yaml` – Compose configuration
 * `.env.example` – Example environment variables (optional)
 * `README.md` – Service-specific documentation
+
+
+## Included Compose Configurations
+
+| Service | Desc | README |
+|---------|--------|--------|
+| poly-php |portable Docker‑Entwicklungsumgebung zum gleichzeitigen Testen mehrerer PHP‑Versionen| [poly-php/README.md](poly-php/README.md) |
+
+
 
 ## Getting Started
 

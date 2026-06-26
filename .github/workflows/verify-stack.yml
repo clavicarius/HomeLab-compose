@@ -1,0 +1,74 @@
+name: Verify Compose Stacks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      stacks: ${{ steps.discover.outputs.stacks }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: discover
+        run: |
+          stacks=$(find . -mindepth 1 -maxdepth 1 -type d \
+            ! -name ".git" \
+            ! -name ".github" \
+            | jq -R -s -c 'split("\n")[:-1] | map(sub("^./"; ""))')
+
+          echo "stacks=$stacks" >> "$GITHUB_OUTPUT"
+
+  verify:
+    needs: discover
+
+    strategy:
+      fail-fast: false
+      matrix:
+        stack: ${{ fromJson(needs.discover.outputs.stacks) }}
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.stack }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start stack
+        run: docker compose up -d
+
+      - name: Wait
+        run: sleep 20
+
+      - name: Show status
+        run: docker compose ps
+
+      - name: Verify containers are running
+        run: |
+          docker compose ps
+          docker compose ps --status running
+
+      - name: Custom health check
+        run: |
+          if [ -f healthcheck.sh ]; then
+            chmod +x healthcheck.sh
+            ./healthcheck.sh
+          fi
+
+      - name: Collect logs
+        if: failure()
+        run: docker compose logs
+
+      - name: Shutdown
+        if: always()
+        run: docker compose down -v

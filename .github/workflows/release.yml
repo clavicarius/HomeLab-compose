@@ -1,0 +1,86 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows:
+      - Verify Compose Stacks
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    name: Create Version Tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: git fetch --tags
+
+      - name: Determine next version
+        id: version
+        shell: bash
+        run: |
+          set -e
+
+          TAGS=$(git tag -l "v*.*.*")
+
+          # Erstes Release
+          if [ -z "$TAGS" ]; then
+            NEXT="v1.0.0"
+            echo "version=$NEXT" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Höchste MAJOR.MINOR bestimmen
+          BASE=$(echo "$TAGS" \
+            | sed 's/^v//' \
+            | awk -F. '{print $1"."$2}' \
+            | sort -t. -k1,1n -k2,2n \
+            | tail -1)
+
+          MAJOR=$(echo "$BASE" | cut -d. -f1)
+          MINOR=$(echo "$BASE" | cut -d. -f2)
+
+          PATCH=$(echo "$TAGS" \
+            | grep "^v${MAJOR}\.${MINOR}\." \
+            | sed 's/^v//' \
+            | awk -F. '{print $3}' \
+            | sort -n \
+            | tail -1)
+
+          PATCH=$((PATCH + 1))
+
+          NEXT="v${MAJOR}.${MINOR}.${PATCH}"
+
+          echo "Next Version: $NEXT"
+
+          echo "version=$NEXT" >> "$GITHUB_OUTPUT"
+
+      - name: Check if current commit already has a version tag
+        run: |
+          if git tag --points-at HEAD | grep -q "^v"; then
+            echo "Commit already tagged."
+            exit 1
+          fi
+
+      - name: Create Git Tag
+        run: |
+          git tag ${{ steps.version.outputs.version }}
+
+      - name: Push Tag
+        run: |
+          git push origin ${{ steps.version.outputs.version }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          generate_release_notes: true

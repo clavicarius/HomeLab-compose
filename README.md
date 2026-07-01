@@ -2,6 +2,9 @@
 
 A collection of (Docker) Compose configurations for self-hosted services and homelab environments.
 
+![HomeLab Compose Logo](./docs/HomeLab-compose-social-logo.png)
+
+
 ## Overview
 
 This repository contains Compose stacks for running and maintaining various self-hosted applications. Each service is organized in its own directory and can be deployed independently.
@@ -12,6 +15,10 @@ The goal is to provide:
 * Reusable service definitions
 * Simple deployment and updates
 * A central place for homelab infrastructure
+
+### Disclaimer:
+This is currently (June 2026) a work in progress project. I have no timeline or roadmap (just to be honest).
+Stay tuned :)
 
 
 ## Repository Structure

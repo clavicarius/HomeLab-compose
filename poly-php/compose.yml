@@ -15,6 +15,9 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--providers.docker.network=homelab_mcvlan"
       - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.traefik.address=:8080"
+      - "--ping=true"
+      - "--ping.entrypoint=traefik"
     ports:
       - "80:80"
       - "443:443"
@@ -25,7 +28,7 @@ services:
       homelab_mcvlan:
         ipv4_address: ${TRAEFIK_IP}
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/ping"]
+      test: ["CMD", "traefik", "healthcheck", "--ping", "--ping.entrypoint=web"]
       interval: 10s
       timeout: 3s
       retries: 5

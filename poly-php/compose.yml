@@ -24,6 +24,11 @@ services:
     networks:
       homelab_mcvlan:
         ipv4_address: ${TRAEFIK_IP}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
   php56:
     build: ./php56

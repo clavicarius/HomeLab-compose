@@ -19,6 +19,10 @@ Der Stack basiert auf **Docker Compose** und enthält:
 
 Alle PHP‑Container greifen auf denselben Projektcode zu, sodass Änderungen sofort in allen Versionen getestet werden können.
 
+Der Multi‑PHP Stack kann optional über einen Reverse‑Proxy mit HTTPS betrieben werden.
+
+Hierfür wird zusätzlich ein Traefik‑Container verwendet, der die Requests anhand des Hostnamens an die passenden PHP‑Container weiterleitet. Die grundlegende Traefik‑Konfiguration basiert auf `docs/traefik.md`.
+
 ---
 
 # Voraussetzungen
@@ -89,17 +93,12 @@ docker compose logs -f
 
 Nach dem Start sind folgende URLs verfügbar:
 
-PHP 5.6  
-http://localhost:8056
-
-PHP 7.4  
-http://localhost:8074
-
-PHP 8.5  
-http://localhost:8085
-
-phpMyAdmin  
-http://localhost:8080
+| PHP-Version | HTTP | HTTPS |
+|---|---|---|
+| PHP 5.6 | http://localhost:8056 | https://php56.hostname.local |
+| PHP 7.4 | http://localhost:8074 | https://php74.hostname.local |
+| PHP 8.5 | http://localhost:8085 | https://php85.hostname.local |
+| phpMyAdmin | http://localhost:8080 | https://phpmyadmin.hostname.local |
 
 ---
 
@@ -257,9 +256,19 @@ Für produktive Systeme wird empfohlen:
 docker compose up -d --build
 ```
 
+Ggf. noch DNS/host-Einträge aktualisieren
+```
+192.168.178.240 php56.hostname.local
+192.168.178.240 php74.hostname.local
+192.168.178.240 php85.hostname.local
+```
+
 Browser öffnen:
 
-- http://localhost:8056
-- http://localhost:8074
-- http://localhost:8085
-- http://localhost:8080
+| PHP-Version | HTTP | HTTPS |
+|---|---|---|
+| PHP 5.6 | http://localhost:8056 | https://php56.hostname.local |
+| PHP 7.4 | http://localhost:8074 | https://php74.hostname.local |
+| PHP 8.5 | http://localhost:8085 | https://php85.hostname.local |
+| phpMyAdmin | http://localhost:8080 | https://phpmyadmin.hostname.local |
+

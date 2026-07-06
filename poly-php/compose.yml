@@ -1,0 +1,198 @@
+# php56.${HOMELAB_DOMAIN}
+# php74.${HOMELAB_DOMAIN}
+# php85.${HOMELAB_DOMAIN}
+# phpmyadmin.${HOMELAB_DOMAIN}
+
+services:
+
+  traefik:
+    image: traefik:v3.0
+    container_name: lamp-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker.network=homelab_mcvlan"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.traefik.address=:8080"
+      - "--ping=true"
+      - "--ping.entrypoint=traefik"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8088:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      homelab_mcvlan:
+        ipv4_address: ${TRAEFIK_IP}
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping", "--ping.entrypoint=traefik"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  php56:
+    build: ./php56
+    container_name: lamp-php56
+    ports:
+      - "${PHP56_PORT}:80"
+    volumes:
+      - ./html:/var/www/html
+      - ./php-config/php.ini:/usr/local/etc/php/php.ini
+      - ./php-config/xdebug-php56.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - ./logs/php56:/var/log/apache2
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - homelab_mcvlan
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED}"
+      - "traefik.http.routers.php56.rule=Host(`php56.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.php56.entrypoints=websecure"
+      - "traefik.http.routers.php56.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.routers.php56.tls.certresolver=letsencrypt"
+      - "traefik.http.services.php56.loadbalancer.server.port=80"
+      - "traefik.docker.network=homelab_mcvlan"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
+      interval: 30s
+      timeout: 12s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  php74:
+    build: ./php74
+    container_name: lamp-php74
+    ports:
+      - "${PHP74_PORT}:80"
+    volumes:
+      - ./html:/var/www/html
+      - ./php-config/php.ini:/usr/local/etc/php/php.ini
+      - ./logs/php74:/var/log/apache2
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - homelab_mcvlan
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED}"
+      - "traefik.http.routers.php74.rule=Host(`php74.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.php74.entrypoints=websecure"
+      - "traefik.http.routers.php74.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.routers.php74.tls.certresolver=letsencrypt"
+      - "traefik.http.services.php74.loadbalancer.server.port=80"
+      - "traefik.docker.network=homelab_mcvlan"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
+      interval: 30s
+      timeout: 12s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  php85:
+    build: ./php85
+    container_name: lamp-php85
+    ports:
+      - "${PHP85_PORT}:80"
+    volumes:
+      - ./html:/var/www/html
+      - ./php-config/php.ini:/usr/local/etc/php/php.ini
+      - ./logs/php85:/var/log/apache2
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - homelab_mcvlan
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED}"
+      - "traefik.http.routers.php85.rule=Host(`php85.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.php85.entrypoints=websecure"
+      - "traefik.http.routers.php85.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.routers.php85.tls.certresolver=letsencrypt"
+      - "traefik.http.services.php85.loadbalancer.server.port=80"
+      - "traefik.docker.network=homelab_mcvlan"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
+      interval: 30s
+      timeout: 12s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: mariadb:10.11
+    container_name: lamp-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - homelab_mcvlan
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: lamp-phpmyadmin
+    ports:
+      - "${PHPMYADMIN_PORT}:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - homelab_mcvlan
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED}"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
+      - "traefik.http.routers.phpmyadmin.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
+      - "traefik.docker.network=homelab_mcvlan"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+networks:
+  homelab_mcvlan:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}

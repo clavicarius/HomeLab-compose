@@ -129,7 +129,7 @@ services:
         max-file: "3"
 
   db:
-    image: mariadb:11.4
+    image: mariadb:10.11
     container_name: lamp-db
     environment:
       MYSQL_ROOT_PASSWORD: root_password
@@ -143,11 +143,11 @@ services:
     networks:
       - homelab_mcvlan
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD --silent"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 40s
+      start_period: 30s
     logging:
       driver: "json-file"
       options:

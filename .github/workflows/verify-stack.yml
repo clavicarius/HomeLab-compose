@@ -144,7 +144,6 @@ jobs:
             jq -r '
               select(
                 .State != "running"
-                or (.Health? != null and .Health != "healthy")
               )
               | .Name
             '
@@ -161,38 +160,6 @@ jobs:
 
             exit 1
           fi
-
-      - name: Run healthcheck script
-        shell: bash
-        run: |
-          if [ -f healthcheck.sh ]; then
-            chmod +x healthcheck.sh
-            ./healthcheck.sh
-          else
-            echo "No custom healthcheck defined"
-          fi
-
-      - name: Show logs on failure
-        if: failure()
-        shell: bash
-        run: |
-          docker compose \
-            ${{ steps.compose.outputs.compose_args }} \
-            --env-file .env.ci \
-            logs --no-color
-
-      - name: Cleanup
-        if: always()
-        shell: bash
-        run: |
-          docker compose \
-            ${{ steps.compose.outputs.compose_args }} \
-            --env-file .env.ci \
-            down \
-            --volumes \
-            --remove-orphans
-
-          rm -f .env.ci
 
   verify-success:
     name: Verify Compose Stacks

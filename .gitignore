@@ -3,7 +3,9 @@
 Thumbs.db
 
 # Environment
-.env
+.env*
+!.env.common.example
+!.env.example
 
 # Database volume
 mysql_data/

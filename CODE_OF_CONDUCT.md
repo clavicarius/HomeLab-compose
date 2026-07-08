@@ -1,31 +1,5 @@
 # Code of Conduct
 
-## Our Pledge
+Dieses Projekt verwendet den zentralen Code of Conduct:
 
-Wir verpflichten uns zu einer offenen, respektvollen und inklusiven Community.
-
-## Expected Behavior
-
-- Respektvoller Umgang
-- Konstruktives Feedback
-- Offenheit gegenüber neuen Ideen
-
-## Unacceptable Behavior
-
-- Belästigung
-- Diskriminierung
-- Persönliche Angriffe
-- Trolling
-
-## Enforcement
-
-Projekt-Maintainer können Beiträge entfernen oder Nutzer ausschließen, wenn gegen diese Regeln verstoßen wird.
-
-## Scope
-
-Dieser Verhaltenskodex gilt für:
-
-- Issues
-- Pull Requests
-- Diskussionen
-- Community Kanäle
+https://github.com/clavicarius/clavicarius/blob/main/code_of_conduct.md

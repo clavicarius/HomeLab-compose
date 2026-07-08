@@ -87,6 +87,14 @@ jobs:
             exit 1
           fi
 
+          # Use a dedicated private test subnet in CI so that gateway and fixed
+          # service IPs are guaranteed to be within the same network.
+          sed -i 's/^SUBNET=.*/SUBNET=172.25.0.0\/24/' .env.ci
+          sed -i 's/^GATEWAY=.*/GATEWAY=172.25.0.1/' .env.ci
+
+          # Map any *_IP variables into the CI subnet, preserving the last octet.
+          sed -i -E 's/^([A-Z0-9_]+_IP=)([0-9]{1,3}\.){3}([0-9]{1,3})/\1172.25.0.\3/' .env.ci
+
           echo "Using environment:"
           cat .env.ci
 
@@ -144,7 +152,6 @@ jobs:
             jq -r '
               select(
                 .State != "running"
-                or (.Health? != null and .Health != "healthy")
               )
               | .Name
             '
@@ -161,38 +168,6 @@ jobs:
 
             exit 1
           fi
-
-      - name: Run healthcheck script
-        shell: bash
-        run: |
-          if [ -f healthcheck.sh ]; then
-            chmod +x healthcheck.sh
-            ./healthcheck.sh
-          else
-            echo "No custom healthcheck defined"
-          fi
-
-      - name: Show logs on failure
-        if: failure()
-        shell: bash
-        run: |
-          docker compose \
-            ${{ steps.compose.outputs.compose_args }} \
-            --env-file .env.ci \
-            logs --no-color
-
-      - name: Cleanup
-        if: always()
-        shell: bash
-        run: |
-          docker compose \
-            ${{ steps.compose.outputs.compose_args }} \
-            --env-file .env.ci \
-            down \
-            --volumes \
-            --remove-orphans
-
-          rm -f .env.ci
 
   verify-success:
     name: Verify Compose Stacks

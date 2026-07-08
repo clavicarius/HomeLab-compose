@@ -1,0 +1,7 @@
+networks:
+  homelab_mcvlan: !override
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}

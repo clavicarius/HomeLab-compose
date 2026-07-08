@@ -45,8 +45,4 @@ services:
 
 networks:
   homelab_mcvlan:
-    driver: bridge
-    ipam: 
-      config:
-        - subnet: ${SUBNET}
-          gateway: ${GATEWAY}
+    external: true

@@ -1,5 +1,5 @@
 networks:
-  homelab_mcvlan:
+  homelab_mcvlan: !reset
     driver: bridge
     ipam:
       config:

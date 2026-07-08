@@ -8,7 +8,7 @@ services:
       start_period: !override 180s
 
 networks:
-  homelab_mcvlan:
+  homelab_mcvlan: !reset
     driver: bridge
     ipam:
       config:

@@ -1,137 +1,128 @@
-# HTTPS für den Multi‑PHP Docker Stack
+# Traefik im Homelab
 
-Diese Anleitung beschreibt kurz, wie HTTPS für die lokale Entwicklungsumgebung mit **Traefik als Reverse‑Proxy** aktiviert wird.
+Diese Anleitung beschreibt den Betrieb des **Multi-PHP-Stacks** mit **Traefik als zentralen Reverse Proxy** im Homelab.
 
-Traefik übernimmt dabei die TLS‑Terminierung und leitet die Requests an die jeweiligen PHP‑Container weiter.
+Traefik übernimmt die TLS-Terminierung und leitet Requests anhand des Hostnamens an die PHP-Container weiter.
+
+Die Gesamtarchitektur ist in [docs/network-architecture.md](../../docs/network-architecture.md) dokumentiert.
 
 ---
 
-# 1. Reverse Proxy hinzufügen
+# 1. Voraussetzungen
 
-Im `docker-compose.yml` wird ein **Traefik‑Service** ergänzt.
+* macvlan-Netzwerk `homelab_macvlan` (siehe `./scripts/create-macvlan.sh`)
+* `.env` via `../scripts/create-env.sh`
+* AdGuard Home mit DNS-Rewrites für `*.homelab.internal → 192.168.178.225`
 
-Dieser stellt die Ports **80 (HTTP)** und **443 (HTTPS)** bereit und erkennt automatisch Docker‑Container über Labels.
+---
 
-Beispiel:
+# 2. Traefik-Service
 
-```
+Traefik ist in `compose.yml` enthalten und erhält die feste LAN-IP `${TRAEFIK_IP}` (`192.168.178.225`).
+
+```yaml
 traefik:
   image: traefik:v3.0
   command:
-    - "--api.insecure=true"
     - "--providers.docker=true"
+    - "--providers.docker.network=homelab_macvlan"
     - "--entrypoints.web.address=:80"
     - "--entrypoints.websecure.address=:443"
   ports:
     - "80:80"
     - "443:443"
     - "8088:8080"
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock:ro
+  networks:
+    homelab_macvlan:
+      ipv4_address: ${TRAEFIK_IP}
 ```
 
 ---
 
-# 2. Routing für PHP‑Container definieren
+# 3. Routing aktivieren
 
-Jeder PHP‑Container erhält **Traefik‑Labels**, die definieren:
+In `.env.common`:
 
-- unter welchem Hostnamen der Service erreichbar ist
-- dass HTTPS verwendet wird
-- auf welchen internen Port Traefik weiterleitet
-
-Beispiel für PHP 8.5:
-
+```env
+TRAEFIK_ENABLED=true
+TRAEFIK_TLS_ENABLED=true
+HOMELAB_DOMAIN=homelab.internal
 ```
+
+Container neu starten:
+
+```bash
+docker compose up -d
+```
+
+Jeder PHP-Container trägt Traefik-Labels, z. B. für PHP 8.5:
+
+```yaml
 labels:
-  - "traefik.enable=true"
-  - "traefik.http.routers.php85.rule=Host(`php85.localhost`)"
+  - "traefik.enable=${TRAEFIK_ENABLED}"
+  - "traefik.http.routers.php85.rule=Host(`php85.${HOMELAB_DOMAIN}`)"
   - "traefik.http.routers.php85.entrypoints=websecure"
-  - "traefik.http.routers.php85.tls=true"
+  - "traefik.http.routers.php85.tls=${TRAEFIK_TLS_ENABLED}"
   - "traefik.http.services.php85.loadbalancer.server.port=80"
-```
-
-Analog können Labels für:
-
-- `php56`
-- `php74`
-- `php85`
-- `phpmyadmin`
-
-gesetzt werden.
-
----
-
-# 3. Lokale Hostnamen konfigurieren
-
-Damit die lokalen Domains funktionieren, müssen sie in der **Hosts‑Datei** eingetragen werden.
-
-Linux / macOS
-
-```
-/etc/hosts
-```
-
-Windows
-
-```
-C:\Windows\System32\drivers\etc\hosts
-```
-
-Einträge hinzufügen:
-
-```
-127.0.0.1 php56.localhost
-127.0.0.1 php74.localhost
-127.0.0.1 php85.localhost
-127.0.0.1 pma.localhost
+  - "traefik.docker.network=homelab_macvlan"
 ```
 
 ---
 
-# 4. Container starten
+# 4. DNS (Homelab)
 
-Den Stack bauen und starten:
+DNS-Rewrites in AdGuard Home anlegen:
 
+```text
+php56.homelab.internal      → 192.168.178.225
+php74.homelab.internal      → 192.168.178.225
+php85.homelab.internal      → 192.168.178.225
+phpmyadmin.homelab.internal → 192.168.178.225
 ```
-docker compose up -d --build
-```
+
+Die FRITZ!Box verteilt AdGuard (`192.168.178.252`) als DNS-Server an alle Clients.
 
 ---
 
 # 5. Zugriff auf die Services
 
-Danach sind die Anwendungen über HTTPS erreichbar:
-
-PHP 5.6  
-https://php56.localhost
-
-PHP 7.4  
-https://php74.localhost
-
-PHP 8.5  
-https://php85.localhost
-
-phpMyAdmin  
-https://pma.localhost
+| Service | URL |
+|---------|-----|
+| PHP 5.6 | https://php56.homelab.internal |
+| PHP 7.4 | https://php74.homelab.internal |
+| PHP 8.5 | https://php85.homelab.internal |
+| phpMyAdmin | https://phpmyadmin.homelab.internal |
+| Traefik Dashboard | http://192.168.178.99:8088 |
 
 ---
 
-# 6. Traefik Dashboard
+# 6. Lokale Entwicklung ohne DNS
 
-Das Traefik Dashboard ist erreichbar unter:
+Für Tests ohne AdGuard-DNS stehen die direkten Host-Ports zur Verfügung:
 
+| Service | URL |
+|---------|-----|
+| PHP 5.6 | http://localhost:8056 |
+| PHP 7.4 | http://localhost:8074 |
+| PHP 8.5 | http://localhost:8085 |
+| phpMyAdmin | http://localhost:8080 |
+
+Alternativ können Domains in der Hosts-Datei eingetragen werden:
+
+```text
+192.168.178.225 php56.homelab.internal
+192.168.178.225 php74.homelab.internal
+192.168.178.225 php85.homelab.internal
+192.168.178.225 phpmyadmin.homelab.internal
 ```
-http://localhost:8088
-```
 
-Dort können Router, Services und Container‑Status eingesehen werden.
+Windows: `C:\Windows\System32\drivers\etc\hosts`  
+Linux/macOS: `/etc/hosts`
 
 ---
 
-# Hinweis zu Zertifikaten
+# 7. Zertifikate
 
-Für lokale Domains erzeugt Traefik standardmäßig **Self‑Signed Zertifikate**.  
-Browser zeigen daher eine Sicherheitswarnung an.
+Für interne Domains erzeugt Traefik standardmäßig **selbstsignierte Zertifikate**. Browser zeigen daher eine Sicherheitswarnung.
 
-Für eine komfortablere lokale Entwicklung können später **vertrauenswürdige Zertifikate mit mkcert** integriert werden.
+Für vertrauenswürdige lokale Zertifikate kann später **mkcert** integriert werden.

@@ -416,10 +416,8 @@ labels:
 Die AdGuard-Weboberfläche ist unabhängig von Traefik erreichbar:
 
 ```text
-http://192.168.178.252:8252
+http://192.168.178.252:3000
 ```
-
-(Port konfigurierbar über `ADGUARD_PORT` in `.env.common`)
 
 ---
 
@@ -665,14 +663,14 @@ docker compose up -d
 ## Webinterface (Ersteinrichtung)
 
 ```text
-http://192.168.178.252:8252
+http://192.168.178.252:3000
 ```
 
 ## Ersteinrichtung
 
 | Einstellung | Wert |
 |-------------|------|
-| Admin-Webinterface | 9080 (im Container) |
+| Admin-Webinterface | 3000 |
 | DNS-Port | 53 |
 | Upstream DNS | Quad9 / Cloudflare |
 

@@ -65,7 +65,6 @@ HOMELAB_EMAIL=admin@homelab.internal
 ```env
 ADGUARD_HOST=adguard
 ADGUARD_IP=192.168.178.252
-ADGUARD_PORT=8252
 ```
 
 ### Traefik
@@ -96,22 +95,19 @@ Alle Geräte im Heimnetz nutzen diese IP als DNS-Server. Die FRITZ!Box verteilt 
 
 ## Ports
 
+Über die macvlan-LAN-IP `${ADGUARD_IP}` sind folgende Ports direkt erreichbar:
+
 | Port | Beschreibung |
 | ---- | ------------ |
-| 53/tcp, 53/udp | DNS (über LAN-IP `.252` erreichbar) |
-| 9080 | Weboberfläche im Container |
-| `${ADGUARD_PORT}` | Weboberfläche auf dem Host (Port-Mapping → 9080) |
+| 53/tcp, 53/udp | DNS |
+| 3000 | Weboberfläche (Admin) |
+
+Es werden keine Host-Port-Mappings verwendet — der Container ist im LAN unter seiner festen IP erreichbar.
 
 Die Weboberfläche ist erreichbar unter:
 
 ```text
-http://192.168.178.252:8252
-```
-
-Alternativ über den Host-Port-Mapping:
-
-```text
-http://<Docker-Host>:${ADGUARD_PORT}
+http://192.168.178.252:3000
 ```
 
 ## Container starten
@@ -146,13 +142,13 @@ docker compose down
 Nach dem ersten Start den Einrichtungsassistenten öffnen:
 
 ```text
-http://192.168.178.252:8252
+http://192.168.178.252:3000
 ```
 
 Empfohlene Einstellungen:
 
 * DNS-Port: 53
-* Webinterface: 9080
+* Webinterface: 3000
 * Admin-Benutzer anlegen
 * Upstream-DNS konfigurieren (z. B. Quad9, Cloudflare oder Unbound)
 

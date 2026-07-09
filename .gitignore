@@ -6,6 +6,8 @@ Thumbs.db
 .env*
 !.env.common.example
 !.env.example
+.git-author
+!.git-author.example
 
 # Database volume
 mysql_data/

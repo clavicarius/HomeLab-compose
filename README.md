@@ -111,6 +111,8 @@ Configure the network settings in your `.env` file and run:
 ./scripts/create-macvlan.sh
 ```
 
+For agent commits, copy `.git-author.example` to `.git-author` and set your name and email (see [docs/git-author.md](docs/git-author.md)).
+
 This only needs to be done once.
 
 ### 3. Navigate to the desired service

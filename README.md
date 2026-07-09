@@ -21,8 +21,8 @@ The goals of this repository are to provide:
 ```text
 .
 ├── scripts/
-│   ├── create-macvlan.sh
-│   ├── remove-macvlan.sh
+│   ├── create-mcvlan.sh
+│   ├── remove-mcvlan.sh
 │   └── ...
 ├── service-a/
 │   ├── compose.yaml
@@ -108,7 +108,7 @@ cd homelab-compose
 Configure the network settings in your `.env` file and run:
 
 ```bash
-./scripts/create-macvlan.sh
+./scripts/create-mcvlan.sh
 ```
 
 This only needs to be done once.

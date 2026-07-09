@@ -6,15 +6,15 @@ Docker-Compose-Projekt für den Betrieb von **AdGuard Home** im Homelab.
 
 * Docker Engine
 * Docker Compose
-* Netzwerk mit statischer IP-Konfiguration
-* `.env`-Datei im Projektverzeichnis
+* externes macvlan-Netzwerk `homelab_mcvlan` (siehe [docs/network-architecture.md](../docs/network-architecture.md))
+* `.env`-Datei im Projektverzeichnis (via `create-env.sh`)
 
 ## Projektstruktur
 
 ```text
 adguard/
 ├── compose.yml
-├── .env
+├── .env                 # erzeugt via scripts/create-env.sh
 ├── conf/
 ├── work/
 └── README.md
@@ -22,7 +22,14 @@ adguard/
 
 ## Umgebungsvariablen
 
-Alle projektspezifischen Einstellungen befinden sich in der `.env`.
+Die Konfiguration wird aus `.env.common.example` (Repository-Root) und optional `adguard/.env.example` zusammengeführt:
+
+```bash
+cd adguard
+../scripts/create-env.sh
+```
+
+Zentrale Werte liegen in `.env.common` bzw. `.env.common.example`:
 
 ### Benutzer
 
@@ -32,18 +39,25 @@ PGID=1000
 TZ=Europe/Berlin
 ```
 
-### Netzwerk
+### Netzwerk (macvlan)
 
 ```env
-SUBNET=192.168.178.0/24
+SUBNET=192.168.178.224/27
 GATEWAY=192.168.178.1
+NETWORK_ADAPTER=eth0
+```
+
+Das Netzwerk wird einmalig im Repository-Root angelegt:
+
+```bash
+./scripts/create-mcvlan.sh
 ```
 
 ### Homelab
 
 ```env
-HOMELAB_DOMAIN=homelab.local
-HOMELAB_EMAIL=admin@homelab.local
+HOMELAB_DOMAIN=homelab.internal
+HOMELAB_EMAIL=admin@homelab.internal
 ```
 
 ### AdGuard
@@ -52,6 +66,13 @@ HOMELAB_EMAIL=admin@homelab.local
 ADGUARD_HOST=adguard
 ADGUARD_IP=192.168.178.252
 ADGUARD_PORT=8252
+```
+
+### Traefik
+
+```env
+TRAEFIK_ENABLED=false
+TRAEFIK_TLS_ENABLED=false
 ```
 
 ## Verzeichnisse
@@ -63,62 +84,58 @@ ADGUARD_PORT=8252
 
 Die Daten bleiben dadurch auch nach einem Container-Update erhalten.
 
+## Netzwerk
+
+Der Container erhält eine feste LAN-IP über macvlan:
+
+```text
+${ADGUARD_IP}   →  192.168.178.252
+```
+
+Alle Geräte im Heimnetz nutzen diese IP als DNS-Server. Die FRITZ!Box verteilt sie per DHCP (siehe [network-architecture.md](../docs/network-architecture.md)).
+
 ## Ports
 
-| Port              | Beschreibung                          |
-| ----------------- | ------------------------------------- |
-| 53/tcp            | DNS                                   |
-| 53/udp            | DNS                                   |
-| 9080              | Weboberfläche im Container            |
-| `${ADGUARD_PORT}` | veröffentlichter Webport auf dem Host |
+| Port | Beschreibung |
+| ---- | ------------ |
+| 53/tcp, 53/udp | DNS (über LAN-IP `.252` erreichbar) |
+| 9080 | Weboberfläche im Container |
+| `${ADGUARD_PORT}` | Weboberfläche auf dem Host (Port-Mapping → 9080) |
 
-Die Weboberfläche ist anschließend erreichbar unter
+Die Weboberfläche ist erreichbar unter:
 
+```text
+http://192.168.178.252:8252
 ```
+
+Alternativ über den Host-Port-Mapping:
+
+```text
 http://<Docker-Host>:${ADGUARD_PORT}
 ```
 
-beispielsweise
-
-```
-http://192.168.178.10:8252
-```
-
-## Netzwerk
-
-Der Container erhält eine feste IP-Adresse aus der `.env`.
-
-```text
-${ADGUARD_IP}
-```
-
-Das Docker-Netzwerk wird mit folgenden Parametern erstellt:
-
-```text
-Subnet : ${SUBNET}
-Gateway: ${GATEWAY}
-```
-
 ## Container starten
+
+Voraussetzung: `homelab_mcvlan` existiert (`./scripts/create-mcvlan.sh`).
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
-Containerstatus prüfen
+Containerstatus prüfen:
 
 ```bash
 docker compose ps
 ```
 
-Logs anzeigen
+Logs anzeigen:
 
 ```bash
 docker compose logs -f
 ```
 
-Container stoppen
+Container stoppen:
 
 ```bash
 docker compose down
@@ -128,8 +145,8 @@ docker compose down
 
 Nach dem ersten Start den Einrichtungsassistenten öffnen:
 
-```
-http://<Docker-Host>:${ADGUARD_PORT}
+```text
+http://192.168.178.252:8252
 ```
 
 Empfohlene Einstellungen:
@@ -139,9 +156,25 @@ Empfohlene Einstellungen:
 * Admin-Benutzer anlegen
 * Upstream-DNS konfigurieren (z. B. Quad9, Cloudflare oder Unbound)
 
-## Updates
+## DNS-Rewrites
 
-Container aktualisieren:
+Lokale Domains für Webservices werden in AdGuard als DNS-Rewrites angelegt und zeigen auf die Traefik-IP (`192.168.178.225`). Details: [network-architecture.md](../docs/network-architecture.md#14-dns-rewrites-in-adguard).
+
+## Traefik-Integration
+
+Die `compose.yml` enthält Traefik-Labels. Sobald Traefik läuft und `TRAEFIK_ENABLED=true` gesetzt ist, ist AdGuard zusätzlich erreichbar unter:
+
+```text
+https://adguard.homelab.internal
+```
+
+Voraussetzungen:
+
+* Traefik-Stack läuft (`poly-php/compose.yml`)
+* DNS-Rewrite `adguard.homelab.internal → 192.168.178.225` in AdGuard
+* `TRAEFIK_ENABLED=true` in `.env.common`
+
+## Updates
 
 ```bash
 docker compose pull
@@ -181,24 +214,8 @@ Diese enthalten:
 
 Der Container prüft alle 30 Sekunden die Erreichbarkeit des Webinterfaces.
 
-## Geplante Traefik-Integration
-
-Die `.env` enthält bereits alle benötigten Variablen.
-
-```env
-HOMELAB_DOMAIN=homelab.local
-ADGUARD_HOST=adguard
-```
-
-Später kann AdGuard beispielsweise unter
-
-```
-https://adguard.homelab.local
-```
-
-über Traefik veröffentlicht werden.
-
 ## Hinweise
 
-* Das offizielle AdGuard-Image verwendet `PUID` und `PGID` derzeit nicht aktiv. Die Variablen sind dennoch bereits vorbereitet und können für zukünftige Images oder einen Wechsel auf ein anderes Image beibehalten werden.
-* Alle projektspezifischen Einstellungen (Ports, IP-Adressen, Domains und Benutzerinformationen) werden zentral über die `.env` verwaltet.
+* Das offizielle AdGuard-Image verwendet `PUID` und `PGID` derzeit nicht aktiv. Die Variablen sind dennoch vorbereitet.
+* IP-Adressen, Domains und Netzwerkparameter werden zentral in `.env.common` verwaltet.
+* Die vollständige Netzwerkarchitektur ist in [docs/network-architecture.md](../docs/network-architecture.md) dokumentiert.

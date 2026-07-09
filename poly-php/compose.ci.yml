@@ -1,5 +1,5 @@
 networks:
-  homelab_macvlan: !reset
+  homelab_macvlan: !override
     driver: bridge
     ipam:
       config:

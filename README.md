@@ -21,8 +21,8 @@ The goals of this repository are to provide:
 ```text
 .
 ├── scripts/
-│   ├── create-mcvlan.sh
-│   ├── remove-mcvlan.sh
+│   ├── create-macvlan.sh
+│   ├── remove-macvlan.sh
 │   └── ...
 ├── service-a/
 │   ├── compose.yaml
@@ -52,7 +52,7 @@ All Compose projects share a single external Docker **macvlan** network.
 
 | Property | Value |
 |----------|-------|
-| Network Name | `homelab_mcvlan` |
+| Network Name | `homelab_macvlan` |
 | Driver | `macvlan` |
 | Subnet | 192.168.178.224/27 |
 | Gateway | 192.168.178.1 |
@@ -63,7 +63,7 @@ Example:
 
 ```yaml
 networks:
-  homelab_mcvlan:
+  homelab_macvlan:
     external: true
 ```
 
@@ -77,7 +77,7 @@ Example:
 services:
   example:
     networks:
-      homelab_mcvlan:
+      homelab_macvlan:
         ipv4_address: 192.168.178.235
 ```
 
@@ -108,7 +108,7 @@ cd homelab-compose
 Configure the network settings in your `.env` file and run:
 
 ```bash
-./scripts/create-mcvlan.sh
+./scripts/create-macvlan.sh
 ```
 
 This only needs to be done once.
@@ -142,7 +142,7 @@ docker compose up -d
 - Store secrets outside version control
 - Prefer named volumes for persistent data
 - Pin image versions whenever possible
-- Use the shared external `homelab_mcvlan` network
+- Use the shared external `homelab_macvlan` network
 - Assign static IP addresses to services connected to the macvlan network
 
 ---

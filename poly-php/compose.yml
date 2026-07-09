@@ -13,7 +13,7 @@ services:
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--providers.docker.network=homelab_mcvlan"
+      - "--providers.docker.network=homelab_macvlan"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.traefik.address=:8080"
       - "--ping=true"
@@ -25,7 +25,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      homelab_mcvlan:
+      homelab_macvlan:
         ipv4_address: ${TRAEFIK_IP}
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping", "--ping.entrypoint=traefik"]
@@ -47,7 +47,7 @@ services:
       db:
         condition: service_healthy
     networks:
-      - homelab_mcvlan
+      - homelab_macvlan
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.php56.rule=Host(`php56.${HOMELAB_DOMAIN}`)"
@@ -55,7 +55,7 @@ services:
       - "traefik.http.routers.php56.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.routers.php56.tls.certresolver=letsencrypt"
       - "traefik.http.services.php56.loadbalancer.server.port=80"
-      - "traefik.docker.network=homelab_mcvlan"
+      - "traefik.docker.network=homelab_macvlan"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
@@ -81,7 +81,7 @@ services:
       db:
         condition: service_healthy
     networks:
-      - homelab_mcvlan
+      - homelab_macvlan
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.php74.rule=Host(`php74.${HOMELAB_DOMAIN}`)"
@@ -89,7 +89,7 @@ services:
       - "traefik.http.routers.php74.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.routers.php74.tls.certresolver=letsencrypt"
       - "traefik.http.services.php74.loadbalancer.server.port=80"
-      - "traefik.docker.network=homelab_mcvlan"
+      - "traefik.docker.network=homelab_macvlan"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
@@ -115,7 +115,7 @@ services:
       db:
         condition: service_healthy
     networks:
-      - homelab_mcvlan
+      - homelab_macvlan
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.php85.rule=Host(`php85.${HOMELAB_DOMAIN}`)"
@@ -123,7 +123,7 @@ services:
       - "traefik.http.routers.php85.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.routers.php85.tls.certresolver=letsencrypt"
       - "traefik.http.services.php85.loadbalancer.server.port=80"
-      - "traefik.docker.network=homelab_mcvlan"
+      - "traefik.docker.network=homelab_macvlan"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
@@ -149,7 +149,7 @@ services:
     ports:
       - "3306:3306"
     networks:
-      - homelab_mcvlan
+      - homelab_macvlan
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -174,14 +174,14 @@ services:
       db:
         condition: service_healthy
     networks:
-      - homelab_mcvlan
+      - homelab_macvlan
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${HOMELAB_DOMAIN}`)"
       - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
       - "traefik.http.routers.phpmyadmin.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
-      - "traefik.docker.network=homelab_mcvlan"
+      - "traefik.docker.network=homelab_macvlan"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost/ || exit 1"]
       interval: 10s
@@ -190,5 +190,5 @@ services:
       start_period: 40s
 
 networks:
-  homelab_mcvlan:
+  homelab_macvlan:
     external: true

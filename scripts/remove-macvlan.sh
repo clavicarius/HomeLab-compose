@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# remove mcvlan network from docker host
+# remove macvlan network from docker host
 
 set -euo pipefail
 
@@ -25,7 +25,7 @@ fi
 #
 # Configuration
 #
-NETWORK_NAME="${NETWORK_NAME:-homelab_mcvlan}"
+NETWORK_NAME="${NETWORK_NAME:-homelab_macvlan}"
 
 #
 # Check whether the network exists

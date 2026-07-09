@@ -6,7 +6,7 @@ Docker-Compose-Projekt für den Betrieb von **AdGuard Home** im Homelab.
 
 * Docker Engine
 * Docker Compose
-* externes macvlan-Netzwerk `homelab_mcvlan` (siehe [docs/network-architecture.md](../docs/network-architecture.md))
+* externes macvlan-Netzwerk `homelab_macvlan` (siehe [docs/network-architecture.md](../docs/network-architecture.md))
 * `.env`-Datei im Projektverzeichnis (via `create-env.sh`)
 
 ## Projektstruktur
@@ -50,7 +50,7 @@ NETWORK_ADAPTER=eth0
 Das Netzwerk wird einmalig im Repository-Root angelegt:
 
 ```bash
-./scripts/create-mcvlan.sh
+./scripts/create-macvlan.sh
 ```
 
 ### Homelab
@@ -116,7 +116,7 @@ http://<Docker-Host>:${ADGUARD_PORT}
 
 ## Container starten
 
-Voraussetzung: `homelab_mcvlan` existiert (`./scripts/create-mcvlan.sh`).
+Voraussetzung: `homelab_macvlan` existiert (`./scripts/create-macvlan.sh`).
 
 ```bash
 docker compose pull

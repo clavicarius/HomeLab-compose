@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lists ip addresses of docker containers inside mcvlan network (homelab_mcvlan)
+# lists ip addresses of docker containers inside macvlan network (homelab_macvlan)
 
 set -euo pipefail
 
@@ -26,7 +26,7 @@ fi
 #
 # Configuration
 #
-NETWORK_NAME="${NETWORK_NAME:-homelab_mcvlan}"
+NETWORK_NAME="${NETWORK_NAME:-homelab_macvlan}"
 
 printf "%-30s %-18s %-15s\n" "CONTAINER" "NETWORK" "IP ADDRESS"
 printf "%-30s %-18s %-15s\n" \

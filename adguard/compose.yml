@@ -8,7 +8,7 @@ services:
     image: adguard/adguardhome:latest
     restart: unless-stopped
     networks:
-      homelab_mcvlan:
+      homelab_macvlan:
         ipv4_address: ${ADGUARD_IP}  # fixe IP
     volumes:
       - ./conf:/opt/adguardhome/conf
@@ -44,5 +44,5 @@ services:
       start_period: 60s
 
 networks:
-  homelab_mcvlan:
+  homelab_macvlan:
     external: true

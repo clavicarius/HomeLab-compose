@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# creates mcvlan network (homelab_mcvlan) inside docker host
+# creates macvlan network (homelab_macvlan) inside docker host
 
 set -euo pipefail
 
@@ -25,7 +25,7 @@ fi
 #
 # Configuration
 #
-NETWORK_NAME="${NETWORK_NAME:-homelab_mcvlan}"
+NETWORK_NAME="${NETWORK_NAME:-homelab_macvlan}"
 SUBNET="${SUBNET:-192.168.178.224/27}"
 GATEWAY="${GATEWAY:-192.168.178.1}"
 NETWORK_ADAPTER="${NETWORK_ADAPTER:-eth0}"

@@ -40,7 +40,7 @@ FRITZ!Box: 192.168.178.1
 | `192.168.178.1` | Gateway (FRITZ!Box) |
 | `192.168.178.2 – 99` | Physische Infrastruktur (NAS, Drucker, …) |
 | `192.168.178.100 – 199` | DHCP dynamisch |
-| `192.168.178.225 – 254` | Docker-Container via mcvlan |
+| `192.168.178.225 – 254` | Docker-Container via macvlan |
 
 Der macvlan-Bereich `192.168.178.224/27` liegt **im gleichen LAN** — es werden keine zusätzlichen Routen oder VLANs benötigt.
 
@@ -87,7 +87,7 @@ Reservierter Bereich für weitere physische Geräte:
 
 ## Docker-Container (macvlan)
 
-Container mit fester LAN-IP werden über `homelab_mcvlan` angebunden. Die Adressen werden in `.env.common` definiert.
+Container mit fester LAN-IP werden über `homelab_macvlan` angebunden. Die Adressen werden in `.env.common` definiert.
 
 | Dienst | IP-Adresse | Status |
 |--------|------------|--------|
@@ -127,7 +127,7 @@ Die NAS hostet:
 
 ## Grundprinzip
 
-Alle LAN-sichtbaren Container teilen sich ein externes **macvlan**-Netzwerk (`homelab_mcvlan`). Container erhalten feste IPs aus dem Bereich `192.168.178.225 – 254` und sind für alle Geräte im Heimnetz direkt erreichbar.
+Alle LAN-sichtbaren Container teilen sich ein externes **macvlan**-Netzwerk (`homelab_macvlan`). Container erhalten feste IPs aus dem Bereich `192.168.178.225 – 254` und sind für alle Geräte im Heimnetz direkt erreichbar.
 
 Webservices werden über **Traefik** veröffentlicht. Traefik erkennt Container automatisch über Docker-Labels.
 
@@ -154,14 +154,14 @@ Alle Compose-Projekte nutzen ein einziges externes macvlan-Netzwerk.
 Konfiguration in `.env.common` (Vorlage: `.env.common.example`), dann einmalig:
 
 ```bash
-./scripts/create-mcvlan.sh
+./scripts/create-macvlan.sh
 ```
 
 ## Netzwerkparameter
 
 | Eigenschaft | Wert |
 |-------------|------|
-| Name | `homelab_mcvlan` |
+| Name | `homelab_macvlan` |
 | Treiber | `macvlan` |
 | Subnetz | `192.168.178.224/27` |
 | Gateway | `192.168.178.1` |
@@ -183,7 +183,7 @@ Jeder Service bindet das externe Netzwerk ein. Dienste mit fester IP erhalten `i
 
 ```yaml
 networks:
-  homelab_mcvlan:
+  homelab_macvlan:
     external: true
 ```
 
@@ -194,11 +194,11 @@ services:
   adguardhome:
     image: adguard/adguardhome:latest
     networks:
-      homelab_mcvlan:
+      homelab_macvlan:
         ipv4_address: ${ADGUARD_IP}
 
 networks:
-  homelab_mcvlan:
+  homelab_macvlan:
     external: true
 ```
 
@@ -209,10 +209,10 @@ services:
   paperless:
     image: ghcr.io/paperless-ngx/paperless-ngx
     networks:
-      - homelab_mcvlan
+      - homelab_macvlan
 
 networks:
-  homelab_mcvlan:
+  homelab_macvlan:
     external: true
 ```
 
@@ -428,7 +428,7 @@ http://192.168.178.252:8252
 Neue Container werden wie folgt integriert:
 
 1. Compose-Datei erstellen
-2. Service an `homelab_mcvlan` anbinden (optional mit fester IP)
+2. Service an `homelab_macvlan` anbinden (optional mit fester IP)
 3. Traefik-Labels setzen
 4. DNS-Rewrite in AdGuard anlegen (→ Traefik-IP)
 5. `TRAEFIK_ENABLED=true` setzen (wenn über Traefik erreichbar)
@@ -507,7 +507,7 @@ Dieses Kapitel beschreibt die empfohlene Reihenfolge der Grundinstallation.
 3. DSM-Ports auf 5000/5001 umstellen
 4. Docker aktivieren
 5. `.env.common` anlegen (aus `.env.common.example`)
-6. macvlan-Netzwerk erstellen (`./scripts/create-mcvlan.sh`)
+6. macvlan-Netzwerk erstellen (`./scripts/create-macvlan.sh`)
 7. AdGuard deployen
 8. AdGuard einrichten (DNS Port 53)
 9. FRITZ!Box DNS auf AdGuard-IP umstellen
@@ -615,7 +615,7 @@ Auf der Synology das korrekte Parent-Interface setzen (z. B. `ovs_eth0`).
 ## Netzwerk anlegen
 
 ```bash
-./scripts/create-mcvlan.sh
+./scripts/create-macvlan.sh
 ```
 
 Prüfen:
@@ -627,7 +627,7 @@ docker network ls
 Erwartetes Ergebnis:
 
 ```text
-homelab_mcvlan
+homelab_macvlan
 ```
 
 ---
@@ -637,8 +637,8 @@ homelab_mcvlan
 ```text
 .
 ├── scripts/
-│   ├── create-mcvlan.sh
-│   └── remove-mcvlan.sh
+│   ├── create-macvlan.sh
+│   └── remove-macvlan.sh
 ├── adguard/
 │   ├── compose.yml
 │   └── README.md
@@ -763,7 +763,7 @@ services:
     volumes:
       - ./data:/data
     networks:
-      homelab_mcvlan:
+      homelab_macvlan:
         ipv4_address: ${SERVICE_IP}
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
@@ -773,7 +773,7 @@ services:
       - "traefik.http.services.service-name.loadbalancer.server.port=8080"
 
 networks:
-  homelab_mcvlan:
+  homelab_macvlan:
     external: true
 ```
 
@@ -860,7 +860,7 @@ Erwartet:
 Prüfen:
 
 - Container läuft?
-- im `homelab_mcvlan`-Netzwerk?
+- im `homelab_macvlan`-Netzwerk?
 - `TRAEFIK_ENABLED=true`?
 - richtiger Zielport in Labels?
 - Containername korrekt?
@@ -868,7 +868,7 @@ Prüfen:
 ## Docker-Netzwerk prüfen
 
 ```bash
-docker network inspect homelab_mcvlan
+docker network inspect homelab_macvlan
 ```
 
 IP-Adressen aller Container anzeigen:
@@ -910,7 +910,7 @@ Neue Dienste werden standardisiert integriert.
 ## Ablauf
 
 1. Compose-Datei erstellen
-2. `homelab_mcvlan` einbinden
+2. `homelab_macvlan` einbinden
 3. Traefik-Labels setzen
 4. Service starten
 5. DNS-Rewrite anlegen (→ `192.168.178.225`)

@@ -2,6 +2,8 @@
 
 A collection of Docker Compose configurations for self-hosted services and homelab environments.
 
+![logo](./docs/Homelab-compose-social-log.png)
+
 ## Overview
 
 This repository contains Docker Compose stacks for deploying and maintaining various self-hosted applications. Each service is organized in its own directory and can be deployed independently.

@@ -2,7 +2,7 @@
 
 A collection of Docker Compose configurations for self-hosted services and homelab environments.
 
-![logo](./docs/Homelab-compose-social-log.png)
+![logo](./docs/HomeLab-compose-social-logo.png)
 
 ## Overview
 

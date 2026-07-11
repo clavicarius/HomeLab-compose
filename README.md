@@ -2,6 +2,8 @@
 
 A collection of Docker Compose configurations for self-hosted services and homelab environments.
 
+![logo](./docs/HomeLab-compose-social-logo.png)
+
 ## Overview
 
 This repository contains Docker Compose stacks for deploying and maintaining various self-hosted applications. Each service is organized in its own directory and can be deployed independently.
@@ -110,6 +112,8 @@ Configure the network settings in your `.env` file and run:
 ```bash
 ./scripts/create-macvlan.sh
 ```
+
+For agent commits, copy `.git-author.example` to `.git-author` and set your name and email (see [docs/git-author.md](docs/git-author.md)).
 
 This only needs to be done once.
 

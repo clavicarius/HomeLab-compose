@@ -1,0 +1,32 @@
+---
+description: Git identity, commit messages, and no trailers for agent commits
+alwaysApply: true
+---
+
+# Git commit identity
+
+Before `git commit`, `git rebase`, or other operations that record author/committer:
+
+1. Read `.git-author` in the repository root (gitignored, per-developer).
+2. If missing: tell the user to run `cp .git-author.example .git-author` and fill in their values. Do not commit with a guessed identity.
+3. Set environment variables from that file — never run `git config` to persist identity:
+   - `GIT_AUTHOR_NAME`, `GIT_AUTHOR_EMAIL`
+   - `GIT_COMMITTER_NAME`, `GIT_COMMITTER_EMAIL` (fallback to author if empty)
+4. On Windows/PowerShell, set `$env:GIT_AUTHOR_NAME` etc. before git commands.
+5. On bash: `source ./scripts/git-author-env.sh` before git commands.
+
+To fix author on existing commits:
+
+```bash
+source ./scripts/git-author-env.sh
+git rebase HEAD~N --exec "git commit --amend --no-edit --reset-author"
+```
+
+Each developer maintains their own `.git-author`. Only `.git-author.example` is tracked.
+
+# Commit messages
+
+- Subject + optional body only. Plain text, no metadata footers.
+- **Never add git trailers** — not in the message body, not via `git commit --trailer`.
+- Forbidden examples: `Co-authored-by:`, `Signed-off-by:`, `Made-with:`, `Generated-by:`, `Reviewed-by:`, or any `Key: value` trailer line.
+- No AI/tool attribution in commits.

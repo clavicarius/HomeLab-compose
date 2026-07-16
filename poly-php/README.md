@@ -21,7 +21,9 @@ Alle PHP‑Container greifen auf denselben Projektcode zu, sodass Änderungen so
 
 Der Multi‑PHP Stack kann optional über einen Reverse‑Proxy mit HTTPS betrieben werden.
 
-Hierfür wird zusätzlich ein Traefik‑Container verwendet, der die Requests anhand des Hostnamens an die passenden PHP‑Container weiterleitet. Die grundlegende Traefik‑Konfiguration basiert auf `docs/traefik.md`.
+Hierfür wird zusätzlich ein **Traefik**-Container verwendet, der im Homelab als zentraler Reverse Proxy für alle Compose-Projekte dient. Die Konfiguration basiert auf `docs/traefik.md` und [docs/network-architecture.md](../docs/network-architecture.md).
+
+Voraussetzung: externes macvlan-Netzwerk `homelab_macvlan` (siehe `./scripts/create-macvlan.sh` im Repository-Root).
 
 ---
 
@@ -45,7 +47,7 @@ docker compose version
 
 ```
 poly-php/
- ├─ docker-compose.yml
+ ├─ compose.yml
  ├─ html/                 # Webroot (Projektcode)
  ├─ mysql_data/           # persistente Datenbankdaten
  ├─ logs/
@@ -91,14 +93,28 @@ docker compose logs -f
 
 # Zugriff auf die Services
 
-Nach dem Start sind folgende URLs verfügbar:
+## Direktzugriff (Entwicklung)
 
-| PHP-Version | HTTP | HTTPS |
-|---|---|---|
-| PHP 5.6 | http://localhost:8056 | https://php56.hostname.local |
-| PHP 7.4 | http://localhost:8074 | https://php74.hostname.local |
-| PHP 8.5 | http://localhost:8085 | https://php85.hostname.local |
-| phpMyAdmin | http://localhost:8080 | https://phpmyadmin.hostname.local |
+Nach dem Start sind folgende URLs über publizierte Host-Ports verfügbar:
+
+| PHP-Version | HTTP |
+|---|---|
+| PHP 5.6 | http://localhost:8056 |
+| PHP 7.4 | http://localhost:8074 |
+| PHP 8.5 | http://localhost:8085 |
+| phpMyAdmin | http://localhost:8080 |
+
+## Homelab-Zugriff (Traefik + AdGuard DNS)
+
+Mit `TRAEFIK_ENABLED=true` und DNS-Rewrites in AdGuard (→ `192.168.178.225`):
+
+| PHP-Version | HTTPS |
+|---|---|
+| PHP 5.6 | https://php56.homelab.internal |
+| PHP 7.4 | https://php74.homelab.internal |
+| PHP 8.5 | https://php85.homelab.internal |
+| phpMyAdmin | https://phpmyadmin.homelab.internal |
+| Traefik Dashboard | http://192.168.178.99:8088 |
 
 ---
 
@@ -252,23 +268,16 @@ Für produktive Systeme wird empfohlen:
 
 # Projekt starten (Kurzfassung)
 
-```
+```bash
+# .env anlegen (einmalig)
+../scripts/create-env.sh
+
+# macvlan-Netzwerk muss existieren (Repository-Root)
+# ./scripts/create-macvlan.sh
+
 docker compose up -d --build
 ```
 
-Ggf. noch DNS/host-Einträge aktualisieren
-```
-192.168.178.240 php56.hostname.local
-192.168.178.240 php74.hostname.local
-192.168.178.240 php85.hostname.local
-```
+**Homelab:** DNS-Rewrites in AdGuard für `*.homelab.internal` → `192.168.178.225`, dann `TRAEFIK_ENABLED=true` setzen.
 
-Browser öffnen:
-
-| PHP-Version | HTTP | HTTPS |
-|---|---|---|
-| PHP 5.6 | http://localhost:8056 | https://php56.hostname.local |
-| PHP 7.4 | http://localhost:8074 | https://php74.hostname.local |
-| PHP 8.5 | http://localhost:8085 | https://php85.hostname.local |
-| phpMyAdmin | http://localhost:8080 | https://phpmyadmin.hostname.local |
-
+**Lokale Entwicklung ohne DNS:** Host-Ports (siehe Tabelle oben) oder Einträge in der Hosts-Datei — siehe `docs/traefik.md`.

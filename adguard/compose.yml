@@ -8,21 +8,11 @@ services:
     image: adguard/adguardhome:latest
     restart: unless-stopped
     networks:
-      homelab_mcvlan:
+      homelab_macvlan:
         ipv4_address: ${ADGUARD_IP}  # fixe IP
     volumes:
       - ./conf:/opt/adguardhome/conf
       - ./work:/opt/adguardhome/work
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp" # dns
-      - "67:67/udp"
-      - "80:80/tcp"
-      - "443:443/tcp"
-      - "3000:3000/tcp"
-      - "853:853/tcp"
-      - "784:784/udp"
-      - "${ADGUARD_PORT}:9080" # web-ui
 
     environment:
       - PUID=${PUID}
@@ -33,8 +23,9 @@ services:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.adguard.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.routers.adguard.entrypoints=websecure"
-      - "traefik.http.routers.adguard.rule=Host(`${ADGUARD_HOST}.${HOMELAB_DOMAIN}`)"      
-      - "traefik.http.routers.adguard.loadbalancer.server.port=3000"
+      - "traefik.http.routers.adguard.rule=Host(`${ADGUARD_HOST}.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.services.adguard.loadbalancer.server.port=3000"
+      - "traefik.docker.network=homelab_macvlan"
       
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/control/status >/dev/null || exit 1"] 
@@ -44,5 +35,5 @@ services:
       start_period: 60s
 
 networks:
-  homelab_mcvlan:
+  homelab_macvlan:
     external: true

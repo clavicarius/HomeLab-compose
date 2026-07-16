@@ -1,0 +1,13 @@
+# Local git identity for commits (especially agent-created commits).
+# Copy to .git-author in the repository root and customize.
+#
+# Example:
+# GIT_AUTHOR_NAME=your-famous-github-account-name
+# GIT_AUTHOR_EMAIL=email@adress.invalid
+# GIT_COMMITTER_NAME=your-famous-github-account-name
+# GIT_COMMITTER_EMAIL=email@adress.invalid
+
+GIT_AUTHOR_NAME=
+GIT_AUTHOR_EMAIL=
+GIT_COMMITTER_NAME=
+GIT_COMMITTER_EMAIL=

@@ -2,6 +2,8 @@
 
 A collection of Docker Compose configurations for self-hosted services and homelab environments.
 
+![logo](./docs/HomeLab-compose-social-logo.png)
+
 ## Overview
 
 This repository contains Docker Compose stacks for deploying and maintaining various self-hosted applications. Each service is organized in its own directory and can be deployed independently.
@@ -91,6 +93,7 @@ Using static IP addresses ensures that services remain permanently reachable and
 |---------|-------------|---------------|
 | `poly-php` | Portable Docker-based development environment for testing multiple PHP versions simultaneously. | [poly-php/README.md](poly-php/README.md) |
 | `adguard` | Docker Compose project for running AdGuard Home in a homelab environment. | [adguard/README.md](adguard/README.md) |
+| `gitea` | Docker Compose project for running Gitea (self-hosted Git service) in a homelab environment. | [gitea/README.md](gitea/README.md) |
 
 ---
 
@@ -110,6 +113,8 @@ Configure the network settings in your `.env` file and run:
 ```bash
 ./scripts/create-macvlan.sh
 ```
+
+For agent commits, copy `.git-author.example` to `.git-author` and set your name and email (see [docs/git-author.md](docs/git-author.md)).
 
 This only needs to be done once.
 

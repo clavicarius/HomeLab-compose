@@ -8,7 +8,7 @@ services:
     image: docker.gitea.com/gitea:1.22.6
     restart: unless-stopped
     networks:
-      homelab_mcvlan:
+      homelab_macvlan:
         ipv4_address: ${GITEA_IP}  # fixe IP
     volumes:
       - ./data:/data
@@ -45,5 +45,5 @@ services:
       start_period: 60s
 
 networks:
-  homelab_mcvlan:
+  homelab_macvlan:
     external: true

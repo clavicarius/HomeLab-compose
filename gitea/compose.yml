@@ -1,0 +1,49 @@
+# ${GITEA_HOST}.${HOMELAB_DOMAIN}
+# docker compose file for gitea
+
+services:
+  gitea:
+    container_name: gitea
+    # https://hub.docker.com/r/gitea/gitea/tags
+    image: docker.gitea.com/gitea:1.22.6
+    restart: unless-stopped
+    networks:
+      homelab_mcvlan:
+        ipv4_address: ${GITEA_IP}  # fixe IP
+    volumes:
+      - ./data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "${GITEA_PORT}:3000"  # web-ui
+      - "${GITEA_SSH_PORT}:22"  # ssh
+
+    environment:
+      - USER_UID=${PUID}
+      - USER_GID=${PGID}
+      - TZ=${TZ}
+      - GITEA__database__DB_TYPE=sqlite3
+      - GITEA__database__PATH=/data/gitea/gitea.db
+      - GITEA__server__DOMAIN=${GITEA_HOST}.${HOMELAB_DOMAIN}
+      - GITEA__server__SSH_DOMAIN=${GITEA_HOST}.${HOMELAB_DOMAIN}
+      - GITEA__server__ROOT_URL=https://${GITEA_HOST}.${HOMELAB_DOMAIN}
+      - GITEA__server__HTTP_PORT=3000
+      - GITEA__server__SSH_PORT=${GITEA_SSH_PORT}
+
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED}"
+      - "traefik.http.routers.gitea.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.routers.gitea.entrypoints=websecure"
+      - "traefik.http.routers.gitea.rule=Host(`${GITEA_HOST}.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.gitea.loadbalancer.server.port=3000"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/ >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+networks:
+  homelab_mcvlan:
+    external: true

@@ -10,7 +10,7 @@ Die Gesamtarchitektur ist in [docs/network-architecture.md](../../docs/network-a
 
 # 1. Voraussetzungen
 
-* macvlan-Netzwerk `homelab_macvlan` (siehe `./scripts/create-macvlan.sh`)
+* macvlan-Netzwerk `homelab_macvlan` (siehe `../scripts/create-macvlan.sh`)
 * `.env` via `../scripts/create-env.sh`
 * AdGuard Home mit DNS-Rewrites für `*.homelab.internal → 192.168.178.225`
 

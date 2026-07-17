@@ -930,3 +930,31 @@ Die Architektur soll langfristig:
 bleiben.
 
 Komplexität wird bewusst minimiert. macvlan wird gezielt für LAN-sichtbare Container eingesetzt, nicht als generisches Netzwerk für alle denkbaren Szenarien.
+
+---
+
+# 37. Analyse zu Issue #23 (NAS als Docker-Host)
+
+## Bereits vorhanden (funktioniert)
+
+- Synology NAS ist als zentraler Docker-Host vorgesehen (`192.168.178.99`).
+- Gemeinsame Netzwerkstrategie über `homelab_macvlan` mit fixem IP-Bereich ist dokumentiert.
+- DNS-Struktur (`*.homelab.internal`) und AdGuard-Rewrites sind definiert.
+- Bootstrapping ist vorhanden (`.env.common.example`, `scripts/create-macvlan.sh`).
+- Bestehende Compose-Stacks (`adguard`, `poly-php`, `gitea`) sind auf das Modell abgestimmt.
+
+## Offene Fragen vor Umsetzung weiterer Services
+
+1. Welches Synology-Parent-Interface ist produktiv korrekt (`eth0`, `ovs_eth0` oder `bond0`)?
+2. Welche Services sollen in der ersten Ausbaustufe verbindlich live gehen (z. B. Portainer, Paperless, WordPress)?
+3. Soll TLS intern mit selbstsignierten Zertifikaten, eigener CA oder ACME-DNS-Challenge erfolgen?
+4. Welche Backup- und Restore-Ziele gelten verbindlich (RPO/RTO) für produktive Containerdaten?
+5. Bleibt der Scope auf reines LAN ohne externe Freigaben, VPN oder Tunnel?
+
+## Geplanter Ablauf (ohne technische Implementierung in diesem Schritt)
+
+1. Offene Fragen final entscheiden und als verbindliche Parameter in `.env.common` und Service-READMEs festhalten.
+2. Rollout-Reihenfolge pro Service festlegen (kritische Basisdienste zuerst: DNS, Reverse Proxy, Management).
+3. Pro neuem Service feste IP, Hostname und Traefik-Routing nach dem bestehenden Standard vergeben.
+4. DNS-Rewrites in AdGuard ergänzen und mit `nslookup` gegen `192.168.178.252` verifizieren.
+5. Nach jeder Einführung Compose-Validierung und Laufzeitprüfung gemäß bestehendem Verify-Workflow durchführen.

@@ -336,19 +336,20 @@ HOMELAB_DOMAIN=homelab.internal
 HOMELAB_EMAIL=admin@homelab.internal
 ```
 
-## Geplante Services
+## Service-Phasen
 
-| Domain | Ziel |
-|--------|------|
-| adguard.homelab.internal | Traefik → AdGuard |
-| portainer.homelab.internal | Traefik → Portainer |
-| paperless.homelab.internal | Traefik → Paperless |
-| wordpress.homelab.internal | Traefik → WordPress |
-| php56.homelab.internal | Traefik → PHP 5.6 |
-| php74.homelab.internal | Traefik → PHP 7.4 |
-| php85.homelab.internal | Traefik → PHP 8.5 |
-| phpmyadmin.homelab.internal | Traefik → phpMyAdmin |
-| drucker.homelab.internal | Drucker (direkt) |
+| Domain | Ziel | Phase |
+|--------|------|-------|
+| adguard.homelab.internal | Traefik → AdGuard | Phase 1 (Basis) |
+| gitea.homelab.internal | Traefik → Gitea | Phase 1 (Basis) |
+| portainer.homelab.internal | Traefik → Portainer | Phase 1 (Management) |
+| php56.homelab.internal | Traefik → PHP 5.6 | Phase 1 (Basis) |
+| php74.homelab.internal | Traefik → PHP 7.4 | Phase 1 (Basis) |
+| php85.homelab.internal | Traefik → PHP 8.5 | Phase 1 (Basis) |
+| phpmyadmin.homelab.internal | Traefik → phpMyAdmin | Phase 1 (Basis) |
+| paperless.homelab.internal | Traefik → Paperless | Phase 2 |
+| wordpress.homelab.internal | Traefik → WordPress | Phase 2 |
+| drucker.homelab.internal | Drucker (direkt) | unabhängig |
 
 ---
 
@@ -586,6 +587,28 @@ Systemsteuerung → Terminal & SNMP → SSH aktivieren
 ssh user@192.168.178.99
 ```
 
+## Parent-Interface entscheiden (Blocker)
+
+Vor der Produktivnutzung muss das korrekte Synology-Parent-Interface live geprüft und in `.env.common` gesetzt werden.
+
+Beispielprüfung:
+
+```bash
+ip -o link show
+```
+
+Typische Kandidaten:
+
+- `eth0`
+- `ovs_eth0`
+- `bond0`
+
+Danach in `.env.common` final festlegen:
+
+```env
+NETWORK_ADAPTER=<finales-interface>
+```
+
 ---
 
 # 24. Docker-Netzwerk erstellen
@@ -799,11 +822,18 @@ Empfohlen:
 
 ## Backup-Frequenz
 
-| Daten | Frequenz |
-|-------|----------|
-| Konfiguration | täglich |
-| Dokumente | täglich |
-| Medien | wöchentlich |
+Serviceklassen mit Zielwerten:
+
+| Klasse | Beispiele | Ziel-RPO | Ziel-RTO |
+|--------|-----------|----------|----------|
+| Infrastruktur | AdGuard, Traefik, Gitea-Basiskonfiguration | 12h | 2h |
+| Produktive Daten | Gitea-Repositories, später Paperless/WordPress-Daten | 4h | 1h |
+| Niedrige Kritikalität | reproduzierbare Entwicklungs- oder Testdaten | 24h | 4h |
+
+Zusätzlich:
+
+- Restore-Test mindestens monatlich für jede Klasse
+- Backup-Ziele redundant halten (mindestens 2 Ziele)
 
 ---
 
@@ -892,6 +922,8 @@ docker logs container-name
 - regelmäßige Updates
 - `TRAEFIK_ENABLED=false` bis Service freigegeben
 - SSH nur intern erreichbar
+- Default-Scope: nur LAN, keine direkte externe Veröffentlichung
+- Externe Erreichbarkeit nur explizit via VPN oder separat freigegebenem Zugriffspfad
 
 ## Nicht empfohlen
 
@@ -933,28 +965,20 @@ Komplexität wird bewusst minimiert. macvlan wird gezielt für LAN-sichtbare Con
 
 ---
 
-# 37. Analyse zu Issue #23 (NAS als Docker-Host)
+# 37. Entscheidungsmatrix zu Issue #23 (umgesetzt)
 
-## Bereits vorhanden (funktioniert)
+| Entscheidungspunkt | Entscheidung | Ergebnis |
+|---|---|---|
+| Synology Parent-Interface für macvlan | Per Live-Test auf NAS ermitteln, danach fest in `.env.common` setzen | Blocker dokumentiert, Vorgehen festgelegt |
+| Scope Phase 1 Services | Basis (`adguard`, `traefik`/`poly-php`, `gitea`) + `portainer`; `paperless`/`wordpress` erst Phase 2 | Service-Phasen in der Domainstruktur ergänzt |
+| Interne TLS-Strategie | interne CA als Zielbild; bis zur Einführung kontrollierter Übergang mit bestehender TLS-Option | Entscheidungsrichtung dokumentiert |
+| Backup- und Restore-Ziele | Serviceklassen mit RPO/RTO-Zielen | Zielwerte in Backup-Kapitel definiert |
+| Exponierung nach außen | LAN-only als Default; extern nur explizit per VPN/gesonderter Freigabe | Sicherheitsprinzip erweitert |
 
-- Synology NAS ist als zentraler Docker-Host vorgesehen (`192.168.178.99`).
-- Gemeinsame Netzwerkstrategie über `homelab_macvlan` mit fixem IP-Bereich ist dokumentiert.
-- DNS-Struktur (`*.homelab.internal`) und AdGuard-Rewrites sind definiert.
-- Bootstrapping ist vorhanden (`.env.common.example`, `scripts/create-macvlan.sh`).
-- Bestehende Compose-Stacks (`adguard`, `poly-php`, `gitea`) sind auf das Modell abgestimmt.
+## Verbindliche Entscheidungsreihenfolge
 
-## Offene Fragen vor Umsetzung weiterer Services
-
-1. Welches Synology-Parent-Interface ist produktiv korrekt (`eth0`, `ovs_eth0` oder `bond0`)?
-2. Welche Services sollen in der ersten Ausbaustufe verbindlich live gehen (z. B. Portainer, Paperless, WordPress)?
-3. Soll TLS intern mit selbstsignierten Zertifikaten, eigener CA oder ACME-DNS-Challenge erfolgen?
-4. Welche Backup- und Restore-Ziele gelten verbindlich (RPO/RTO) für produktive Containerdaten?
-5. Bleibt der Scope auf reines LAN ohne externe Freigaben, VPN oder Tunnel?
-
-## Geplanter Ablauf (ohne technische Implementierung in diesem Schritt)
-
-1. Offene Fragen final entscheiden und als verbindliche Parameter in `.env.common` und Service-READMEs festhalten.
-2. Rollout-Reihenfolge pro Service festlegen (kritische Basisdienste zuerst: DNS, Reverse Proxy, Management).
-3. Pro neuem Service feste IP, Hostname und Traefik-Routing nach dem bestehenden Standard vergeben.
-4. DNS-Rewrites in AdGuard ergänzen und mit `nslookup` gegen `192.168.178.252` verifizieren.
-5. Nach jeder Einführung Compose-Validierung und Laufzeitprüfung gemäß bestehendem Verify-Workflow durchführen.
+1. Parent-Interface final festlegen
+2. Scope Phase 1 aktivieren
+3. Exponierung strikt auf LAN belassen
+4. Backup-/Restore-Ziele pro Serviceklasse prüfen
+5. TLS auf interne CA umsetzen

@@ -1,0 +1,91 @@
+name: Versioning
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: versioning-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' &&
+       github.ref == 'refs/heads/main' &&
+       github.actor != 'github-actions[bot]')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: git fetch --force --tags
+
+      - name: Compute next tags
+        id: compute
+        uses: ./.github/actions/compute-version
+
+      - name: Dry-run summary (pull request)
+        if: github.event_name == 'pull_request'
+        run: |
+          {
+            echo "## Versioning dry-run"
+            echo ""
+            echo "- would create: \`${{ steps.compute.outputs.next_tag }}\`"
+            echo "- would move major tag: \`${{ steps.compute.outputs.major_tag }}\`"
+            echo ""
+            echo "_Dry-run only: no tags are created or pushed on pull requests._"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Idempotency summary
+        if: github.event_name == 'push' && steps.compute.outputs.tag_exists_on_origin == 'true'
+        run: |
+          {
+            echo "## Versioning result"
+            echo ""
+            echo "- next tag already exists on origin: \`${{ steps.compute.outputs.next_tag }}\`"
+            echo "- no changes were made"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create and push tags
+        if: github.event_name == 'push' && steps.compute.outputs.tag_exists_on_origin != 'true'
+        env:
+          NEXT_TAG: ${{ steps.compute.outputs.next_tag }}
+          MAJOR_TAG: ${{ steps.compute.outputs.major_tag }}
+        run: |
+          set -euo pipefail
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${NEXT_TAG}" >/dev/null 2>&1; then
+            {
+              echo "## Versioning result"
+              echo ""
+              echo "- next tag already exists on origin: \`${NEXT_TAG}\`"
+              echo "- no changes were made"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          git tag "${NEXT_TAG}"
+          git push origin "refs/tags/${NEXT_TAG}"
+
+          git tag --force "${MAJOR_TAG}" "${NEXT_TAG}"
+          git push --force origin "refs/tags/${MAJOR_TAG}"
+
+          {
+            echo "## Versioning result"
+            echo ""
+            echo "- created tag: \`${NEXT_TAG}\`"
+            echo "- moved major tag: \`${MAJOR_TAG}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

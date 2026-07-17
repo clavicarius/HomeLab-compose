@@ -1,5 +1,25 @@
 #!/usr/bin/env bash
-# lists ip addresses of docker containers inside macvlan network (homelab_macvlan)
+# list-container-ips.sh
+# Lists the IP addresses of all running containers attached to the shared
+# macvlan Docker network (homelab_macvlan).
+#
+# Usage:
+#   ./scripts/list-container-ips.sh
+#   (run from the repository root or any service directory)
+#
+# Configuration (read from .env.common and .env, with defaults):
+#   NETWORK_NAME  — name of the macvlan network to inspect (default: homelab_macvlan)
+#
+# Output format:
+#   CONTAINER                      NETWORK            IP ADDRESS
+#   ----------------------------- ------------------ ---------------
+#   adguard-homelab                homelab_macvlan    192.168.178.252
+#   ...
+#
+# See also:
+#   create-macvlan.sh              — create the shared network
+#   docs/network-architecture.md   — full network documentation
+#   docs/scripts.md                — overview of all helper scripts
 
 set -euo pipefail
 

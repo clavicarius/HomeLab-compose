@@ -1,7 +1,26 @@
 # ${ADGUARD_HOST}.${HOMELAB_DOMAIN}
 # docker compose file for adguard
+#
+# AdGuard Home — network-wide ad and tracker blocker acting as the LAN DNS server.
+# The container receives a static macvlan LAN-IP (${ADGUARD_IP}) so that all
+# devices can use it as a DNS resolver.
+#
+# Documentation : adguard/README.md
+# Network setup : docs/network-architecture.md
+# Helper scripts : docs/scripts.md
 
 services:
+  # adguardhome — DNS server and ad-blocker for the entire homelab LAN.
+  #
+  # Exposes:
+  #   port 53/tcp+udp  — DNS queries from LAN devices
+  #   port 3000        — Admin web UI (initial setup wizard and dashboard)
+  #
+  # Volumes:
+  #   ./conf  — persistent AdGuard configuration (filters, DNS settings, users)
+  #   ./work  — runtime data (query logs, statistics, filter lists)
+  #
+  # Healthcheck: polls /control/status every 30 s via wget.
   adguardhome:
     container_name: adguard-homelab
     # https://hub.docker.com/r/adguard/adguardhome/tags

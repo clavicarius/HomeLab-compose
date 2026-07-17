@@ -1,7 +1,28 @@
 # ${GITEA_HOST}.${HOMELAB_DOMAIN}
 # docker compose file for gitea
+#
+# Gitea — lightweight self-hosted Git service with web UI, SSH, and issue tracking.
+# The container receives a static macvlan LAN-IP (${GITEA_IP}) and also publishes
+# its web and SSH ports on the host for direct access without a reverse proxy.
+#
+# Documentation : gitea/README.md
+# Network setup : docs/network-architecture.md
+# Helper scripts : docs/scripts.md
 
 services:
+  # gitea — self-hosted Git service (web UI + SSH).
+  #
+  # Exposes (via published host ports):
+  #   ${GITEA_PORT}:3000   — web interface
+  #   ${GITEA_SSH_PORT}:22 — SSH access for git clone/push/pull
+  #
+  # Volumes:
+  #   ./data          — repositories, Gitea configuration, and SQLite database
+  #   /etc/timezone   — timezone file from the host (Synology NAS path used)
+  #   /etc/localtime  — localtime from the host
+  #
+  # Database: SQLite3 (default); path /data/gitea/gitea.db inside the container.
+  # Healthcheck: polls the web root every 30 s via wget.
   gitea:
     container_name: gitea
     # https://hub.docker.com/r/gitea/gitea/tags

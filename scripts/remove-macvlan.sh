@@ -1,5 +1,23 @@
 #!/usr/bin/env bash
-# remove macvlan network from docker host
+# remove-macvlan.sh
+# Removes the shared external macvlan Docker network (homelab_macvlan) from the
+# Docker host.
+#
+# Usage:
+#   ./scripts/remove-macvlan.sh
+#   (run from the repository root)
+#
+# Configuration (read from .env.common and .env, with defaults):
+#   NETWORK_NAME  — name of the Docker network to remove (default: homelab_macvlan)
+#
+# The script exits without error if the network does not exist.
+# All containers using the network must be stopped before removal.
+#
+# See also:
+#   create-macvlan.sh              — create the network
+#   list-container-ips.sh          — list IPs of containers in the network
+#   docs/network-architecture.md   — full network documentation
+#   docs/scripts.md                — overview of all helper scripts
 
 set -euo pipefail
 

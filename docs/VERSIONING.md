@@ -13,10 +13,11 @@
 
 ## Increment strategy
 
-- The versioning logic scans existing tags that match `^v[0-9]+\\.[0-9]+\\.[0-9]+$`.
+- The versioning logic scans existing tags that match `^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$`.
 - If no semantic version tags exist, the first tag is `v0.1.0`.
 - Otherwise, the globally highest semantic version is selected and only `patch` is incremented.
 - `major` and `minor` are never auto-incremented.
+- Tags with leading zeros in any numeric component (for example `v1.02.3`) are ignored.
 
 ## Monotonicity rule
 
@@ -34,6 +35,7 @@
 - Tag pushes do not retrigger the workflow because it listens only to branch pushes on `main`.
 - The workflow also ignores push events initiated by `github-actions[bot]`.
 - Pull request runs are side-effect free (dry-run only).
+- Pull request runs use read-only repository contents permission; only the push job on `main` receives write permission for tag updates.
 
 ## Dry-run behavior (pull requests)
 

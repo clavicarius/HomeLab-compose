@@ -336,19 +336,20 @@ HOMELAB_DOMAIN=homelab.internal
 HOMELAB_EMAIL=admin@homelab.internal
 ```
 
-## Geplante Services
+## Service-Phasen
 
-| Domain | Ziel |
-|--------|------|
-| adguard.homelab.internal | Traefik → AdGuard |
-| portainer.homelab.internal | Traefik → Portainer |
-| paperless.homelab.internal | Traefik → Paperless |
-| wordpress.homelab.internal | Traefik → WordPress |
-| php56.homelab.internal | Traefik → PHP 5.6 |
-| php74.homelab.internal | Traefik → PHP 7.4 |
-| php85.homelab.internal | Traefik → PHP 8.5 |
-| phpmyadmin.homelab.internal | Traefik → phpMyAdmin |
-| drucker.homelab.internal | Drucker (direkt) |
+| Domain | Ziel | Phase |
+|--------|------|-------|
+| adguard.homelab.internal | Traefik → AdGuard | Phase 1 (Basis) |
+| gitea.homelab.internal | Traefik → Gitea | Phase 1 (Basis) |
+| portainer.homelab.internal | Traefik → Portainer | Phase 1 (Management) |
+| php56.homelab.internal | Traefik → PHP 5.6 | Phase 1 (Basis) |
+| php74.homelab.internal | Traefik → PHP 7.4 | Phase 1 (Basis) |
+| php85.homelab.internal | Traefik → PHP 8.5 | Phase 1 (Basis) |
+| phpmyadmin.homelab.internal | Traefik → phpMyAdmin | Phase 1 (Basis) |
+| paperless.homelab.internal | Traefik → Paperless | Phase 2 |
+| wordpress.homelab.internal | Traefik → WordPress | Phase 2 |
+| drucker.homelab.internal | Drucker (direkt) | unabhängig |
 
 ---
 
@@ -586,6 +587,28 @@ Systemsteuerung → Terminal & SNMP → SSH aktivieren
 ssh user@192.168.178.99
 ```
 
+## Parent-Interface entscheiden (Blocker)
+
+Vor der Produktivnutzung muss das korrekte Synology-Parent-Interface live geprüft und in `.env.common` gesetzt werden.
+
+Beispielprüfung:
+
+```bash
+ip -o link show
+```
+
+Typische Kandidaten:
+
+- `eth0`
+- `ovs_eth0`
+- `bond0`
+
+Danach in `.env.common` final festlegen:
+
+```env
+NETWORK_ADAPTER=<finales-interface>
+```
+
 ---
 
 # 24. Docker-Netzwerk erstellen
@@ -799,11 +822,18 @@ Empfohlen:
 
 ## Backup-Frequenz
 
-| Daten | Frequenz |
-|-------|----------|
-| Konfiguration | täglich |
-| Dokumente | täglich |
-| Medien | wöchentlich |
+Serviceklassen mit Zielwerten:
+
+| Klasse | Beispiele | Ziel-RPO | Ziel-RTO |
+|--------|-----------|----------|----------|
+| Infrastruktur | AdGuard, Traefik, Gitea-Basiskonfiguration | 12h | 2h |
+| Produktive Daten | Gitea-Repositories, später Paperless/WordPress-Daten | 4h | 1h |
+| Niedrige Kritikalität | reproduzierbare Entwicklungs- oder Testdaten | 24h | 4h |
+
+Zusätzlich:
+
+- Restore-Test mindestens monatlich für jede Klasse
+- Backup-Ziele redundant halten (mindestens 2 Ziele)
 
 ---
 
@@ -892,6 +922,8 @@ docker logs container-name
 - regelmäßige Updates
 - `TRAEFIK_ENABLED=false` bis Service freigegeben
 - SSH nur intern erreichbar
+- Default-Scope: nur LAN, keine direkte externe Veröffentlichung
+- Externe Erreichbarkeit nur explizit via VPN oder separat freigegebenem Zugriffspfad
 
 ## Nicht empfohlen
 
@@ -930,3 +962,23 @@ Die Architektur soll langfristig:
 bleiben.
 
 Komplexität wird bewusst minimiert. macvlan wird gezielt für LAN-sichtbare Container eingesetzt, nicht als generisches Netzwerk für alle denkbaren Szenarien.
+
+---
+
+# 37. Entscheidungsmatrix zu Issue #23 (umgesetzt)
+
+| Entscheidungspunkt | Entscheidung | Ergebnis |
+|---|---|---|
+| Synology Parent-Interface für macvlan | Per Live-Test auf NAS ermitteln, danach fest in `.env.common` setzen | Blocker dokumentiert, Vorgehen festgelegt |
+| Scope Phase 1 Services | Basis (`adguard`, `traefik`/`poly-php`, `gitea`) + `portainer`; `paperless`/`wordpress` erst Phase 2 | Service-Phasen in der Domainstruktur ergänzt |
+| Interne TLS-Strategie | interne CA als Zielbild; bis zur Einführung kontrollierter Übergang mit bestehender TLS-Option | Entscheidungsrichtung dokumentiert |
+| Backup- und Restore-Ziele | Serviceklassen mit RPO/RTO-Zielen | Zielwerte in Backup-Kapitel definiert |
+| Exponierung nach außen | LAN-only als Default; extern nur explizit per VPN/gesonderter Freigabe | Sicherheitsprinzip erweitert |
+
+## Verbindliche Entscheidungsreihenfolge
+
+1. Parent-Interface final festlegen
+2. Scope Phase 1 aktivieren
+3. Exponierung strikt auf LAN belassen
+4. Backup-/Restore-Ziele pro Serviceklasse prüfen
+5. TLS auf interne CA umsetzen

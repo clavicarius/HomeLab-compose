@@ -44,6 +44,8 @@ Each service directory should contain:
 
 The `scripts/` directory contains helper scripts for managing the shared infrastructure.
 
+For a full description of every script (usage, options, dependencies), see **[docs/scripts.md](docs/scripts.md)**.
+
 ---
 
 ## Networking

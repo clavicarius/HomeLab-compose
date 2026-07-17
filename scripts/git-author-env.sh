@@ -1,6 +1,29 @@
 #!/usr/bin/env bash
-# Loads GIT_AUTHOR_* and GIT_COMMITTER_* from .git-author into the current shell.
-# Usage: source ./scripts/git-author-env.sh
+# git-author-env.sh
+# Loads GIT_AUTHOR_* and GIT_COMMITTER_* environment variables from the
+# .git-author file in the repository root into the current shell session.
+#
+# Usage (must be sourced, not executed):
+#   source ./scripts/git-author-env.sh
+#
+# Input file:
+#   .git-author  — personal identity file in the repository root (gitignored)
+#                  Copy from .git-author.example and fill in your values.
+#
+# Exported variables:
+#   GIT_AUTHOR_NAME, GIT_AUTHOR_EMAIL
+#   GIT_COMMITTER_NAME (falls back to GIT_AUTHOR_NAME if not set)
+#   GIT_COMMITTER_EMAIL (falls back to GIT_AUTHOR_EMAIL if not set)
+#
+# Exit codes:
+#   0 — variables successfully exported
+#   1 — .git-author not found, or required variables are missing
+#
+# See also:
+#   .git-author.example            — template for the identity file
+#   docs/git-author.md             — full setup and usage documentation
+#   .cursor/rules/git-commit-author.mdc — Cursor agent rule for git identity
+#   docs/scripts.md                — overview of all helper scripts
 
 set -euo pipefail
 

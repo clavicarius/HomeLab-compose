@@ -1,5 +1,25 @@
 #!/usr/bin/env bash
-# creates macvlan network (homelab_macvlan) inside docker host
+# create-macvlan.sh
+# Creates the shared external macvlan Docker network (homelab_macvlan) on the
+# Docker host. This network is used by all Compose stacks in the repository.
+#
+# Usage:
+#   ./scripts/create-macvlan.sh
+#   (run from the repository root)
+#
+# Configuration (read from .env.common and .env, with defaults):
+#   NETWORK_NAME     — name of the Docker network  (default: homelab_macvlan)
+#   SUBNET           — macvlan subnet CIDR          (default: 192.168.178.224/27)
+#   GATEWAY          — default gateway              (default: 192.168.178.1)
+#   NETWORK_ADAPTER  — host network interface       (default: eth0)
+#
+# The script exits without error if the network already exists.
+#
+# See also:
+#   remove-macvlan.sh              — remove the network
+#   list-container-ips.sh          — list IPs of containers in the network
+#   docs/network-architecture.md   — full network documentation
+#   docs/scripts.md                — overview of all helper scripts
 
 set -euo pipefail
 

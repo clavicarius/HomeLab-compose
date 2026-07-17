@@ -1,0 +1,76 @@
+---
+description: Documentation requirements for helper scripts and container units
+alwaysApply: true
+---
+
+# Documentation requirements
+
+## Helper scripts (`scripts/`)
+
+Every script in the `scripts/` directory **must** begin with a documentation header
+(immediately after the shebang line) that includes:
+
+1. **Filename** — `# <script-name>.sh`
+2. **One-line description** — what the script does
+3. **Usage** — how to invoke it (working directory, flags)
+4. **Dependencies** — files, environment variables, or services that must exist
+5. **See also** — links to related scripts and documentation files
+
+Use this template:
+
+```bash
+#!/usr/bin/env bash
+# <script-name>.sh
+# <one-line description>
+#
+# Usage:
+#   <invocation example>
+#
+# Dependencies:
+#   - <dependency 1>
+#   - <dependency 2>
+#
+# See also:
+#   <related-script>.sh  — <description>
+#   docs/scripts.md      — overview of all helper scripts
+```
+
+When adding a new script, also add an entry to `docs/scripts.md`.
+
+## Container units (`compose.yml`)
+
+Every `compose.yml` file **must** have:
+
+1. A **file-level header** (top of file) describing:
+   - The service(s) it deploys
+   - Links to `README.md`, relevant docs, and `docs/scripts.md`
+
+2. A **service-level comment block** above each service key that describes:
+   - Purpose of the container
+   - Exposed ports and their function
+   - Mounted volumes and their content
+   - Dependencies (`depends_on`)
+   - Healthcheck strategy
+
+Use this template:
+
+```yaml
+# <service-name> — <one-line description>
+#
+# Exposes:
+#   <host-port>:<container-port>  — <description>
+#
+# Volumes:
+#   <host-path>  — <description>
+#
+# Depends on: <service> (condition)
+# Healthcheck: <description>
+<service-name>:
+```
+
+## Cross-linking
+
+- Every new script must link to `docs/scripts.md` in its `See also` section.
+- Every new `compose.yml` must link to its service `README.md` and `docs/scripts.md`
+  in its file-level header.
+- `docs/scripts.md` must be kept up to date whenever a script is added or changed.

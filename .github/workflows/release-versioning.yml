@@ -38,7 +38,7 @@ jobs:
 
       - name: Compute next version
         id: compute
-        uses: ci-platform/actions/release-semver-versioning@v1
+        uses: clavicarius/ci-platform/actions/release-semver-versioning@v1
 
       - name: Dry-run summary (PR)
         if: github.event_name == 'pull_request'

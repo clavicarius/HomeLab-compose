@@ -1,0 +1,94 @@
+name: Versioning
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: versioning-${{ github.event_name }}-${{ github.ref }}
+  # push-to-main: never cancel (every push must get a tag)
+  # pull_request: cancel stale runs (dry-run only, no side effects)
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    # recursion/bot guard:
+    # - run on PRs always (dry-run only)
+    # - run on push to main only if actor is not github-actions[bot]
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' &&
+       github.ref == 'refs/heads/main' &&
+       github.actor != 'github-actions[bot]')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (full history + tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure tags are up to date
+        run: git fetch --force --tags
+
+      - name: Compute next version
+        id: compute
+        uses: clavicarius/ci-platform/actions/release-semver-versioning@v1
+
+      - name: Dry-run summary (PR)
+        if: github.event_name == 'pull_request'
+        run: |
+          {
+            echo "## Versioning dry-run"
+            echo ""
+            echo "- event: pull_request"
+            echo "- would create next tag: \`${{ steps.compute.outputs.next_tag }}\`"
+            echo ""
+            echo "_No tags were pushed in PR mode._"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create tag (push to main)
+        if: github.event_name == 'push'
+        env:
+          NEXT_TAG: ${{ steps.compute.outputs.next_tag }}
+        run: |
+          set -euo pipefail
+
+          # Idempotency check: if NEXT_TAG already exists remotely, exit cleanly.
+          if git ls-remote --exit-code --tags origin "refs/tags/${NEXT_TAG}" >/dev/null 2>&1; then
+            echo "Tag ${NEXT_TAG} already exists on origin."
+
+            {
+              echo "## Versioning result"
+              echo ""
+              echo "- next tag already exists: \`${NEXT_TAG}\`"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo "Creating version tag: ${NEXT_TAG}"
+          git tag "${NEXT_TAG}"
+
+          echo "Pushing tag"
+          git push origin "${NEXT_TAG}"
+
+          # Derive the major alias tag (e.g. v1.2.3 -> v1) and move it to HEAD.
+          MAJOR_NUM="${NEXT_TAG#v}"     # strip leading 'v' -> "1.2.3"
+          MAJOR_NUM="${MAJOR_NUM%%.*}"  # strip ".minor.patch" -> "1"
+          MAJOR_TAG="v${MAJOR_NUM}"    # -> "v1"
+
+          echo "Moving major alias tag: ${MAJOR_TAG} -> ${NEXT_TAG}"
+          git tag --force "${MAJOR_TAG}"
+          git push origin --force "refs/tags/${MAJOR_TAG}"
+
+          {
+            echo "## Versioning result"
+            echo ""
+            echo "- created tag: \`${NEXT_TAG}\`"
+            echo "- moved major alias: \`${MAJOR_TAG}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

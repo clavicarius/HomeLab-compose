@@ -1,0 +1,77 @@
+# ${TRAEFIK_HOST}.${HOMELAB_DOMAIN}
+# docker compose file for traefik
+
+services:
+  traefik:
+    image: traefik:v3.6
+    container_name: traefik-111
+    restart: always
+    networks:
+      homelab_macvlan:
+        ipv4_address: ${TRAEFIK_IP}  # fixe IP
+      - traefik_internal
+
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+    ports: 
+      - "8111:80"
+      - "58111:8080"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config/traefik.yml:/traefik.yml:ro
+      - ./config/dynamic.yml:/dynamic.yml:ro
+      - ./certs:/certs:ro
+
+    command:
+      - "--configFile=/traefik.yml"
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost/ping || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+    labels:
+      - "traefik.enable=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.routers.dashboard.rule=Host(`${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.dashboard.entrypoints=web"
+      - "traefik.http.routers.dashboard.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+      - "traefik.docker.network=homelab_macvlan" 
+
+  step-ca:
+    image: smallstep/step-ca
+    container_name: step-ca
+    restart: always
+    user: "0:0"
+    
+    networks:
+      - traefik_internal
+    ports:
+      - "59000:9000"
+      
+    volumes:
+      - ./step:/home/step
+      
+    environment:
+      - DOCKER_STEPCA_INIT_NAME=HomeLab CA
+      - DOCKER_STEPCA_INIT_DNS_NAMES=step-ca,${HOMELAB_DOMAIN}
+      - DOCKER_STEPCA_INIT_PASSWORD=${TRAEFIK_CA_PASSWORD}
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9000/roots.pem"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+  
+networks:
+  homelab_macvlan:
+    external: true
+    
+  traefik_internal:
+    driver: bridge

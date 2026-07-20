@@ -1,0 +1,5 @@
+tls:
+  certificates:
+    - certFile: /certs/HomeLabCert.crt
+      keyFile: /certs/HomeLabCert.key
+      

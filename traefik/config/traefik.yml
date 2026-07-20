@@ -1,0 +1,22 @@
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  web:
+    address: ":80" # internes mapping - extern läuft auf 8111
+  websecure:
+    address: ":443"
+#  dashboard:
+#    address: ":8080"
+
+ping:
+  entryPoint: web
+  
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"  
+    exposedByDefault: false
+  file:
+    filename: /dynamic.yml
+    

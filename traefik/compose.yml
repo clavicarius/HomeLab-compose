@@ -7,9 +7,9 @@ services:
     container_name: traefik-homelab
     restart: always
     networks:
-      - homelab_macvlan:
-          ipv4_address: ${TRAEFIK_IP}  # fixe IP
-      - traefik_internal: {}
+      homelab_macvlan:
+        ipv4_address: ${TRAEFIK_IP}  # fixe IP
+      traefik_internal: {}
 
     environment:
       - PUID=${PUID}

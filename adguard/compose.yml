@@ -47,7 +47,7 @@ services:
       - "traefik.docker.network=homelab_macvlan"
       
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/control/status >/dev/null || exit 1"] 
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:9080/ >/dev/null || exit 1"] 
       interval: 30s
       timeout: 10s
       retries: 5

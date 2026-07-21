@@ -63,7 +63,7 @@ services:
       - DOCKER_STEPCA_INIT_PASSWORD=${TRAEFIK_CA_PASSWORD}
 
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:9000/roots.pem"]
+      test: ["CMD", "step", "ca", "health", "https://127.0.0.1:9000"]
       interval: 30s
       timeout: 5s
       retries: 3

@@ -4,7 +4,13 @@ api:
 
 entryPoints:
   web:
-    address: ":80" # internes mapping - extern läuft auf 8111
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
   websecure:
     address: ":443"
 #  dashboard:
@@ -12,11 +18,10 @@ entryPoints:
 
 ping:
   entryPoint: web
-  
+
 providers:
   docker:
-    endpoint: "unix:///var/run/docker.sock"  
+    endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
   file:
     filename: /dynamic.yml
-    

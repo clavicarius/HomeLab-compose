@@ -63,7 +63,7 @@ services:
       - DOCKER_STEPCA_INIT_PASSWORD=${TRAEFIK_CA_PASSWORD}
 
     healthcheck:
-      test: ["CMD", "step", "ca", "health", "https://127.0.0.1:9000"]
+      test: ["CMD", "step", "ca", "health"]
       interval: 30s
       timeout: 5s
       retries: 3

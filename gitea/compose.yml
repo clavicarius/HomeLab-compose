@@ -26,19 +26,20 @@ services:
   gitea:
     container_name: gitea
     # https://hub.docker.com/r/gitea/gitea/tags
-    image: docker.gitea.com/gitea:1.22.6
+    image: gitea/gitea:1-rootless
     restart: unless-stopped
     networks:
       homelab_macvlan:
         ipv4_address: ${GITEA_IP}  # fixe IP
     volumes:
       - ./data:/data
+      - ./config:/etc/gitea
 #      - /etc/timezone:/etc/timezone:ro # use for linux systems
       - /etc/TZ:/etc/timezone:ro       # use for synology NAS systems
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "${GITEA_PORT}:3000"  # web-ui
-      - "${GITEA_SSH_PORT}:22"  # ssh
+      - "${GITEA_SSH_PORT}:2222"  # ssh
 
     environment:
       - USER_UID=${PUID}

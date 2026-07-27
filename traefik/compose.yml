@@ -22,33 +22,18 @@ services:
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./config/traefik.yml:/traefik.yml:ro
-      - ./config/dynamic.yml:/dynamic.yml:ro
+      - ./config/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./config/dynamic.yml:/etc/traefik/dynamic.yml:ro
       - ./certs:/certs:ro
 
     command:
-      - "--configFile=/traefik.yml"
+      - "--configFile=/etc/traefik/traefik.yml"
 
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ping || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
-
-    labels:
-      - "traefik.enable=${TRAEFIK_TLS_ENABLED}"
-      - "traefik.docker.network=homelab_macvlan"
-
-      # HTTP
-      - "traefik.http.routers.dashboard-http.rule=Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)"
-      - "traefik.http.routers.dashboard-http.entrypoints=web"
-      - "traefik.http.routers.dashboard-http.service=api@internal"
-
-      # HTTPS
-      - "traefik.http.routers.dashboard-https.rule=Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)"
-      - "traefik.http.routers.dashboard-https.entrypoints=websecure"
-      - "traefik.http.routers.dashboard-https.tls=${TRAEFIK_TLS_ENABLED}"
-      - "traefik.http.routers.dashboard-https.service=api@internal"
 
   step-ca:
     image: smallstep/step-ca
@@ -76,7 +61,7 @@ services:
       retries: 3
       start_period: 15s
   
-networks:
+networbraucks:
   homelab_macvlan:
     external: true
     

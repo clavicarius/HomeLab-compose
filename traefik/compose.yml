@@ -22,12 +22,16 @@ services:
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./config/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./config/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - ./config:/config
       - ./certs:/certs:ro
 
     command:
-      - "--configFile=/etc/traefik/traefik.yml"
+      - /bin/sh
+      - -c
+      - |
+        apk add --no-cache gettext >/dev/null
+        envsubst < /config/dynamic.yml.template > /config/dynamic.yml
+        exec traefik --configFile=/config/traefik.yml
 
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ping || exit 1"]
@@ -43,8 +47,6 @@ services:
     
     networks:
       - traefik_internal
-    ports:
-      - "59000:9000"
       
     volumes:
       - ./step:/home/step

@@ -8,11 +8,9 @@ http:
   routers:
 
     dashboard-http:
-
       rule: Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)
-
       entryPoints:
-        - web
+        - ${TRAEFIK_ENDPOINT}
 
       middlewares:
         - redirect-to-https
@@ -20,18 +18,18 @@ http:
       service: api@internal
 
     dashboard-https:
-
       rule: Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)
-
       entryPoints:
-        - websecure
+        - ${TRAEFIK_ENDPOINT}
 
-      tls: {}
+      tls:
+        certResolver: ${CERT_RESOLVER}
 
       middlewares:
         - dashboard-auth
 
       service: api@internal
+
 
   middlewares:
 
@@ -44,5 +42,4 @@ http:
     dashboard-auth:
       basicAuth:
         users:
-          - "admin:$apr1$4cv79qkr$fqKzPnmE3nX1pYXIhYq8u0" # Admin1$
-          
+          - "${TRAEFIK_BASIC_AUTH}"

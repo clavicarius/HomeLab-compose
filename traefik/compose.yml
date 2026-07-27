@@ -61,7 +61,7 @@ services:
       retries: 3
       start_period: 15s
   
-networbraucks:
+networks:
   homelab_macvlan:
     external: true
     

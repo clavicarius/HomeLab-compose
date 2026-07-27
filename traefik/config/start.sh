@@ -19,6 +19,8 @@ required_vars="
 TRAEFIK_HOST
 HOMELAB_DOMAIN
 TRAEFIK_ENTRYPOINT
+TRAEFIK_BASIC_AUTH
+CERT_RESOLVER
 "
 
 echo "==> Checking required variables..."

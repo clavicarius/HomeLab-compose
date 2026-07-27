@@ -3,7 +3,6 @@ services:
     ports: !override []
     
     healthcheck:
-#      test: !override ["CMD-SHELL", "wget -q --spider http://localhost/ping || exit 1"]
       retries: !override 15
       start_period: !override 180s
 
@@ -12,5 +11,5 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: ${SUBNET}
-          gateway: ${GATEWAY}
+        - subnet: 192.168.178.224/27
+          gateway: 192.168.178.1

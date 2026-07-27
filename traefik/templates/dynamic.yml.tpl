@@ -5,7 +5,7 @@ http:
     dashboard-http:
       rule: Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)
       entryPoints:
-        - ${TRAEFIK_ENDPOINT}
+        - websecure
 
       middlewares:
         - redirect-to-https
@@ -15,10 +15,10 @@ http:
     dashboard-https:
       rule: Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)
       entryPoints:
-        - ${TRAEFIK_ENDPOINT}
+        - websecure
 
       tls:
-        certResolver: ${CERT_RESOLVER}
+        certResolver: stepca
 
       middlewares:
         - dashboard-auth
@@ -38,3 +38,9 @@ http:
       basicAuth:
         users:
           - "${TRAEFIK_BASIC_AUTH}"
+
+
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12

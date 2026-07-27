@@ -21,13 +21,15 @@ services:
       - "58111:8080"
 
     volumes:
+      # Docker Provider
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./config:/config
-      - ./certs:/certs:ro
 
-    command:
-      - /bin/sh
-      - /config/start.sh
+      # Generierte Traefik Konfiguration
+      - ./config:/etc/traefik:ro
+
+      # Persistente Daten (ACME später)
+      - ./data:/data
+      - ./certs:/certs:ro
 
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ping || exit 1"]
@@ -50,7 +52,7 @@ services:
     environment:
       - DOCKER_STEPCA_INIT_NAME=HomeLab CA
       - DOCKER_STEPCA_INIT_DNS_NAMES=step-ca,${HOMELAB_DOMAIN}
-      - DOCKER_STEPCA_INIT_PASSWORD=${TRAEFIK_CA_PASSWORD}
+      - DOCKER_STEPCA_INIT_PASSWORD=${STEP_CA_PASSWORD}
 
     healthcheck:
       test: ["CMD", "step", "ca", "health"]

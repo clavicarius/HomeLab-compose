@@ -1,0 +1,16 @@
+services:
+  forgejo:
+    ports: !override []
+
+    healthcheck:
+      test: !override ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/ || exit 1"]
+      retries: !override 15
+      start_period: !override 180s
+
+networks:
+  homelab_macvlan: !override
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}

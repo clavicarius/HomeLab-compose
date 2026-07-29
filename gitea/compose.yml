@@ -26,7 +26,7 @@ services:
   gitea:
     container_name: gitea
     # https://hub.docker.com/r/gitea/gitea/tags
-    image: docker.gitea.com/gitea:1.22.6
+    image: docker.gitea.com/gitea:1
     restart: unless-stopped
     networks:
       homelab_macvlan:

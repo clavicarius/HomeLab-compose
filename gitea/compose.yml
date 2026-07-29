@@ -24,9 +24,9 @@ services:
   # Database: SQLite3 (default); path /data/gitea/gitea.db inside the container.
   # Healthcheck: polls the web root every 30 s via wget.
   gitea:
-    container_name: gitea
+    container_name: gitea-homelab
     # https://hub.docker.com/r/gitea/gitea/tags
-    image: docker.gitea.com/gitea:1
+    image:  gitea/gitea:1
     restart: unless-stopped
     networks:
       homelab_macvlan:

@@ -1,0 +1,200 @@
+# Forgejo
+
+Docker-Compose-Projekt für den Betrieb von **Forgejo** im Homelab.
+
+## Voraussetzungen
+
+* Docker Engine
+* Docker Compose
+* Netzwerk mit statischer IP-Konfiguration
+* `.env`-Datei im Projektverzeichnis
+
+## Projektstruktur
+
+```text
+Forgejo/
+├── compose.yml
+├── .env
+├── data/
+└── README.md
+```
+
+## Umgebungsvariablen
+
+Alle projektspezifischen Einstellungen befinden sich in der `.env`.
+
+### Benutzer
+
+```env
+PUID=1000
+PGID=1000
+TZ=Europe/Berlin
+```
+
+### Netzwerk
+
+```env
+SUBNET=192.168.178.0/24
+GATEWAY=192.168.178.1
+```
+
+### Homelab
+
+```env
+HOMELAB_DOMAIN=homelab.internal
+HOMELAB_EMAIL=admin@homelab.internal
+```
+
+### Forgejo
+
+```env
+FORGEJO_HOST=Forgejo
+FORGEJO_IP=192.168.178.248
+FORGEJO_PORT=3000
+FORGEJO_SSH_PORT=222
+```
+
+## Verzeichnisse
+
+| Verzeichnis | Beschreibung                  |
+| ----------- | ----------------------------- |
+| `./data`    | Repositorys, Konfiguration, Datenbank |
+
+Die Daten bleiben dadurch auch nach einem Container-Update erhalten.
+
+## Ports
+
+| Port               | Beschreibung                          |
+| ------------------ | ------------------------------------- |
+| 3000               | Weboberfläche im Container            |
+| 22                 | SSH im Container                      |
+| `${FORGEJO_PORT}`    | veröffentlichter Webport auf dem Host |
+| `${FORGEJO_SSH_PORT}`| veröffentlichter SSH-Port auf dem Host|
+
+Die Weboberfläche ist anschließend erreichbar unter
+
+```
+http://<Docker-Host>:${FORGEJO_PORT}
+```
+
+beispielsweise
+
+```
+http://192.168.178.218:3000
+```
+
+## Netzwerk
+
+Der Container erhält eine feste IP-Adresse aus der `.env`.
+
+```text
+${FORGEJO_IP}
+```
+
+Das Docker-Netzwerk wird mit folgenden Parametern erstellt:
+
+```text
+Subnet : ${SUBNET}
+Gateway: ${GATEWAY}
+```
+
+## Container starten
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Containerstatus prüfen
+
+```bash
+docker compose ps
+```
+
+Logs anzeigen
+
+```bash
+docker compose logs -f
+```
+
+Container stoppen
+
+```bash
+docker compose down
+```
+
+## Ersteinrichtung
+
+Nach dem ersten Start den Einrichtungsassistenten öffnen:
+
+```
+http://<Docker-Host>:${FORGEJO_PORT}
+```
+
+Empfohlene Einstellungen:
+
+* Datenbanktyp: SQLite3 (Standard, für kleine Installationen ausreichend)
+* Admin-Benutzer anlegen
+* SSH-Port konfigurieren
+
+## Updates
+
+Container aktualisieren:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Nicht benötigte Images entfernen:
+
+```bash
+docker image prune
+```
+
+## Backup
+
+Folgendes Verzeichnis sichern:
+
+```text
+data/
+```
+
+Dieses enthält:
+
+* Repositorys
+* Konfiguration
+* Datenbank
+* Benutzer
+
+## Wiederherstellung
+
+1. Container stoppen.
+2. `data/` zurückkopieren.
+3. Container erneut starten.
+
+## Healthcheck
+
+Der Container prüft alle 30 Sekunden die Erreichbarkeit des Webinterfaces.
+
+## Geplante Traefik-Integration
+
+Die `.env` enthält bereits alle benötigten Variablen.
+
+```env
+HOMELAB_DOMAIN=homelab.internal
+FORGEJO_HOST=Forgejo
+```
+
+Später kann Forgejo beispielsweise unter
+
+```
+https://forgejo.homelab.internal
+```
+
+über Traefik veröffentlicht werden.
+
+## Hinweise
+
+* Forgejo wird standardmäßig mit SQLite3 als Datenbank betrieben. Für größere Installationen empfiehlt sich ein externer Datenbankserver (z. B. PostgreSQL oder MySQL).
+* Alle projektspezifischen Einstellungen (Ports, IP-Adressen, Domains und Benutzerinformationen) werden zentral über die `.env` verwaltet.

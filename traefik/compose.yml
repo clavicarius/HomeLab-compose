@@ -1,69 +1,59 @@
-# ${TRAEFIK_HOST}.${HOMELAB_DOMAIN}
-# docker compose file for traefik
+# traefik.${HOMELAB_DOMAIN}
+# Docker Compose file for the standalone Traefik reverse proxy.
+#
+# Traefik provides the shared HTTP/HTTPS entrypoints and discovers enabled
+# services through the Docker provider on the external homelab network.
+#
+# Documentation : traefik/README.md
+# Network setup : docs/network-architecture.md
+# Helper scripts : docs/scripts.md
 
 services:
+  # traefik — standalone reverse proxy for all homelab services.
+  #
+  # Exposes:
+  #   80                         — HTTP entrypoint, redirected to HTTPS
+  #   443                        — HTTPS entrypoint
+  #   ${TRAEFIK_DASHBOARD_PORT}  — insecure dashboard/API
+  #
+  # Volumes:
+  #   /var/run/docker.sock:ro — read-only Docker socket for service discovery
+  #   ./certs:ro              — optional TLS certificates
+  #
+  # Static IP: ${TRAEFIK_IP} on the external homelab network.
   traefik:
-    image: traefik:v3.7
+    image: traefik:v3.3
     container_name: traefik-homelab
-    restart: always
+    restart: unless-stopped
+    command:
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=${NETWORK_NAME}"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--ping=true"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "${TRAEFIK_DASHBOARD_PORT:-8088}:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/certs:ro
     networks:
       homelab_macvlan:
-        ipv4_address: ${TRAEFIK_IP}  # fixe IP
-      traefik_internal: {}
-
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-
-    ports: 
-      - "8111:80"
-      - "58111:8080"
-
-    volumes:
-      # Docker Provider
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-
-      # Generierte Traefik Konfiguration
-      - ./config:/etc/traefik:ro
-
-      # Persistente Daten (ACME später)
-      - ./data:/data
-      - ./certs:/certs:ro
-
+        ipv4_address: ${TRAEFIK_IP}
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ping || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
-  step-ca:
-    image: smallstep/step-ca
-    container_name: step-ca
-    restart: always
-    user: "0:0"
-    
-    networks:
-      - traefik_internal
-      
-    volumes:
-      - ./step:/home/step
-      
-    environment:
-      - DOCKER_STEPCA_INIT_NAME=HomeLab CA
-      - DOCKER_STEPCA_INIT_DNS_NAMES=step-ca,${HOMELAB_DOMAIN}
-      - DOCKER_STEPCA_INIT_PASSWORD=${STEP_CA_PASSWORD}
-
-    healthcheck:
-      test: ["CMD", "step", "ca", "health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
-  
 networks:
   homelab_macvlan:
     external: true
-    
-  traefik_internal:
-    driver: bridge
+    name: ${NETWORK_NAME}

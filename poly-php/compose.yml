@@ -8,52 +8,10 @@
 # single code base can be exercised against every PHP version without copying files.
 #
 # Documentation : poly-php/README.md
-# Traefik setup : poly-php/docs/traefik.md
 # Network setup : docs/network-architecture.md
 # Helper scripts : docs/scripts.md
 
 services:
-
-  # traefik — reverse proxy that routes *.${HOMELAB_DOMAIN} HTTPS requests to the
-  #           correct PHP or phpMyAdmin container inside the stack.
-  #
-  # Exposes:
-  #   80    — HTTP entrypoint (redirects to HTTPS when TLS is enabled)
-  #   443   — HTTPS entrypoint
-  #   8088  — Traefik dashboard (host-mapped from internal port 8080)
-  #
-  # Volumes:
-  #   /var/run/docker.sock:ro — read-only Docker socket for container discovery
-  #
-  # Static IP: ${TRAEFIK_IP} on homelab_macvlan
-  # Healthcheck: traefik healthcheck --ping every 10 s.
-  traefik:
-    image: traefik:v3.0
-    container_name: lamp-traefik
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--providers.docker.network=homelab_macvlan"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.traefik.address=:8080"
-      - "--ping=true"
-      - "--ping.entrypoint=traefik"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8088:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      homelab_macvlan:
-        ipv4_address: ${TRAEFIK_IP}
-    healthcheck:
-      test: ["CMD", "traefik", "healthcheck", "--ping", "--ping.entrypoint=traefik"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
 
   # php56 — Apache/PHP 5.6 web server (End of Life; for migration testing only).
   #

@@ -1,2 +1,4 @@
-# gitea gitignore file
-data/
+# adguard gitignore file
+conf/
+work/
+

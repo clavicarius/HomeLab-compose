@@ -1,6 +1,6 @@
 # create-env.sh
 
-Das Helper-Skript `create-env.sh` erstellt eine lokale `.env`-Datei aus den vorhandenen Beispiel-Dateien. Dabei werden die Inhalte der gemeinsamen Konfiguration (`.env.common.example`) und der projektspezifischen Konfiguration (`.env.example`) zu einer einzigen `.env` zusammengeführt.
+Das Helper-Skript `create-env.sh` erstellt eine lokale `.env`-Datei aus den vorhandenen Beispiel-Dateien. Dabei werden die Inhalte der gemeinsamen Konfiguration (`.env.common`) und der projektspezifischen Konfiguration (`.env.example`) zu einer einzigen `.env` zusammengeführt.
 
 ## Voraussetzungen
 
@@ -8,7 +8,7 @@ Das Skript sucht nach folgenden Dateien:
 
 | Datei | Beschreibung |
 | ------ | ------------ |
-| `../.env.common.example` | Gemeinsame Konfiguration für mehrere Projekte (optional). |
+| `../.env.common` | Gemeinsame Konfiguration für mehrere Projekte (optional). |
 | `.env.example` | Projektspezifische Konfiguration (optional). |
 
 Mindestens eine der beiden Dateien muss vorhanden sein.
@@ -18,7 +18,7 @@ Mindestens eine der beiden Dateien muss vorhanden sein.
 1. Prüft, ob bereits eine `.env` existiert.
 2. Fragt den Benutzer, ob die vorhandene Datei überschrieben werden soll.
 3. Erstellt eine neue `.env`.
-4. Fügt den Inhalt von `../.env.common.example` hinzu (falls vorhanden).
+4. Fügt den Inhalt von `../.env.common` hinzu (falls vorhanden).
 5. Fügt anschließend den Inhalt von `.env.example` hinzu (falls vorhanden).
 6. Gibt die erzeugte `.env` auf der Konsole aus.
 
@@ -59,7 +59,7 @@ oder
 
 Die Reihenfolge der zusammengeführten Dateien ist:
 
-1. `../.env.common.example`
+1. `../.env.common`
 2. `.env.example`
 
 Dadurch können projektspezifische Werte gemeinsame Standardwerte überschreiben, sofern dieselbe Variable mehrfach definiert ist. In den meisten Anwendungen wird dabei der zuletzt definierte Wert verwendet.
@@ -70,7 +70,7 @@ Dadurch können projektspezifische Werte gemeinsame Standardwerte überschreiben
 
 ```text
 project-root/
-├── .env.common.example
+├── .env.common
 └── app/
     ├── .env.example
     └── README.md
@@ -81,7 +81,7 @@ project-root/
 Aus
 
 ```text
-../.env.common.example
+../.env.common
 ```
 
 und
@@ -99,7 +99,7 @@ wird erzeugt:
 mit folgendem Inhalt:
 
 ```env
-# Inhalt aus .env.common.example
+# Inhalt aus .env.common
 
 ...
 

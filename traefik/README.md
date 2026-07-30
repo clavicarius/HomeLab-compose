@@ -1,24 +1,58 @@
-# Traefik Homelab
+# Traefik Stack (Homelab)
 
-This directory contains the standalone Traefik reverse-proxy stack for the
-homelab. Traefik uses Docker labels to route HTTPS requests to enabled services
-on the shared external network.
+Dieser Ordner enthaelt den zentralen Traefik Reverse-Proxy-Stack fuer das Homelab.
 
-## Configuration
+Traefik veroeffentlicht Webservices ueber Hostnamen wie `service.homelab.internal` und nutzt Docker-Labels zur automatischen Service-Erkennung.
 
-Copy the repository-level `.env.common.example` to `.env.common` and set the
-network, Traefik IP, dashboard port, and domain values. The service-specific
-`.env` is optional and can be created from `.env.example`.
+Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-architecture.md)
 
-## Start and stop
+---
 
-Create the shared macvlan network once, then start stacks in this order:
+## Inhalt
 
-1. `adguard/`
-2. `traefik/`
-3. application stacks such as `gitea/` and `poly-php/`
+- `compose.yml` - Traefik-Stack fuer den regulaeren Betrieb
+- `compose.ci.yml` - CI-Override
+- `certs/` - Zertifikate
+- `config/` - Laufzeitkonfiguration
+- `scripts/` - Helper fuer Initialisierung/Validierung
+- `templates/` - Vorlagen fuer gerenderte Konfigurationsdateien
 
-From this directory, use the shared helper scripts:
+---
+
+## Konfiguration
+
+Gemeinsame Konfiguration aus `.env.common.example` kopieren und Werte fuer Netzwerk, Traefik-IP, Dashboard-Port und Domain eintragen. Die servicespezifische `.env` ist optional und kann aus `.env.example` erstellt werden.
+
+---
+
+## Voraussetzungen
+
+1. Docker / Docker Compose v2 installiert
+2. Gemeinsame Konfiguration erstellt:
+
+```bash
+cp .env.common.example .env.common
+```
+
+3. macvlan-Netzwerk vorhanden:
+
+```bash
+./scripts/create-macvlan.sh
+```
+
+4. Service-spezifische `.env` im Ordner `traefik/` anlegen (falls benoetigt)
+
+---
+
+## Starten
+
+Startreihenfolge im Homelab:
+
+1. `adguard/` (DNS)
+2. `traefik/` (Reverse Proxy)
+3. Weitere Services mit Traefik-Labels (z. B. `gitea/`, `poly-php/`)
+
+Aus dem Ordner `traefik/`:
 
 ```bash
 ../scripts/docker-up.sh
@@ -26,5 +60,19 @@ From this directory, use the shared helper scripts:
 ../scripts/docker-update.sh
 ```
 
-Traefik publishes HTTP on port 80, HTTPS on port 443, and its dashboard on
-`${TRAEFIK_DASHBOARD_PORT}` (8088 by default).
+Traefik veroeffentlicht HTTP auf Port 80, HTTPS auf Port 443 und das Dashboard auf `${TRAEFIK_DASHBOARD_PORT}` (Standard: 8088).
+
+---
+
+## Typische Validierung
+
+```bash
+# DNS-Rewrite pruefen
+nslookup gitea.homelab.internal 192.168.178.252
+
+# HTTP Redirect / Routing pruefen
+curl -I http://gitea.homelab.internal
+curl -k https://gitea.homelab.internal
+```
+
+Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `compose.yml` und die DNS-Rewrites in AdGuard pruefen.

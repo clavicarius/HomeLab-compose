@@ -107,6 +107,9 @@ gitea                          homelab_macvlan    192.168.178.248
 Creates a local `.env` file by merging `.env.common.example` (repository root) and the
 service-specific `.env.example` (current directory).
 
+Use this when a stack expects a local `.env` file. The preferred runtime workflow is still
+`docker compose --env-file ../.env.common --env-file .env ...` as used by `docker-up.sh`.
+
 **Usage** (run from the service directory, e.g. `adguard/` or `gitea/`):
 
 ```bash
@@ -150,6 +153,11 @@ cd adguard
 ../scripts/docker-up.sh
 ```
 
+Recommended startup order for homelab routing:
+1. `adguard`
+2. `traefik`
+3. routed services (`gitea`, `forgejo`, `poly-php`, ...)
+
 **See also:** [docker-down.sh](#docker-downsh) · [docker-update.sh](#docker-updatesh)
 
 ---
@@ -162,6 +170,8 @@ Stops the running Docker Compose stack and removes containers.
 cd adguard
 ../scripts/docker-down.sh
 ```
+
+Current implementation uses `docker-compose down`.
 
 **See also:** [docker-up.sh](#docker-upsh)
 
@@ -180,6 +190,8 @@ cd adguard
 1. `docker-compose pull` — fetch latest image versions
 2. `docker-compose down` — stop and remove containers
 3. `docker compose up -d` — start containers with updated images
+
+Current implementation uses the local `.env` for `pull/down` and explicit dual env-file loading for `up`.
 
 **See also:** [docker-up.sh](#docker-upsh) · [docker-down.sh](#docker-downsh)
 

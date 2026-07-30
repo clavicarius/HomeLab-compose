@@ -19,9 +19,9 @@ Der Stack basiert auf **Docker Compose** und enthält:
 
 Alle PHP‑Container greifen auf denselben Projektcode zu, sodass Änderungen sofort in allen Versionen getestet werden können.
 
-Der Multi‑PHP Stack kann optional über einen Reverse‑Proxy mit HTTPS betrieben werden.
+Der Multi‑PHP Stack kann optional über den zentralen Reverse Proxy mit HTTPS betrieben werden.
 
-Hierfür wird zusätzlich ein **Traefik**-Container verwendet, der im Homelab als zentraler Reverse Proxy für alle Compose-Projekte dient. Die Konfiguration basiert auf `docs/traefik.md` und [docs/network-architecture.md](../docs/network-architecture.md).
+Der Reverse Proxy läuft als eigener Stack in [traefik/README.md](../traefik/README.md). Die Gesamtarchitektur ist in [docs/network-architecture.md](../docs/network-architecture.md) dokumentiert.
 
 Voraussetzung: externes macvlan-Netzwerk `homelab_macvlan` (siehe `./scripts/create-macvlan.sh` im Repository-Root).
 
@@ -114,7 +114,6 @@ Mit `TRAEFIK_ENABLED=true` und DNS-Rewrites in AdGuard (→ `192.168.178.225`):
 | PHP 7.4 | https://php74.homelab.internal |
 | PHP 8.5 | https://php85.homelab.internal |
 | phpMyAdmin | https://phpmyadmin.homelab.internal |
-| Traefik Dashboard | http://192.168.178.99:8088 |
 
 ---
 
@@ -280,4 +279,4 @@ docker compose up -d --build
 
 **Homelab:** DNS-Rewrites in AdGuard für `*.homelab.internal` → `192.168.178.225`, dann `TRAEFIK_ENABLED=true` setzen.
 
-**Lokale Entwicklung ohne DNS:** Host-Ports (siehe Tabelle oben) oder Einträge in der Hosts-Datei — siehe `docs/traefik.md`.
+**Lokale Entwicklung ohne DNS:** Host-Ports (siehe Tabelle oben) oder Einträge in der Hosts-Datei. Details zum zentralen Routing stehen in [traefik/README.md](../traefik/README.md).

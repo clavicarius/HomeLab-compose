@@ -91,7 +91,7 @@ Container mit fester LAN-IP werden über `homelab_macvlan` angebunden. Die Adres
 
 | Dienst | IP-Adresse | Status |
 |--------|------------|--------|
-| Traefik | 192.168.178.225 | implementiert (`poly-php`) |
+| Traefik | 192.168.178.225 | implementiert (`traefik`) |
 | Portainer | 192.168.178.250 | geplant |
 | AdGuard Home | 192.168.178.252 | implementiert (`adguard`) |
 
@@ -248,7 +248,7 @@ Standardmäßig sind beide Werte `false` — Services sind dann nur direkt über
 
 ## Container
 
-Traefik läuft im `poly-php`-Stack (`poly-php/compose.yml`).
+Traefik läuft als eigener Stack in `traefik/compose.yml`.
 
 ## LAN-IP
 
@@ -511,7 +511,7 @@ Dieses Kapitel beschreibt die empfohlene Reihenfolge der Grundinstallation.
 8. AdGuard einrichten (DNS Port 53)
 9. FRITZ!Box DNS auf AdGuard-IP umstellen
 10. DNS-Rewrites anlegen
-11. Traefik-Stack deployen (`poly-php`)
+11. Traefik-Stack deployen (`traefik`)
 12. `TRAEFIK_ENABLED=true` setzen
 13. weitere Services deployen
 
@@ -663,9 +663,12 @@ homelab_macvlan
 ├── adguard/
 │   ├── compose.yml
 │   └── README.md
+├── traefik/
+│   ├── compose.yml
+│   └── README.md
 ├── poly-php/
 │   ├── compose.yml
-│   └── docs/traefik.md
+│   └── README.md
 ├── .env.common
 └── .env.common.example
 ```
@@ -750,7 +753,7 @@ Filters → DNS rewrites
 ## Starten
 
 ```bash
-cd poly-php
+cd traefik
 docker compose up -d
 ```
 
@@ -769,7 +772,7 @@ Container neu starten:
 docker compose up -d
 ```
 
-Weitere Details: [poly-php/docs/traefik.md](../poly-php/docs/traefik.md)
+Weitere Details: [traefik/README.md](../traefik/README.md)
 
 ---
 
@@ -970,7 +973,7 @@ Komplexität wird bewusst minimiert. macvlan wird gezielt für LAN-sichtbare Con
 | Entscheidungspunkt | Entscheidung | Ergebnis |
 |---|---|---|
 | Synology Parent-Interface für macvlan | Per Live-Test auf NAS ermitteln, danach fest in `.env.common` setzen | Blocker dokumentiert, Vorgehen festgelegt |
-| Scope Phase 1 Services | Basis (`adguard`, `traefik`/`poly-php`, `gitea`) + `portainer`; `paperless`/`wordpress` erst Phase 2 | Service-Phasen in der Domainstruktur ergänzt |
+| Scope Phase 1 Services | Basis (`adguard`, `traefik`, `gitea`) + `portainer`; `paperless`/`wordpress` erst Phase 2 | Service-Phasen in der Domainstruktur ergänzt |
 | Interne TLS-Strategie | interne CA als Zielbild; bis zur Einführung kontrollierter Übergang mit bestehender TLS-Option | Entscheidungsrichtung dokumentiert |
 | Backup- und Restore-Ziele | Serviceklassen mit RPO/RTO-Zielen | Zielwerte in Backup-Kapitel definiert |
 | Exponierung nach außen | LAN-only als Default; extern nur explizit per VPN/gesonderter Freigabe | Sicherheitsprinzip erweitert |

@@ -43,7 +43,7 @@ services:
       - "traefik.http.routers.adguard.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.routers.adguard.entrypoints=websecure"
       - "traefik.http.routers.adguard.rule=Host(`${ADGUARD_HOST}.${HOMELAB_DOMAIN}`)"
-      - "traefik.http.services.adguard.loadbalancer.server.port=3000"
+      - "traefik.http.services.adguard.loadbalancer.server.port=9080"
       - "traefik.docker.network=${NETWORK_NAME}"
       
     healthcheck:

@@ -24,3 +24,9 @@ vendor/
 
 # Docker
 *.log
+
+# Traefik
+traefik/steps/secrets/
+traefik/steps/config/
+traefik/steps/db
+traefik/steps/certs/

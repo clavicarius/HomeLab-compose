@@ -69,6 +69,7 @@ Example:
 networks:
   homelab_macvlan:
     external: true
+    name: ${NETWORK_NAME}
 ```
 
 ### Static IP Addresses
@@ -93,9 +94,11 @@ Using static IP addresses ensures that services remain permanently reachable and
 
 | Service | Description | Documentation |
 |---------|-------------|---------------|
+| `traefik` | Standalone reverse proxy stack for central ingress routing in the homelab. | [traefik/README.md](traefik/README.md) |
 | `poly-php` | Portable Docker-based development environment for testing multiple PHP versions simultaneously. | [poly-php/README.md](poly-php/README.md) |
 | `adguard` | Docker Compose project for running AdGuard Home in a homelab environment. | [adguard/README.md](adguard/README.md) |
 | `gitea` | Docker Compose project for running Gitea (self-hosted Git service) in a homelab environment. | [gitea/README.md](gitea/README.md) |
+| `forgejo` | Docker Compose project for running Forgejo (self-hosted Git service) in a homelab environment. | [forgejo/README.md](forgejo/README.md) |
 
 ---
 
@@ -108,9 +111,17 @@ git clone https://github.com/clavicarius/homelab-compose.git
 cd homelab-compose
 ```
 
-### 2. Create the shared macvlan network
+### 2. Create shared environment configuration
 
-Configure the network settings in your `.env` file and run:
+Create `.env.common` from the shared example file and adjust it for your network:
+
+```bash
+cp .env.common.example .env.common
+```
+
+### 3. Create the shared macvlan network
+
+Configure the network settings in `.env.common` and run:
 
 ```bash
 ./scripts/create-macvlan.sh
@@ -120,13 +131,13 @@ For agent commits, copy `.git-author.example` to `.git-author` and set your name
 
 This only needs to be done once.
 
-### 3. Navigate to the desired service
+### 4. Navigate to the desired service
 
 ```bash
 cd <service>
 ```
 
-### 4. Copy the example environment file
+### 5. Copy the example environment file
 
 If the service provides one:
 
@@ -134,10 +145,10 @@ If the service provides one:
 cp .env.example .env
 ```
 
-### 5. Start the service
+### 6. Start the service
 
 ```bash
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 ---

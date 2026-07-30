@@ -1,4 +1,9 @@
 http:
   middlewares:
-    noop:
-      headers: {}
+    to-dashboard:
+      redirectRegex:
+        regex: ".*"
+        # replace with proper domain and path to dashboard
+        # replacement: "https://traefik.homelab.internal/dashboard/"
+        replacement: "https://${TRAEFIK_HOST}.${HOMELAB_DOMAIN}/dashboard/"
+        permanent: false

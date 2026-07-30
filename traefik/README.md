@@ -10,7 +10,11 @@ Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-archi
 
 ## Inhalt
 
+<<<<<<< HEAD
 - `compose.yml` - Traefik-Stack fuer den regulären Betrieb
+=======
+- `compose.yml` - Traefik-Stack fuer den regulaeren Betrieb
+>>>>>>> origin/45-integration-branch
 - `compose.ci.yml` - CI-Override
 - `certs/` - Zertifikate
 - `config/` - Laufzeitkonfiguration
@@ -19,6 +23,15 @@ Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-archi
 
 ---
 
+<<<<<<< HEAD
+=======
+## Konfiguration
+
+Gemeinsame Konfiguration aus `.env.common.example` kopieren und Werte fuer Netzwerk, Traefik-IP, Dashboard-Port und Domain eintragen. Die servicespezifische `.env` ist optional und kann aus `.env.example` erstellt werden.
+
+---
+
+>>>>>>> origin/45-integration-branch
 ## Voraussetzungen
 
 1. Docker / Docker Compose v2 installiert
@@ -40,10 +53,20 @@ cp .env.common.example .env.common
 
 ## Starten
 
+<<<<<<< HEAD
+=======
+Startreihenfolge im Homelab:
+
+1. `adguard/` (DNS)
+2. `traefik/` (Reverse Proxy)
+3. Weitere Services mit Traefik-Labels (z. B. `gitea/`, `poly-php/`)
+
+>>>>>>> origin/45-integration-branch
 Aus dem Ordner `traefik/`:
 
 ```bash
 ../scripts/docker-up.sh
+<<<<<<< HEAD
 ```
 
 Stoppen:
@@ -67,6 +90,13 @@ Empfohlene Startreihenfolge:
 1. `adguard` (DNS)
 2. `traefik` (Reverse Proxy)
 3. weitere Services mit Traefik-Labels
+=======
+../scripts/docker-down.sh
+../scripts/docker-update.sh
+```
+
+Traefik veroeffentlicht HTTP auf Port 80, HTTPS auf Port 443 und das Dashboard auf `${TRAEFIK_DASHBOARD_PORT}` (Standard: 8088).
+>>>>>>> origin/45-integration-branch
 
 ---
 
@@ -82,6 +112,7 @@ curl -k https://gitea.homelab.internal
 ```
 
 Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `compose.yml` und die DNS-Rewrites in AdGuard pruefen.
+<<<<<<< HEAD
 
 ---
 
@@ -109,3 +140,5 @@ mkcert homelab.internal "*.homelab.internal"
 ```
 
 5. Die mkcert-Root-CA auf den Clients importieren, die die Domains aufrufen sollen.
+=======
+>>>>>>> origin/45-integration-branch

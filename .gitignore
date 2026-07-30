@@ -26,6 +26,7 @@ vendor/
 *.log
 
 # Traefik
+<<<<<<< HEAD
 traefik/step/secrets/
 traefik/step/config/
 traefik/step/db
@@ -33,3 +34,9 @@ traefik/step/certs/
 traefik/certs/*.pem
 traefik/certs/*-key.pem
 !traefik/certs/.gitkeep
+=======
+traefik/steps/secrets/
+traefik/steps/config/
+traefik/steps/db
+traefik/steps/certs/
+>>>>>>> origin/45-integration-branch

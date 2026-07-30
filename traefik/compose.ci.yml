@@ -1,6 +1,7 @@
 services:
   traefik:
     ports: !override []
+<<<<<<< HEAD
     
     healthcheck:
       retries: !override 15
@@ -15,6 +16,10 @@ services:
     healthcheck:
       retries: !override 15
       start_period: !override 180s
+=======
+    healthcheck:
+      start_period: 30s
+>>>>>>> origin/45-integration-branch
 
 networks:
   homelab_macvlan: !override

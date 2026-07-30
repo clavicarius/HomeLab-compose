@@ -1,74 +1,3 @@
-<<<<<<< HEAD
-# ${TRAEFIK_HOST}.${HOMELAB_DOMAIN}
-# docker compose file for traefik
-
-services:
-  traefik:
-    image: traefik:v3.7
-    container_name: traefik-homelab
-    restart: always
-    networks:
-      homelab_macvlan:
-        ipv4_address: ${TRAEFIK_IP}  # fixe IP
-      traefik_internal: {}
-
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-
-    ports: 
-      - "8111:80"
-      - "58111:8080"
-
-    volumes:
-      # Docker Provider
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-
-      # Generierte Traefik Konfiguration
-      - ./config:/etc/traefik:ro
-
-      # Persistente Daten (ACME später)
-      - ./data:/data
-      - ./certs:/certs:ro
-
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ping || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
-  step-ca:
-    image: smallstep/step-ca
-    container_name: step-ca
-    restart: always
-    user: "0:0"
-    
-    networks:
-      - traefik_internal
-      
-    volumes:
-      - ./step:/home/step
-      
-    environment:
-      - DOCKER_STEPCA_INIT_NAME=HomeLab CA
-      - DOCKER_STEPCA_INIT_DNS_NAMES=step-ca,${HOMELAB_DOMAIN}
-      - DOCKER_STEPCA_INIT_PASSWORD=${STEP_CA_PASSWORD}
-
-    healthcheck:
-      test: ["CMD", "step", "ca", "health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
-  
-networks:
-  homelab_macvlan:
-    external: true
-    
-  traefik_internal:
-    driver: bridge
-=======
 # traefik.${HOMELAB_DOMAIN}
 # Docker Compose file for the standalone Traefik reverse proxy.
 #
@@ -93,7 +22,7 @@ services:
   #
   # Static IP: ${TRAEFIK_IP} on the external homelab network.
   traefik:
-    image: traefik:v3.3
+    image: traefik:v3.7
     container_name: traefik-homelab
     restart: unless-stopped
     command:
@@ -105,6 +34,8 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=${NETWORK_NAME}"
+      - "--providers.file.filename=/etc/traefik/tls.yml"
+      - "--providers.file.watch=true"
       - "--api.dashboard=true"
       - "--api.insecure=true"
       - "--ping=true"
@@ -115,6 +46,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./certs:/certs:ro
+      - ./config/tls.yml:/etc/traefik/tls.yml:ro
     networks:
       homelab_macvlan:
         ipv4_address: ${TRAEFIK_IP}
@@ -128,4 +60,3 @@ networks:
   homelab_macvlan:
     external: true
     name: ${NETWORK_NAME}
->>>>>>> origin/45-integration-branch

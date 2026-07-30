@@ -1,25 +1,9 @@
 services:
   traefik:
-    ports: !override []
-<<<<<<< HEAD
-    
+    ports: !override []   
     healthcheck:
-      retries: !override 15
-      start_period: !override 180s
-
-  step-ca:
-    environment: !override
-      - DOCKER_STEPCA_INIT_NAME=HomeLab CA
-      - DOCKER_STEPCA_INIT_DNS_NAMES=step-ca,${HOMELAB_DOMAIN}
-      - DOCKER_STEPCA_INIT_PASSWORD=${STEP_CA_PASSWORD:-TopSecretPassw0rd}
-
-    healthcheck:
-      retries: !override 15
-      start_period: !override 180s
-=======
-    healthcheck:
-      start_period: 30s
->>>>>>> origin/45-integration-branch
+      start_period: !override 30s
+      timeout: !override 180s
 
 networks:
   homelab_macvlan: !override

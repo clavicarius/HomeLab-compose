@@ -6,10 +6,20 @@ services:
       retries: !override 15
       start_period: !override 180s
 
+  step-ca:
+    environment: !override
+      - DOCKER_STEPCA_INIT_NAME=HomeLab CA
+      - DOCKER_STEPCA_INIT_DNS_NAMES=step-ca,${HOMELAB_DOMAIN}
+      - DOCKER_STEPCA_INIT_PASSWORD=${STEP_CA_PASSWORD:-TopSecretPassw0rd}
+
+    healthcheck:
+      retries: !override 15
+      start_period: !override 180s
+
 networks:
   homelab_macvlan: !override
     driver: bridge
     ipam:
       config:
-        - subnet: 192.168.178.224/27
-          gateway: 192.168.178.1
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}

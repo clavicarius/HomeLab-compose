@@ -10,12 +10,18 @@ Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-archi
 
 ## Inhalt
 
-- `compose.yml` - Traefik-Stack fuer den regulären Betrieb
+- `compose.yml` - Traefik-Stack fuer den regulaeren Betrieb
 - `compose.ci.yml` - CI-Override
 - `certs/` - Zertifikate
 - `config/` - Laufzeitkonfiguration
 - `scripts/` - Helper fuer Initialisierung/Validierung
 - `templates/` - Vorlagen fuer gerenderte Konfigurationsdateien
+
+---
+
+## Konfiguration
+
+Gemeinsame Konfiguration aus `.env.common.example` kopieren und Werte fuer Netzwerk, Traefik-IP, Dashboard-Port und Domain eintragen. Die servicespezifische `.env` ist optional und kann aus `.env.example` erstellt werden.
 
 ---
 
@@ -40,33 +46,21 @@ cp .env.common.example .env.common
 
 ## Starten
 
+Startreihenfolge im Homelab:
+
+1. `adguard/` (DNS)
+2. `traefik/` (Reverse Proxy)
+3. Weitere Services mit Traefik-Labels (z. B. `gitea/`, `poly-php/`)
+
 Aus dem Ordner `traefik/`:
 
 ```bash
 ../scripts/docker-up.sh
-```
-
-Stoppen:
-
-```bash
 ../scripts/docker-down.sh
-```
-
-Update:
-
-```bash
 ../scripts/docker-update.sh
 ```
 
----
-
-## Reihenfolge im Homelab
-
-Empfohlene Startreihenfolge:
-
-1. `adguard` (DNS)
-2. `traefik` (Reverse Proxy)
-3. weitere Services mit Traefik-Labels
+Traefik veroeffentlicht HTTP auf Port 80, HTTPS auf Port 443 und das Dashboard auf `${TRAEFIK_DASHBOARD_PORT}` (Standard: 8088).
 
 ---
 

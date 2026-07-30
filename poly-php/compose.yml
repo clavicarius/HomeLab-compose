@@ -88,9 +88,8 @@ services:
       - "traefik.http.routers.php56.rule=Host(`php56.${HOMELAB_DOMAIN}`)"
       - "traefik.http.routers.php56.entrypoints=websecure"
       - "traefik.http.routers.php56.tls=${TRAEFIK_TLS_ENABLED}"
-      - "traefik.http.routers.php56.tls.certresolver=letsencrypt"
       - "traefik.http.services.php56.loadbalancer.server.port=80"
-      - "traefik.docker.network=homelab_macvlan"
+      - "traefik.docker.network=${NETWORK_NAME}"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
@@ -134,9 +133,8 @@ services:
       - "traefik.http.routers.php74.rule=Host(`php74.${HOMELAB_DOMAIN}`)"
       - "traefik.http.routers.php74.entrypoints=websecure"
       - "traefik.http.routers.php74.tls=${TRAEFIK_TLS_ENABLED}"
-      - "traefik.http.routers.php74.tls.certresolver=letsencrypt"
       - "traefik.http.services.php74.loadbalancer.server.port=80"
-      - "traefik.docker.network=homelab_macvlan"
+      - "traefik.docker.network=${NETWORK_NAME}"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
@@ -180,9 +178,8 @@ services:
       - "traefik.http.routers.php85.rule=Host(`php85.${HOMELAB_DOMAIN}`)"
       - "traefik.http.routers.php85.entrypoints=websecure"
       - "traefik.http.routers.php85.tls=${TRAEFIK_TLS_ENABLED}"
-      - "traefik.http.routers.php85.tls.certresolver=letsencrypt"
       - "traefik.http.services.php85.loadbalancer.server.port=80"
-      - "traefik.docker.network=homelab_macvlan"
+      - "traefik.docker.network=${NETWORK_NAME}"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
@@ -266,7 +263,7 @@ services:
       - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
       - "traefik.http.routers.phpmyadmin.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
-      - "traefik.docker.network=homelab_macvlan"
+      - "traefik.docker.network=${NETWORK_NAME}"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost/ || exit 1"]
       interval: 10s
@@ -277,3 +274,4 @@ services:
 networks:
   homelab_macvlan:
     external: true
+    name: ${NETWORK_NAME}

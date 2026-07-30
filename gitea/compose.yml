@@ -58,6 +58,7 @@ services:
       - "traefik.http.routers.gitea.entrypoints=websecure"
       - "traefik.http.routers.gitea.rule=Host(`${GITEA_HOST}.${HOMELAB_DOMAIN}`)"
       - "traefik.http.services.gitea.loadbalancer.server.port=3000"
+      - "traefik.docker.network=${NETWORK_NAME}"
 
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/ >/dev/null || exit 1"]
@@ -69,3 +70,4 @@ services:
 networks:
   homelab_macvlan:
     external: true
+    name: ${NETWORK_NAME}

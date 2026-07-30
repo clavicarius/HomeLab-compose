@@ -38,9 +38,3 @@ http:
       basicAuth:
         users:
           - "${TRAEFIK_BASIC_AUTH}"
-
-
-tls:
-  options:
-    default:
-      minVersion: VersionTLS12

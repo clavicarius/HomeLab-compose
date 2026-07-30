@@ -45,6 +45,11 @@ ${CERT_RESOLVER}' \
 < "${CONFIG_DIR}/dynamic.yml.template" \
 > "${CONFIG_DIR}/dynamic.yml"
 
+if [ -f "${CONFIG_DIR}/tls.yml" ]; then
+    printf '\n' >> "${CONFIG_DIR}/dynamic.yml"
+    cat "${CONFIG_DIR}/tls.yml" >> "${CONFIG_DIR}/dynamic.yml"
+fi
+
 echo "==> Generated dynamic.yml"
 
 cat "${CONFIG_DIR}/dynamic.yml"

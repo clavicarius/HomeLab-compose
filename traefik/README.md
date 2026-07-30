@@ -82,3 +82,30 @@ curl -k https://gitea.homelab.internal
 ```
 
 Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `compose.yml` und die DNS-Rewrites in AdGuard pruefen.
+
+---
+
+## Mkcert TLS (optional)
+
+Fuer eine interne Wildcard-Zertifikatskette ohne Browser-Warnungen kann `mkcert` verwendet werden.
+
+1. Zertifikate erzeugen:
+
+```bash
+mkcert homelab.internal "*.homelab.internal"
+```
+
+2. Die erzeugten Dateien nach `traefik/certs/` kopieren:
+
+- `wildcard.pem`
+- `wildcard-key.pem`
+
+3. [traefik/config/tls.yml](config/tls.yml) bindet diese Dateien als Standardzertifikat ein.
+
+4. Den Stack neu starten:
+
+```bash
+../scripts/docker-up.sh
+```
+
+5. Die mkcert-Root-CA auf den Clients importieren, die die Domains aufrufen sollen.

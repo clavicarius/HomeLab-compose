@@ -26,7 +26,10 @@ vendor/
 *.log
 
 # Traefik
-traefik/steps/secrets/
-traefik/steps/config/
-traefik/steps/db
-traefik/steps/certs/
+traefik/step/secrets/
+traefik/step/config/
+traefik/step/db
+traefik/step/certs/
+traefik/certs/*.pem
+traefik/certs/*-key.pem
+!traefik/certs/.gitkeep

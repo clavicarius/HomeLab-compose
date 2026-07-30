@@ -12,7 +12,7 @@ http:
 
     dashboard-root-redirect:
       # replace with proper domain and path to dashboard
-      # rule: Host(`traefik.homelab.internal`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      # rule: Host(`traefik.homelab.internal`)
       rule: Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)
       entryPoints:
         - websecure

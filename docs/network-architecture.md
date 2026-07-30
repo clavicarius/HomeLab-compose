@@ -273,6 +273,8 @@ Traefik läuft als eigener Stack in `traefik/compose.yml`.
 
 Das Dashboard ist über den auf dem Host publizierten Port erreichbar. HTTPS-Services laufen über die Traefik-LAN-IP, sobald DNS-Rewrites gesetzt sind.
 
+Optional kann fuer interne Domains ein mkcert-Wildcard-Zertifikat ueber `traefik/certs/` und `traefik/config/tls.yml` bereitgestellt werden, um Browser-Warnungen zu vermeiden.
+
 ---
 
 # 10. DSM-Portanpassung

@@ -37,6 +37,9 @@ http:
     dashboard-auth:
       basicAuth:
         users:
+<<<<<<< HEAD
+          - "${TRAEFIK_BASIC_AUTH}"
+=======
           - "${TRAEFIK_BASIC_AUTH}"
 
 
@@ -44,3 +47,4 @@ tls:
   options:
     default:
       minVersion: VersionTLS12
+>>>>>>> origin/45-integration-branch

@@ -45,6 +45,14 @@ ${CERT_RESOLVER}' \
 < "${CONFIG_DIR}/dynamic.yml.template" \
 > "${CONFIG_DIR}/dynamic.yml"
 
+<<<<<<< HEAD
+if [ -f "${CONFIG_DIR}/tls.yml" ]; then
+    printf '\n' >> "${CONFIG_DIR}/dynamic.yml"
+    cat "${CONFIG_DIR}/tls.yml" >> "${CONFIG_DIR}/dynamic.yml"
+fi
+
+=======
+>>>>>>> origin/45-integration-branch
 echo "==> Generated dynamic.yml"
 
 cat "${CONFIG_DIR}/dynamic.yml"

@@ -37,8 +37,21 @@ services:
       - "--providers.file.filename=/etc/traefik/tls.yml"
       - "--providers.file.watch=true"
       - "--api.dashboard=true"
-      - "--api.insecure=true"
+      - "--api.insecure=false"
       - "--ping=true"
+    labels:
+      - "traefik.enable=true"
+
+      # Router
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls=true"
+
+      # Dashboard - using admin:password for basic auth (change this!)
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.middlewares=dashboard-auth"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:$$apr1$$g420e8rh$$Rfve3NuibXBmqSTHSeUyB0"
+
     ports:
       - "80:80"
       - "443:443"

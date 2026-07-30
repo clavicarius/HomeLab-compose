@@ -12,7 +12,7 @@ Docker-Compose-Projekt für den Betrieb von **Forgejo** im Homelab.
 ## Projektstruktur
 
 ```text
-Forgejo/
+forgejo/
 ├── compose.yml
 ├── .env
 ├── data/
@@ -34,7 +34,7 @@ TZ=Europe/Berlin
 ### Netzwerk
 
 ```env
-SUBNET=192.168.178.0/24
+SUBNET=192.168.178.224/27
 GATEWAY=192.168.178.1
 ```
 
@@ -48,8 +48,8 @@ HOMELAB_EMAIL=admin@homelab.internal
 ### Forgejo
 
 ```env
-FORGEJO_HOST=Forgejo
-FORGEJO_IP=192.168.178.248
+FORGEJO_HOST=forgejo
+FORGEJO_IP=192.168.178.247
 FORGEJO_PORT=3000
 FORGEJO_SSH_PORT=222
 ```

@@ -34,7 +34,7 @@ TZ=Europe/Berlin
 ### Netzwerk
 
 ```env
-SUBNET=192.168.178.0/24
+SUBNET=192.168.178.224/27
 GATEWAY=192.168.178.1
 ```
 

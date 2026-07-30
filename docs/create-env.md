@@ -29,7 +29,7 @@ Zwischen den beiden Dateien wird jeweils eine Leerzeile eingefügt.
 ### Interaktiv
 
 ```bash
-./create-env.sh
+../scripts/create-env.sh
 ```
 
 Existiert bereits eine `.env`, erscheint folgende Abfrage:
@@ -46,13 +46,13 @@ Existiert bereits eine `.env`, erscheint folgende Abfrage:
 Für automatisierte Umgebungen (z. B. CI/CD) kann die Rückfrage mit dem Parameter `--force` oder `-f` übersprungen werden.
 
 ```bash
-./create-env.sh --force
+../scripts/create-env.sh --force
 ```
 
 oder
 
 ```bash
-./create-env.sh -f
+../scripts/create-env.sh -f
 ```
 
 ## Priorität der Konfiguration
@@ -72,8 +72,8 @@ Dadurch können projektspezifische Werte gemeinsame Standardwerte überschreiben
 project-root/
 ├── .env.common.example
 └── app/
-    ├── create-env.sh
-    └── .env.example
+    ├── .env.example
+    └── README.md
 ```
 
 ### Ergebnis

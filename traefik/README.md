@@ -12,14 +12,12 @@ Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-archi
 
 - `compose.yml` - Traefik-Stack fuer den regulaeren Betrieb
 - `compose.ci.yml` - CI-Override
+- `.env.example` - Beispielkonfiguration fuer servicespezifische Variablen
 - `certs/` - Zertifikate
 - `config/` - Laufzeitkonfiguration
-- `scripts/` - Helper fuer Initialisierung/Validierung
-- `templates/` - Vorlagen fuer gerenderte Konfigurationsdateien
 
 ---
 
-=======
 ## Konfiguration
 
 Gemeinsame Konfiguration aus `.env.common.example` kopieren und Werte fuer Netzwerk, Traefik-IP, Dashboard-Port und Domain eintragen. Die servicespezifische `.env` ist optional und kann aus `.env.example` erstellt werden.
@@ -38,10 +36,14 @@ cp .env.common.example .env.common
 3. macvlan-Netzwerk vorhanden:
 
 ```bash
-./scripts/create-macvlan.sh
+../scripts/create-macvlan.sh
 ```
 
-4. Service-spezifische `.env` im Ordner `traefik/` anlegen (falls benoetigt)
+4. Service-spezifische `.env` im Ordner `traefik/` anlegen:
+
+```bash
+../scripts/create-env.sh
+```
 
 ---
 
@@ -114,4 +116,3 @@ mkcert homelab.internal "*.homelab.internal"
 ```
 
 5. Die mkcert-Root-CA auf den Clients importieren, die die Domains aufrufen sollen.
-=======

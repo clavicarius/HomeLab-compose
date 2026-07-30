@@ -48,6 +48,7 @@ services:
       - "traefik.http.routers.traefik.tls=true"
 
       # Dashboard - using admin:password for basic auth (change this!)
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.middlewares=dashboard-auth"
       - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:$$apr1$$g420e8rh$$Rfve3NuibXBmqSTHSeUyB0"

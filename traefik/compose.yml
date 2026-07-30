@@ -34,25 +34,11 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=${NETWORK_NAME}"
-      - "--providers.file.filename=/etc/traefik/tls.yml"
+      - "--providers.file.directory=/etc/traefik/dynamic"
       - "--providers.file.watch=true"
       - "--api.dashboard=true"
       - "--api.insecure=false"
       - "--ping=true"
-    labels:
-      - "traefik.enable=true"
-
-      # Router
-      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls=true"
-
-      # Dashboard - using admin:password for basic auth (change this!)
-      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.middlewares=dashboard-auth"
-      - "traefik.http.middlewares.dashboard-auth.basicauth.users=admin:$$apr1$$g420e8rh$$Rfve3NuibXBmqSTHSeUyB0"
-
     ports:
       - "80:80"
       - "443:443"
@@ -60,7 +46,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./certs:/certs:ro
-      - ./config/tls.yml:/etc/traefik/tls.yml:ro
+      - ./config:/etc/traefik/dynamic:ro
     networks:
       homelab_macvlan:
         ipv4_address: ${TRAEFIK_IP}

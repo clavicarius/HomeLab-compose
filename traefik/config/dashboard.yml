@@ -1,0 +1,9 @@
+http:
+  routers:
+    dashboard:
+      rule: Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)
+      entryPoints:
+        - websecure
+      service: api@internal
+      tls: {}
+      

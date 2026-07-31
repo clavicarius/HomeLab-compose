@@ -104,6 +104,8 @@ Nach dem Start sind folgende URLs über publizierte Host-Ports verfügbar:
 | PHP 8.5 | http://localhost:8085 |
 | phpMyAdmin | http://localhost:8080 |
 
+MariaDB wird dabei nicht über einen Host-Port veröffentlicht. Datenbankzugriffe aus PHP-Skripten und aus phpMyAdmin erfolgen intern im Stack über den Hostnamen `db`.
+
 ## Homelab-Zugriff (Traefik + AdGuard DNS)
 
 Mit `TRAEFIK_ENABLED=true` und DNS-Rewrites in AdGuard (→ `192.168.178.225`):
@@ -119,7 +121,7 @@ Mit `TRAEFIK_ENABLED=true` und DNS-Rewrites in AdGuard (→ `192.168.178.225`):
 
 # Datenbankzugang
 
-Datenbank: MariaDB 10.3
+Datenbank: MariaDB 10.11
 
 Standardzugang:
 
@@ -127,6 +129,8 @@ Host
 ```
 db
 ```
+
+Der Hostname `db` ist nur innerhalb des Docker-Stacks erreichbar. Ein direkter Zugriff aus dem LAN oder über `localhost:3306` ist nicht vorgesehen.
 
 Root Benutzer  
 ```

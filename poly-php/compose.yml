@@ -42,6 +42,7 @@ services:
     networks:
       homelab_macvlan:
         ipv4_address: ${POLYPHP56_IP}  # fixe IP
+      poly_internal:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.php56.rule=Host(`php56.${HOMELAB_DOMAIN}`)"
@@ -88,6 +89,7 @@ services:
     networks:
       homelab_macvlan:
         ipv4_address: ${POLYPHP74_IP}  # fixe IP
+      poly_internal:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.php74.rule=Host(`php74.${HOMELAB_DOMAIN}`)"
@@ -134,6 +136,7 @@ services:
     networks:
       homelab_macvlan:
         ipv4_address: ${POLYPHP85_IP}  # fixe IP
+      poly_internal:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.php85.rule=Host(`php85.${HOMELAB_DOMAIN}`)"
@@ -155,9 +158,6 @@ services:
 
   # db — MariaDB 10.11 relational database shared by all PHP containers.
   #
-  # Exposes:
-  #   3306:3306  — MySQL/MariaDB port (host-mapped for direct client access)
-  #
   # Volumes:
   #   ./mysql_data  — persistent database files (survives container re-creation)
   #
@@ -178,11 +178,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - ./mysql_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
     networks:
-      homelab_macvlan:
-        ipv4_address: ${POLYPHPDB_IP}  # fixe IP
+      - poly_internal
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -220,6 +217,7 @@ services:
     networks:
       homelab_macvlan:
         ipv4_address: ${POLYPHPADM_IP}  # fixe IP
+      poly_internal:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${HOMELAB_DOMAIN}`)"
@@ -238,3 +236,6 @@ networks:
   homelab_macvlan:
     external: true
     name: ${NETWORK_NAME}
+  poly_internal:
+    driver: bridge
+    internal: true

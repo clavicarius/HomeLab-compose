@@ -4,7 +4,7 @@ set -euo pipefail
 STEP_DIR="./step"
 
 CA_NAME="HomeLab CA"
-DNS_NAMES="step-ca,${HOMELAB_DOMAIN:-homelab.internal}"
+DNS_NAMES="step-ca,${HOMELAB_DOMAIN:-home.arpa}"
 PASSWORD="${TRAEFIK_CA_PASSWORD:TopS3cretPa$$w0rd}"
 
 mkdir -p "${STEP_DIR}"

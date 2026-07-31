@@ -2,7 +2,7 @@
 
 Dieser Ordner enthaelt den zentralen Traefik Reverse-Proxy-Stack fuer das Homelab.
 
-Traefik veroeffentlicht Webservices ueber Hostnamen wie `service.homelab.internal` und nutzt Docker-Labels zur automatischen Service-Erkennung.
+Traefik veroeffentlicht Webservices ueber Hostnamen wie `service.home.arpa` und nutzt Docker-Labels zur automatischen Service-Erkennung.
 
 Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-architecture.md)
 
@@ -81,11 +81,11 @@ Traefik veroeffentlicht HTTP auf Port 80, HTTPS auf Port 443 und das Dashboard a
 
 ```bash
 # DNS-Rewrite pruefen
-nslookup gitea.homelab.internal 192.168.178.252
+nslookup gitea.home.arpa 192.168.178.252
 
 # HTTP Redirect / Routing pruefen
-curl -I http://adguard.homelab.internal
-curl -k https://adguard.homelab.internal
+curl -I http://adguard.home.arpa
+curl -k https://adguard.home.arpa
 ```
 
 Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `compose.yml` und die DNS-Rewrites in AdGuard pruefen.
@@ -99,7 +99,7 @@ Fuer eine interne Wildcard-Zertifikatskette ohne Browser-Warnungen kann `mkcert`
 1. Zertifikate erzeugen:
 
 ```bash
-mkcert homelab.internal "*.homelab.internal"
+mkcert home.arpa "*.home.arpa"
 ```
 
 2. Die erzeugten Dateien nach `traefik/certs/` kopieren:

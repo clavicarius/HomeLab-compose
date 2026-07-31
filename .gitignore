@@ -22,3 +22,5 @@ vendor/
 # Docker
 *.log
 
+# Python cache
+__pycache__/

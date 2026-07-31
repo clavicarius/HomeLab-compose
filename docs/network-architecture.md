@@ -92,6 +92,12 @@ Container mit fester LAN-IP werden über `homelab_macvlan` angebunden. Die Adres
 | Dienst | IP-Adresse | Status |
 |--------|------------|--------|
 | Traefik | 192.168.178.225 | implementiert (`traefik`) |
+| Forgejo | 192.168.178.247 | implementiert (`forgejo`) |
+| Gitea | 192.168.178.248 | implementiert (`gitea`) |
+| phpMyAdmin | 192.168.178.234 | implementiert (`poly-php`) |
+| PHP 5.6 | 192.168.178.235 | implementiert (`poly-php`) |
+| PHP 7.4 | 192.168.178.237 | implementiert (`poly-php`) |
+| PHP 8.5 | 192.168.178.238 | implementiert (`poly-php`) |
 | Portainer | 192.168.178.250 | geplant |
 | AdGuard Home | 192.168.178.252 | implementiert (`adguard`) |
 

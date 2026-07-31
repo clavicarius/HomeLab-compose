@@ -178,6 +178,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - ./mysql_data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
     networks:
       - poly_internal
     healthcheck:
@@ -211,6 +212,8 @@ services:
     environment:
       PMA_HOST: db
       PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     depends_on:
       db:
         condition: service_healthy

@@ -142,6 +142,8 @@ Root Passwort
 root_password
 ```
 
+phpMyAdmin ist für diesen Stack auf den Root-Zugang vorbereitet. Wenn du die Datenbank neu initialisiert hast, funktioniert der Login direkt mit dem Root-Passwort aus der `.env`.
+
 Standarddatenbank  
 ```
 lamp_db
@@ -151,13 +153,15 @@ Optionaler Benutzer
 
 User  
 ```
-lamp_user
+lamp_dbuser
 ```
 
 Passwort  
 ```
-lamp_password
+lamp_dbSecretPassword
 ```
+
+Hinweis: Die Rechte werden beim ersten Start über [db-init/01-grants.sql](db-init/01-grants.sql) angelegt. Wenn du die DB-Grants geändert hast und der Fehler weiter auftritt, `mysql_data/` einmal leeren und den Stack neu starten.
 
 ---
 

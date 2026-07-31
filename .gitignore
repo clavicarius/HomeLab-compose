@@ -9,9 +9,6 @@ Thumbs.db
 .git-author
 !.git-author.example
 
-# Database volume
-mysql_data/
-
 # Logs
 logs/
 

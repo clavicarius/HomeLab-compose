@@ -91,7 +91,7 @@ Container mit fester LAN-IP werden über `homelab_macvlan` angebunden. Die Adres
 
 | Dienst | IP-Adresse | Status |
 |--------|------------|--------|
-| Traefik | 192.168.178.225 | implementiert (`poly-php`) |
+| Traefik | 192.168.178.225 | implementiert (`traefik`) |
 | Portainer | 192.168.178.250 | geplant |
 | AdGuard Home | 192.168.178.252 | implementiert (`adguard`) |
 
@@ -248,7 +248,7 @@ Standardmäßig sind beide Werte `false` — Services sind dann nur direkt über
 
 ## Container
 
-Traefik läuft im `poly-php`-Stack (`poly-php/compose.yml`).
+Traefik läuft als eigener Stack in `traefik/compose.yml`.
 
 ## LAN-IP
 
@@ -268,10 +268,12 @@ Traefik läuft im `poly-php`-Stack (`poly-php/compose.yml`).
 
 | Zweck | URL |
 |-------|-----|
-| Dashboard | http://192.168.178.99:8088 |
-| HTTPS-Services | https://<service>.homelab.internal |
+| Dashboard | http://192.168.178.225:8088 |
+| HTTPS-Services | https://<service>.home.arpa |
 
 Das Dashboard ist über den auf dem Host publizierten Port erreichbar. HTTPS-Services laufen über die Traefik-LAN-IP, sobald DNS-Rewrites gesetzt sind.
+
+Optional kann fuer interne Domains ein mkcert-Wildcard-Zertifikat ueber `traefik/certs/` und `traefik/config/tls.yml` bereitgestellt werden, um Browser-Warnungen zu vermeiden.
 
 ---
 
@@ -317,7 +319,7 @@ Die FRITZ!Box verteilt per DHCP folgenden DNS-Server:
 Dadurch nutzen alle Clients automatisch:
 
 - AdGuard Home (DNS-Filter, Rewrites)
-- lokale Namensauflösung für `*.homelab.internal`
+- lokale Namensauflösung für `*.home.arpa`
 
 ---
 
@@ -326,30 +328,30 @@ Dadurch nutzen alle Clients automatisch:
 ## Interne Domain
 
 ```text
-homelab.internal
+home.arpa
 ```
 
 Domain und E-Mail werden zentral in `.env.common` konfiguriert:
 
 ```env
-HOMELAB_DOMAIN=homelab.internal
-HOMELAB_EMAIL=admin@homelab.internal
+HOMELAB_DOMAIN=home.arpa
+HOMELAB_EMAIL=admin@home.arpa
 ```
 
 ## Service-Phasen
 
 | Domain | Ziel | Phase |
 |--------|------|-------|
-| adguard.homelab.internal | Traefik → AdGuard | Phase 1 (Basis) |
-| gitea.homelab.internal | Traefik → Gitea | Phase 1 (Basis) |
-| portainer.homelab.internal | Traefik → Portainer | Phase 1 (Management) |
-| php56.homelab.internal | Traefik → PHP 5.6 | Phase 1 (Basis) |
-| php74.homelab.internal | Traefik → PHP 7.4 | Phase 1 (Basis) |
-| php85.homelab.internal | Traefik → PHP 8.5 | Phase 1 (Basis) |
-| phpmyadmin.homelab.internal | Traefik → phpMyAdmin | Phase 1 (Basis) |
-| paperless.homelab.internal | Traefik → Paperless | Phase 2 |
-| wordpress.homelab.internal | Traefik → WordPress | Phase 2 |
-| drucker.homelab.internal | Drucker (direkt) | unabhängig |
+| adguard.home.arpa | Traefik → AdGuard | Phase 1 (Basis) |
+| gitea.home.arpa | Traefik → Gitea | Phase 1 (Basis) |
+| portainer.home.arpa | Traefik → Portainer | Phase 1 (Management) |
+| php56.home.arpa | Traefik → PHP 5.6 | Phase 1 (Basis) |
+| php74.home.arpa | Traefik → PHP 7.4 | Phase 1 (Basis) |
+| php85.home.arpa | Traefik → PHP 8.5 | Phase 1 (Basis) |
+| phpmyadmin.home.arpa | Traefik → phpMyAdmin | Phase 1 (Basis) |
+| paperless.home.arpa | Traefik → Paperless | Phase 2 |
+| wordpress.home.arpa | Traefik → WordPress | Phase 2 |
+| drucker.home.arpa | Drucker (direkt) | unabhängig |
 
 ---
 
@@ -360,15 +362,15 @@ Webservices zeigen auf die Traefik-IP. Der Drucker wird direkt angesprochen.
 ## DNS-Einträge
 
 ```text
-adguard.homelab.internal       -> 192.168.178.225
-portainer.homelab.internal     -> 192.168.178.225
-paperless.homelab.internal     -> 192.168.178.225
-wordpress.homelab.internal     -> 192.168.178.225
-php56.homelab.internal         -> 192.168.178.225
-php74.homelab.internal         -> 192.168.178.225
-php85.homelab.internal         -> 192.168.178.225
-phpmyadmin.homelab.internal    -> 192.168.178.225
-drucker.homelab.internal       -> 192.168.178.20
+adguard.home.arpa       -> 192.168.178.225
+portainer.home.arpa     -> 192.168.178.225
+paperless.home.arpa     -> 192.168.178.225
+wordpress.home.arpa     -> 192.168.178.225
+php56.home.arpa         -> 192.168.178.225
+php74.home.arpa         -> 192.168.178.225
+php85.home.arpa         -> 192.168.178.225
+phpmyadmin.home.arpa    -> 192.168.178.225
+drucker.home.arpa       -> 192.168.178.20
 ```
 
 ---
@@ -394,11 +396,11 @@ labels:
 
 | Domain | Zielcontainer | Port |
 |--------|-----------------|------|
-| adguard.homelab.internal | adguard-homelab | 3000 |
-| portainer.homelab.internal | portainer | 9000 |
-| paperless.homelab.internal | paperless | 8000 |
-| wordpress.homelab.internal | wordpress | 80 |
-| php85.homelab.internal | lamp-php85 | 80 |
+| adguard.home.arpa | adguard-homelab | 3000 |
+| portainer.home.arpa | portainer | 9000 |
+| paperless.home.arpa | paperless | 8000 |
+| wordpress.home.arpa | wordpress | 80 |
+| php85.home.arpa | lamp-php85 | 80 |
 
 ---
 
@@ -489,7 +491,7 @@ Die Architektur bietet:
 - zentrale Reverse-Proxy-Verwaltung über Traefik
 - einfache Docker-Erweiterbarkeit über Labels
 - stabile Netzwerkstruktur mit dokumentierten IP-Bereichen
-- saubere lokale Domains unter `homelab.internal`
+- saubere lokale Domains unter `home.arpa`
 - einfache Wartung
 - geringe Komplexität
 
@@ -511,7 +513,7 @@ Dieses Kapitel beschreibt die empfohlene Reihenfolge der Grundinstallation.
 8. AdGuard einrichten (DNS Port 53)
 9. FRITZ!Box DNS auf AdGuard-IP umstellen
 10. DNS-Rewrites anlegen
-11. Traefik-Stack deployen (`poly-php`)
+11. Traefik-Stack deployen (`traefik`)
 12. `TRAEFIK_ENABLED=true` setzen
 13. weitere Services deployen
 
@@ -663,9 +665,12 @@ homelab_macvlan
 ├── adguard/
 │   ├── compose.yml
 │   └── README.md
+├── traefik/
+│   ├── compose.yml
+│   └── README.md
 ├── poly-php/
 │   ├── compose.yml
-│   └── docs/traefik.md
+│   └── README.md
 ├── .env.common
 └── .env.common.example
 ```
@@ -733,15 +738,15 @@ Filters → DNS rewrites
 
 | Domain | Ziel |
 |--------|------|
-| adguard.homelab.internal | 192.168.178.225 |
-| portainer.homelab.internal | 192.168.178.225 |
-| paperless.homelab.internal | 192.168.178.225 |
-| wordpress.homelab.internal | 192.168.178.225 |
-| php56.homelab.internal | 192.168.178.225 |
-| php74.homelab.internal | 192.168.178.225 |
-| php85.homelab.internal | 192.168.178.225 |
-| phpmyadmin.homelab.internal | 192.168.178.225 |
-| drucker.homelab.internal | 192.168.178.20 |
+| adguard.home.arpa | 192.168.178.225 |
+| portainer.home.arpa | 192.168.178.225 |
+| paperless.home.arpa | 192.168.178.225 |
+| wordpress.home.arpa | 192.168.178.225 |
+| php56.home.arpa | 192.168.178.225 |
+| php74.home.arpa | 192.168.178.225 |
+| php85.home.arpa | 192.168.178.225 |
+| phpmyadmin.home.arpa | 192.168.178.225 |
+| drucker.home.arpa | 192.168.178.20 |
 
 ---
 
@@ -750,7 +755,7 @@ Filters → DNS rewrites
 ## Starten
 
 ```bash
-cd poly-php
+cd traefik
 docker compose up -d
 ```
 
@@ -769,7 +774,7 @@ Container neu starten:
 docker compose up -d
 ```
 
-Weitere Details: [poly-php/docs/traefik.md](../poly-php/docs/traefik.md)
+Weitere Details: [traefik/README.md](../traefik/README.md)
 
 ---
 
@@ -874,7 +879,7 @@ Automatische Updates vermeiden bei:
 Prüfen:
 
 ```bash
-nslookup portainer.homelab.internal 192.168.178.252
+nslookup portainer.home.arpa 192.168.178.252
 ```
 
 Erwartet:
@@ -970,7 +975,7 @@ Komplexität wird bewusst minimiert. macvlan wird gezielt für LAN-sichtbare Con
 | Entscheidungspunkt | Entscheidung | Ergebnis |
 |---|---|---|
 | Synology Parent-Interface für macvlan | Per Live-Test auf NAS ermitteln, danach fest in `.env.common` setzen | Blocker dokumentiert, Vorgehen festgelegt |
-| Scope Phase 1 Services | Basis (`adguard`, `traefik`/`poly-php`, `gitea`) + `portainer`; `paperless`/`wordpress` erst Phase 2 | Service-Phasen in der Domainstruktur ergänzt |
+| Scope Phase 1 Services | Basis (`adguard`, `traefik`, `gitea`) + `portainer`; `paperless`/`wordpress` erst Phase 2 | Service-Phasen in der Domainstruktur ergänzt |
 | Interne TLS-Strategie | interne CA als Zielbild; bis zur Einführung kontrollierter Übergang mit bestehender TLS-Option | Entscheidungsrichtung dokumentiert |
 | Backup- und Restore-Ziele | Serviceklassen mit RPO/RTO-Zielen | Zielwerte in Backup-Kapitel definiert |
 | Exponierung nach außen | LAN-only als Default; extern nur explizit per VPN/gesonderter Freigabe | Sicherheitsprinzip erweitert |

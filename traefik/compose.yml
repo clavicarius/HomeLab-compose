@@ -22,7 +22,7 @@ services:
   #
   # Static IP: ${TRAEFIK_IP} on the external homelab network.
   traefik:
-    image: traefik:v3.3
+    image: traefik:v3.7
     container_name: traefik-homelab
     restart: unless-stopped
     command:
@@ -34,8 +34,10 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=${NETWORK_NAME}"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
       - "--api.dashboard=true"
-      - "--api.insecure=true"
+      - "--api.insecure=false"
       - "--ping=true"
     ports:
       - "80:80"
@@ -44,6 +46,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./certs:/certs:ro
+      - ./config:/etc/traefik/dynamic:ro
     networks:
       homelab_macvlan:
         ipv4_address: ${TRAEFIK_IP}

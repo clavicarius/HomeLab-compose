@@ -1,0 +1,20 @@
+# Example configuration for Docker Compose repositories.
+# Copy to .yaml-lint-hooks.yml in your repo root and adjust as needed.
+# Or run: yaml-lint-hooks init --profile compose
+
+extends: default
+
+exclude:
+  - "**/.git/**"
+  - "**/.venv/**"
+  - "**/node_modules/**"
+  - "**/__pycache__/**"
+  - "**/.pytest_cache/**"
+
+schemas:
+  - preset: docker-compose
+
+custom_rules:
+  - builtin: no-tabs
+  - builtin: no-trailing-spaces
+  - builtin: no-empty-document

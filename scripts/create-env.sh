@@ -1,6 +1,6 @@
 #!/bin/bash
 # create-env.sh
-# Creates a local .env file by merging .env.common.example (repository root)
+# Creates a local .env file by merging .env.common (repository root)
 # and the service-specific .env.example (current directory).
 #
 # Usage:
@@ -9,7 +9,7 @@
 #   ../scripts/create-env.sh -f        — same as --force
 #
 # Input files (at least one must exist):
-#   ../.env.common.example   — shared configuration for all services
+#   ../.env.common   — shared configuration for all services
 #   .env.example             — service-specific configuration
 #
 # Output:
@@ -49,8 +49,8 @@ rm -f .env
 FOUND=0
 
 # Gemeinsame Konfiguration übernehmen
-if [ -f "../.env.common.example" ]; then
-  cat ../.env.common.example >> .env
+if [ -f "../.env.common" ]; then
+  cat ../.env.common >> .env
   echo "" >> .env
   FOUND=1
 fi

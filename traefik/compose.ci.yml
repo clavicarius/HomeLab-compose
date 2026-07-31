@@ -1,8 +1,9 @@
 services:
   traefik:
-    ports: !override []
+    ports: !override []   
     healthcheck:
-      start_period: 30s
+      start_period: !override 30s
+      timeout: !override 180s
 
 networks:
   homelab_macvlan: !override

@@ -19,9 +19,9 @@ Der Stack basiert auf **Docker Compose** und enthält:
 
 Alle PHP‑Container greifen auf denselben Projektcode zu, sodass Änderungen sofort in allen Versionen getestet werden können.
 
-Der Multi‑PHP Stack kann optional über einen Reverse‑Proxy mit HTTPS betrieben werden.
+Der Multi‑PHP Stack kann optional über den zentralen Reverse Proxy mit HTTPS betrieben werden.
 
-Hierfür wird zusätzlich ein **Traefik**-Container verwendet, der im Homelab als zentraler Reverse Proxy für alle Compose-Projekte dient. Die Konfiguration basiert auf `docs/traefik.md` und [docs/network-architecture.md](../docs/network-architecture.md).
+Der Reverse Proxy läuft als eigener Stack in [traefik/README.md](../traefik/README.md). Die Gesamtarchitektur ist in [docs/network-architecture.md](../docs/network-architecture.md) dokumentiert.
 
 Voraussetzung: externes macvlan-Netzwerk `homelab_macvlan` (siehe `./scripts/create-macvlan.sh` im Repository-Root).
 
@@ -104,23 +104,24 @@ Nach dem Start sind folgende URLs über publizierte Host-Ports verfügbar:
 | PHP 8.5 | http://localhost:8085 |
 | phpMyAdmin | http://localhost:8080 |
 
+MariaDB wird dabei nicht über einen Host-Port veröffentlicht. Datenbankzugriffe aus PHP-Skripten und aus phpMyAdmin erfolgen intern im Stack über den Hostnamen `db`.
+
 ## Homelab-Zugriff (Traefik + AdGuard DNS)
 
 Mit `TRAEFIK_ENABLED=true` und DNS-Rewrites in AdGuard (→ `192.168.178.225`):
 
 | PHP-Version | HTTPS |
 |---|---|
-| PHP 5.6 | https://php56.homelab.internal |
-| PHP 7.4 | https://php74.homelab.internal |
-| PHP 8.5 | https://php85.homelab.internal |
-| phpMyAdmin | https://phpmyadmin.homelab.internal |
-| Traefik Dashboard | http://192.168.178.99:8088 |
+| PHP 5.6 | https://php56.home.arpa |
+| PHP 7.4 | https://php74.home.arpa |
+| PHP 8.5 | https://php85.home.arpa |
+| phpMyAdmin | https://phpmyadmin.home.arpa |
 
 ---
 
 # Datenbankzugang
 
-Datenbank: MariaDB 10.3
+Datenbank: MariaDB 10.11
 
 Standardzugang:
 
@@ -128,6 +129,8 @@ Host
 ```
 db
 ```
+
+Der Hostname `db` ist nur innerhalb des Docker-Stacks erreichbar. Ein direkter Zugriff aus dem LAN oder über `localhost:3306` ist nicht vorgesehen.
 
 Root Benutzer  
 ```
@@ -139,6 +142,8 @@ Root Passwort
 root_password
 ```
 
+phpMyAdmin ist für diesen Stack auf den Root-Zugang vorbereitet. Wenn du die Datenbank neu initialisiert hast, funktioniert der Login direkt mit dem Root-Passwort aus der `.env`.
+
 Standarddatenbank  
 ```
 lamp_db
@@ -148,13 +153,15 @@ Optionaler Benutzer
 
 User  
 ```
-lamp_user
+lamp_dbuser
 ```
 
 Passwort  
 ```
-lamp_password
+lamp_dbSecretPassword
 ```
+
+Hinweis: Die Rechte werden beim ersten Start über [db-init/01-grants.sql](db-init/01-grants.sql) angelegt. Wenn du die DB-Grants geändert hast und der Fehler weiter auftritt, `mysql_data/` einmal leeren und den Stack neu starten.
 
 ---
 
@@ -278,6 +285,6 @@ Für produktive Systeme wird empfohlen:
 docker compose up -d --build
 ```
 
-**Homelab:** DNS-Rewrites in AdGuard für `*.homelab.internal` → `192.168.178.225`, dann `TRAEFIK_ENABLED=true` setzen.
+**Homelab:** DNS-Rewrites in AdGuard für `*.home.arpa` → `192.168.178.225`, dann `TRAEFIK_ENABLED=true` setzen.
 
-**Lokale Entwicklung ohne DNS:** Host-Ports (siehe Tabelle oben) oder Einträge in der Hosts-Datei — siehe `docs/traefik.md`.
+**Lokale Entwicklung ohne DNS:** Host-Ports (siehe Tabelle oben) oder Einträge in der Hosts-Datei. Details zum zentralen Routing stehen in [traefik/README.md](../traefik/README.md).

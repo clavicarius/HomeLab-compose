@@ -43,8 +43,8 @@ services:
       - "traefik.http.routers.adguard.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.routers.adguard.entrypoints=websecure"
       - "traefik.http.routers.adguard.rule=Host(`${ADGUARD_HOST}.${HOMELAB_DOMAIN}`)"
-      - "traefik.http.services.adguard.loadbalancer.server.port=3000"
-      - "traefik.docker.network=homelab_macvlan"
+      - "traefik.http.services.adguard.loadbalancer.server.port=9080"
+      - "traefik.docker.network=${NETWORK_NAME}"
       
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:9080/ >/dev/null || exit 1"] 
@@ -56,3 +56,4 @@ services:
 networks:
   homelab_macvlan:
     external: true
+    name: ${NETWORK_NAME}

@@ -1,0 +1,8 @@
+# Traefik
+step/secrets/
+step/config/
+step/db
+step/certs/
+certs/*.pem
+certs/*-key.pem
+!certs/.gitkeep

@@ -12,7 +12,7 @@ Docker-Compose-Projekt für den Betrieb von **Forgejo** im Homelab.
 ## Projektstruktur
 
 ```text
-Forgejo/
+forgejo/
 ├── compose.yml
 ├── .env
 ├── data/
@@ -34,22 +34,22 @@ TZ=Europe/Berlin
 ### Netzwerk
 
 ```env
-SUBNET=192.168.178.0/24
+SUBNET=192.168.178.224/27
 GATEWAY=192.168.178.1
 ```
 
 ### Homelab
 
 ```env
-HOMELAB_DOMAIN=homelab.internal
-HOMELAB_EMAIL=admin@homelab.internal
+HOMELAB_DOMAIN=home.arpa
+HOMELAB_EMAIL=admin@home.arpa
 ```
 
 ### Forgejo
 
 ```env
-FORGEJO_HOST=Forgejo
-FORGEJO_IP=192.168.178.248
+FORGEJO_HOST=forgejo
+FORGEJO_IP=192.168.178.247
 FORGEJO_PORT=3000
 FORGEJO_SSH_PORT=222
 ```
@@ -182,14 +182,14 @@ Der Container prüft alle 30 Sekunden die Erreichbarkeit des Webinterfaces.
 Die `.env` enthält bereits alle benötigten Variablen.
 
 ```env
-HOMELAB_DOMAIN=homelab.internal
+HOMELAB_DOMAIN=home.arpa
 FORGEJO_HOST=Forgejo
 ```
 
 Später kann Forgejo beispielsweise unter
 
 ```
-https://forgejo.homelab.internal
+https://forgejo.home.arpa
 ```
 
 über Traefik veröffentlicht werden.

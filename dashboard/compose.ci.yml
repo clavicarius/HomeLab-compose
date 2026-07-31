@@ -1,0 +1,14 @@
+services:
+  dashboard:
+    networks:
+      homelab_macvlan:
+        ipv4_address: ${DASHBOARD_IP}
+
+networks:
+  homelab_macvlan:
+    driver: bridge
+    name: ${NETWORK_NAME}
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}

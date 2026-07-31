@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+:root { --ink: #182126; --muted: #647176; --paper: #f5f1e8; --card: #fffdf7; --accent: #e05b3f; --line: #d8d2c5; }
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: radial-gradient(circle at 80% 0%, #f1c98f 0, transparent 30%), var(--paper); font-family: 'DM Sans', sans-serif; }
+.shell { max-width: 1120px; margin: 0 auto; padding: 8vh 7vw 10vh; }
+.masthead { max-width: 680px; animation: rise .6s ease-out both; }
+.eyebrow { color: var(--accent); font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+h1, h2 { font-family: 'Space Grotesk', sans-serif; }
+h1 { margin: 1rem 0 .6rem; font-size: clamp(2.8rem, 7vw, 6.4rem); line-height: .95; letter-spacing: 0; }
+.intro { color: var(--muted); font-size: 1.1rem; line-height: 1.6; }
+.services { margin-top: 7rem; }
+h2 { margin: 0 0 1.2rem; font-size: 1.5rem; }
+.service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+.service-card { display: flex; align-items: center; gap: 1rem; min-height: 104px; padding: 1.1rem; color: inherit; background: var(--card); border: 1px solid var(--line); text-decoration: none; transition: transform .2s ease, border-color .2s ease; }
+.service-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+.service-mark { display: grid; place-items: center; flex: 0 0 48px; aspect-ratio: 1; color: white; background: var(--ink); font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; }
+.service-card strong, .service-card small { display: block; }
+.service-card small { margin-top: .3rem; color: var(--muted); font-size: .83rem; }
+.arrow { margin-left: auto; color: var(--accent); font-size: 1.4rem; }
+.state { color: var(--muted); }
+.error { color: var(--accent); }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 600px) { .shell { padding-top: 4rem; } .services { margin-top: 4rem; } }

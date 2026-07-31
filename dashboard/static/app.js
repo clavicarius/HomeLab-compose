@@ -1,0 +1,46 @@
+async function loadServices() {
+  const container = document.querySelector("#services");
+  try {
+    const response = await fetch("/api/services");
+    if (!response.ok) throw new Error("Service data unavailable");
+    const services = await response.json();
+    container.replaceChildren();
+    if (services.length === 0) {
+      container.innerHTML = '<p class="state">Noch keine Services veroeffentlicht.</p>';
+      return;
+    }
+    const group = document.createElement("section");
+    group.className = "service-group";
+    const heading = document.createElement("h2");
+    heading.textContent = "Services";
+    group.append(heading);
+    const grid = document.createElement("div");
+    grid.className = "service-grid";
+    services.forEach((service) => {
+      const card = document.createElement("a");
+      card.className = "service-card";
+      card.href = service.url;
+      const mark = document.createElement("span");
+      mark.className = "service-mark";
+      mark.textContent = service.name.slice(0, 1);
+      const details = document.createElement("span");
+      const name = document.createElement("strong");
+      name.textContent = service.name;
+      const host = document.createElement("small");
+      host.textContent = service.host;
+      details.append(name, host);
+      const arrow = document.createElement("span");
+      arrow.className = "arrow";
+      arrow.textContent = "->";
+      card.append(mark, details, arrow);
+      grid.append(card);
+    });
+    group.append(grid);
+    container.append(group);
+  } catch (error) {
+    container.innerHTML = '<p class="state error">Services konnten nicht geladen werden.</p>';
+  }
+}
+
+loadServices();
+setInterval(loadServices, 30000);

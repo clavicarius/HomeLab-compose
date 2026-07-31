@@ -40,7 +40,8 @@ services:
       db:
         condition: service_healthy
     networks:
-      - homelab_macvlan
+      homelab_macvlan:
+        ipv4_address: ${POLYPHP56_IP}  # fixe IP
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.php56.rule=Host(`php56.${HOMELAB_DOMAIN}`)"
@@ -85,7 +86,8 @@ services:
       db:
         condition: service_healthy
     networks:
-      - homelab_macvlan
+      homelab_macvlan:
+        ipv4_address: ${POLYPHP74_IP}  # fixe IP
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.php74.rule=Host(`php74.${HOMELAB_DOMAIN}`)"
@@ -130,7 +132,8 @@ services:
       db:
         condition: service_healthy
     networks:
-      - homelab_macvlan
+      homelab_macvlan:
+        ipv4_address: ${POLYPHP85_IP}  # fixe IP
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.php85.rule=Host(`php85.${HOMELAB_DOMAIN}`)"
@@ -178,7 +181,8 @@ services:
     ports:
       - "3306:3306"
     networks:
-      - homelab_macvlan
+      homelab_macvlan:
+        ipv4_address: ${POLYPHPDB_IP}  # fixe IP
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -214,7 +218,8 @@ services:
       db:
         condition: service_healthy
     networks:
-      - homelab_macvlan
+      homelab_macvlan:
+        ipv4_address: ${POLYPHPADM_IP}  # fixe IP
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${HOMELAB_DOMAIN}`)"

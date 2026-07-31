@@ -18,7 +18,7 @@ class DashboardNormalizerTests(unittest.TestCase):
             {"Name": "wildcard@docker", "Provider": "docker", "Rule": "HostRegexp(`{host:.+}.home.arpa`)", "Service": "wildcard@docker"},
             {"Name": "duplicate@docker", "Provider": "docker", "Rule": "Host(`gitea.home.arpa`)", "Service": "duplicate@docker"},
         ]
-        self.assertEqual(normalize_routers(routers), [{"name": "Gitea", "host": "gitea.home.arpa", "url": "https://gitea.home.arpa", "tls": True}])
+        self.assertEqual(normalize_routers(routers), [{"name": "Gitea", "host": "gitea.home.arpa", "url": "https://gitea.home.arpa", "tls": True, "category": "Other"}])
 
 
 if __name__ == "__main__":

@@ -34,3 +34,14 @@ python -m unittest dashboard.test_server
 Der MVP beruecksichtigt nur Docker-Provider-Router mit einer auswertbaren
 `Host(...)`-Regel. Interne Services, File-Provider-Router, Wildcard-Regeln und
 doppelte Hosts werden nicht als Karten angezeigt.
+
+## Phase 2: Kategoriegruppen
+
+Die API liefert fuer jeden Service das Feld `category`. Solange keine zusaetzliche
+Metadatenquelle verwendet wird, ist der Wert deterministisch `Other`. Die UI
+gruppiert nach diesem Feld und sortiert Kategorien sowie Services alphabetisch.
+
+Das optionale Docker-Label `homelab.category` ist als spaeterer Datenvertrag
+vorgesehen. Der Dashboard-Container verwendet dafuer in Phase 2 absichtlich
+keinen Docker-Socket; eine echte Labelauswertung wird erst nach einer separaten
+Sicherheitsentscheidung umgesetzt.

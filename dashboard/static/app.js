@@ -9,34 +9,49 @@ async function loadServices() {
       container.innerHTML = '<p class="state">Noch keine Services veroeffentlicht.</p>';
       return;
     }
-    const group = document.createElement("section");
-    group.className = "service-group";
-    const heading = document.createElement("h2");
-    heading.textContent = "Services";
-    group.append(heading);
-    const grid = document.createElement("div");
-    grid.className = "service-grid";
+    const groups = new Map();
     services.forEach((service) => {
-      const card = document.createElement("a");
-      card.className = "service-card";
-      card.href = service.url;
-      const mark = document.createElement("span");
-      mark.className = "service-mark";
-      mark.textContent = service.name.slice(0, 1);
-      const details = document.createElement("span");
-      const name = document.createElement("strong");
-      name.textContent = service.name;
-      const host = document.createElement("small");
-      host.textContent = service.host;
-      details.append(name, host);
-      const arrow = document.createElement("span");
-      arrow.className = "arrow";
-      arrow.textContent = "->";
-      card.append(mark, details, arrow);
-      grid.append(card);
+      const category = typeof service.category === "string" && service.category.trim()
+        ? service.category.trim()
+        : "Other";
+      if (!groups.has(category)) groups.set(category, []);
+      groups.get(category).push(service);
     });
-    group.append(grid);
-    container.append(group);
+
+    [...groups.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .forEach(([category, categoryServices]) => {
+        const group = document.createElement("section");
+        group.className = "service-group";
+        const heading = document.createElement("h2");
+        heading.textContent = category;
+        group.append(heading);
+        const grid = document.createElement("div");
+        grid.className = "service-grid";
+        categoryServices
+          .sort((left, right) => left.name.localeCompare(right.name))
+          .forEach((service) => {
+            const card = document.createElement("a");
+            card.className = "service-card";
+            card.href = service.url;
+            const mark = document.createElement("span");
+            mark.className = "service-mark";
+            mark.textContent = service.name.slice(0, 1);
+            const details = document.createElement("span");
+            const name = document.createElement("strong");
+            name.textContent = service.name;
+            const host = document.createElement("small");
+            host.textContent = service.host;
+            details.append(name, host);
+            const arrow = document.createElement("span");
+            arrow.className = "arrow";
+            arrow.textContent = "->";
+            card.append(mark, details, arrow);
+            grid.append(card);
+          });
+        group.append(grid);
+        container.append(group);
+      });
   } catch (error) {
     container.innerHTML = '<p class="state error">Services konnten nicht geladen werden.</p>';
   }

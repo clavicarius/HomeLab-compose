@@ -12,6 +12,7 @@ from urllib.request import Request, urlopen
 HOST_PATTERN = re.compile(r"Host\((?P<hosts>[^)]*)\)")
 QUOTED_HOST = re.compile(r"[`\"](?P<host>[^`\"]+)[`\"]")
 TECHNICAL_SERVICES = {"api@internal", "noop@internal"}
+DEFAULT_CATEGORY = "Other"
 STATIC_DIR = Path(__file__).parent / "static"
 
 
@@ -45,6 +46,7 @@ def normalize_routers(routers):
                 "host": host,
                 "url": f"https://{host}",
                 "tls": router.get("TLS") is not None,
+                "category": DEFAULT_CATEGORY,
             }
     return sorted(services.values(), key=lambda item: item["name"].lower())
 

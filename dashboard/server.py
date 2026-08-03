@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import socket
 import ssl
 import threading
 import time
@@ -13,6 +14,8 @@ HOST_PATTERN = re.compile(r"Host\((?P<hosts>[^)]*)\)")
 QUOTED_HOST = re.compile(r"[`\"](?P<host>[^`\"]+)[`\"]")
 TECHNICAL_SERVICES = {"api@internal", "noop@internal"}
 DEFAULT_CATEGORY = "Other"
+DOCKER_SOCKET = "/var/run/docker.sock"
+LABEL_PREFIX = "homelab."
 STATIC_DIR = Path(__file__).parent / "static"
 
 
@@ -28,7 +31,35 @@ def display_name(host):
     return label.title()
 
 
-def normalize_routers(routers):
+def clean_metadata_value(value, maximum_length=120):
+    if not isinstance(value, str):
+        return ""
+    return value.strip()[:maximum_length]
+
+
+def container_metadata(containers):
+    metadata = {}
+    for container in containers:
+        labels = container.get("Labels") or {}
+        router_names = {
+            key.split(".")[3]
+            for key in labels
+            if key.startswith("traefik.http.routers.")
+            and key.count(".") >= 3
+        }
+        values = {
+            "name": clean_metadata_value(labels.get(f"{LABEL_PREFIX}name")),
+            "icon": clean_metadata_value(labels.get(f"{LABEL_PREFIX}icon"), 40),
+            "description": clean_metadata_value(labels.get(f"{LABEL_PREFIX}description"), 240),
+            "category": clean_metadata_value(labels.get(f"{LABEL_PREFIX}category"), 60) or DEFAULT_CATEGORY,
+        }
+        for router_name in router_names:
+            metadata[router_name] = values
+    return metadata
+
+
+def normalize_routers(routers, metadata=None):
+    metadata = metadata or {}
     services = {}
     for router in routers:
         provider = router.get("Provider", "")
@@ -41,21 +72,41 @@ def normalize_routers(routers):
         for host in hostnames_from_rule(router.get("Rule", "")):
             if "*" in host or host in services:
                 continue
+            router_name = name.removesuffix("@docker")
+            details = metadata.get(router_name, {})
             services[host] = {
-                "name": display_name(host),
+                "name": details.get("name") or display_name(host),
                 "host": host,
                 "url": f"https://{host}",
                 "tls": router.get("TLS") is not None,
-                "category": DEFAULT_CATEGORY,
+                "category": details.get("category") or DEFAULT_CATEGORY,
+                "icon": details.get("icon", ""),
+                "description": details.get("description", ""),
             }
     return sorted(services.values(), key=lambda item: item["name"].lower())
 
 
+def read_docker_containers(socket_path=DOCKER_SOCKET):
+    request = b"GET /containers/json HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n"
+    connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    try:
+        connection.connect(socket_path)
+        connection.sendall(request)
+        response = b""
+        while chunk := connection.recv(65536):
+            response += chunk
+    finally:
+        connection.close()
+    _, body = response.split(b"\r\n\r\n", 1)
+    return json.loads(body)
+
+
 class DashboardState:
-    def __init__(self, api_url, api_host, refresh_seconds):
+    def __init__(self, api_url, api_host, refresh_seconds, docker_socket=DOCKER_SOCKET):
         self.api_url = api_url
         self.api_host = api_host
         self.refresh_seconds = refresh_seconds
+        self.docker_socket = docker_socket
         self.services = []
         self.lock = threading.Lock()
 
@@ -64,7 +115,9 @@ class DashboardState:
         context = ssl._create_unverified_context()
         with urlopen(request, context=context, timeout=10) as response:
             payload = json.load(response)
-        services = normalize_routers(payload if isinstance(payload, list) else [])
+        routers = payload if isinstance(payload, list) else []
+        metadata = container_metadata(read_docker_containers(self.docker_socket))
+        services = normalize_routers(routers, metadata)
         with self.lock:
             self.services = services
 
@@ -129,6 +182,7 @@ def main():
         os.environ.get("TRAEFIK_API_URL", "https://traefik-homelab/api/http/routers"),
         os.environ.get("TRAEFIK_API_HOST", "traefik.home.arpa"),
         int(os.environ.get("REFRESH_SECONDS", "30")),
+        os.environ.get("DOCKER_SOCKET", DOCKER_SOCKET),
     )
     threading.Thread(target=refresh_loop, args=(state,), daemon=True).start()
     server = ThreadingHTTPServer(("0.0.0.0", 8080), handler_for(state))

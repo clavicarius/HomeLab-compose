@@ -36,13 +36,19 @@ async function loadServices() {
             card.href = service.url;
             const mark = document.createElement("span");
             mark.className = "service-mark";
-            mark.textContent = service.name.slice(0, 1);
+            mark.textContent = service.icon || service.name.slice(0, 1);
             const details = document.createElement("span");
             const name = document.createElement("strong");
             name.textContent = service.name;
             const host = document.createElement("small");
             host.textContent = service.host;
             details.append(name, host);
+            if (service.description) {
+              const description = document.createElement("small");
+              description.className = "description";
+              description.textContent = service.description;
+              details.append(description);
+            }
             const arrow = document.createElement("span");
             arrow.className = "arrow";
             arrow.textContent = "->";

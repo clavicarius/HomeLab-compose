@@ -59,6 +59,10 @@ services:
       - "traefik.http.routers.gitea.rule=Host(`${GITEA_HOST}.${HOMELAB_DOMAIN}`)"
       - "traefik.http.services.gitea.loadbalancer.server.port=3000"
       - "traefik.docker.network=${NETWORK_NAME}"
+      - "homelab.name=Gitea"
+      - "homelab.icon=Git"
+      - "homelab.category=Development"
+      - "homelab.description=Self-hosted Git-Service mit Issue-Tracking"
 
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/ >/dev/null || exit 1"]

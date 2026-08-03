@@ -41,7 +41,18 @@ Die API liefert fuer jeden Service das Feld `category`. Solange keine zusaetzlic
 Metadatenquelle verwendet wird, ist der Wert deterministisch `Other`. Die UI
 gruppiert nach diesem Feld und sortiert Kategorien sowie Services alphabetisch.
 
-Das optionale Docker-Label `homelab.category` ist als spaeterer Datenvertrag
-vorgesehen. Der Dashboard-Container verwendet dafuer in Phase 2 absichtlich
-keinen Docker-Socket; eine echte Labelauswertung wird erst nach einer separaten
-Sicherheitsentscheidung umgesetzt.
+## Phase 3: Erweiterte Metadaten
+
+Veroeffentlichte Services koennen folgende optionale Docker-Labels verwenden:
+
+```yaml
+- "homelab.name=Gitea"
+- "homelab.icon=Git"
+- "homelab.category=Development"
+- "homelab.description=Self-hosted Git-Service"
+```
+
+Der Dashboard-Adapter liest diese Labels ueber den Docker-Socket mit read-only
+Berechtigung. Sie beeinflussen weder Traefik-Routing noch Ziel-URL. Fehlende
+Labels fallen auf den Hostnamen, ein Initialen-Icon, `Other` und eine leere
+Beschreibung zurück. Werte werden vor der Ausgabe begrenzt.

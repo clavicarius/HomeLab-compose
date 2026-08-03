@@ -45,6 +45,10 @@ services:
       - "traefik.http.routers.adguard.rule=Host(`${ADGUARD_HOST}.${HOMELAB_DOMAIN}`)"
       - "traefik.http.services.adguard.loadbalancer.server.port=9080"
       - "traefik.docker.network=${NETWORK_NAME}"
+      - "homelab.name=AdGuard"
+      - "homelab.icon=DNS"
+      - "homelab.category=Infrastructure"
+      - "homelab.description=Lokaler DNS-Server und Werbeblocker"
       
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:9080/ >/dev/null || exit 1"] 

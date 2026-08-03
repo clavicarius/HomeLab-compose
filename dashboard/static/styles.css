@@ -17,6 +17,7 @@ h2 { margin: 0 0 1.2rem; font-size: 1.5rem; }
 .service-mark { display: grid; place-items: center; flex: 0 0 48px; aspect-ratio: 1; color: white; background: var(--ink); font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; }
 .service-card strong, .service-card small { display: block; }
 .service-card small { margin-top: .3rem; color: var(--muted); font-size: .83rem; }
+.service-card .description { margin-top: .5rem; color: var(--ink); }
 .arrow { margin-left: auto; color: var(--accent); font-size: 1.4rem; }
 .state { color: var(--muted); }
 .error { color: var(--accent); }

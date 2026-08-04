@@ -1,6 +1,6 @@
 import unittest
 
-from dashboard.server import container_metadata, display_name, hostnames_from_rule, image_parts, normalize_routers
+from dashboard.server import container_metadata, decode_chunked_body, display_name, hostnames_from_rule, image_parts, normalize_routers
 
 
 class DashboardNormalizerTests(unittest.TestCase):
@@ -64,6 +64,13 @@ class DashboardNormalizerTests(unittest.TestCase):
     def test_image_parts_support_tags_and_digests(self):
         self.assertEqual(image_parts("gitea/gitea:1"), ("gitea/gitea", "1"))
         self.assertEqual(image_parts("gitea/gitea@sha256:abc"), ("gitea/gitea", "sha256:abc"))
+
+    def test_decodes_chunked_docker_response_body(self):
+        body = b'[{"State":"running"}]'
+        first = body[:10]
+        second = body[10:]
+        chunked = b"%x\r\n%s\r\n%x\r\n%s\r\n0\r\n\r\n" % (len(first), first, len(second), second)
+        self.assertEqual(decode_chunked_body(chunked), body)
 
     def test_normalizer_uses_metadata_without_changing_routing(self):
         routers = [{"Name": "gitea@docker", "Provider": "docker", "Rule": "Host(`gitea.home.arpa`)", "Service": "gitea@docker", "TLS": {}}]

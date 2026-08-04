@@ -130,8 +130,29 @@ def read_docker_containers(socket_path=DOCKER_SOCKET):
             response += chunk
     finally:
         connection.close()
-    _, body = response.split(b"\r\n\r\n", 1)
-    return json.loads(body)
+    header_bytes, body = response.split(b"\r\n\r\n", 1)
+    headers = header_bytes.decode("iso-8859-1").lower()
+    if "transfer-encoding: chunked" in headers:
+        body = decode_chunked_body(body)
+    return json.loads(body.decode("utf-8"))
+
+
+def decode_chunked_body(body):
+    decoded = bytearray()
+    position = 0
+    while True:
+        line_end = body.find(b"\r\n", position)
+        if line_end < 0:
+            raise ValueError("Invalid chunked Docker response")
+        size = int(body[position:line_end].split(b";", 1)[0], 16)
+        position = line_end + 2
+        if size == 0:
+            return bytes(decoded)
+        end = position + size
+        if end + 2 > len(body) or body[end:end + 2] != b"\r\n":
+            raise ValueError("Invalid chunked Docker response")
+        decoded.extend(body[position:end])
+        position = end + 2
 
 
 class DashboardState:

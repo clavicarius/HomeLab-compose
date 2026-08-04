@@ -74,3 +74,6 @@ und fehlende oder nicht erreichbare Metadaten als `Status unbekannt` angezeigt.
 Der Dashboard-Adapter fragt dafuer `/containers/json?all=1` ueber den read-only
 Docker-Socket ab. Ausfaelle dieser Abfrage lassen die Traefik-Services sichtbar
 und fallen nur bei den Laufzeitdaten auf unbekannt zurueck.
+
+Die Docker-API-Antwort wird ueber den Unix-Socket als HTTP gelesen und
+unterstuetzt sowohl `Content-Length` als auch `Transfer-Encoding: chunked`.

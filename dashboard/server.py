@@ -19,6 +19,18 @@ LABEL_PREFIX = "homelab."
 STATIC_DIR = Path(__file__).parent / "static"
 
 
+def normalized_key(value):
+    return re.sub(r"[^a-z0-9]", "", str(value).lower())
+
+
+def field_value(record, field, default=None):
+    wanted = normalized_key(field)
+    for key, value in record.items():
+        if normalized_key(key) == wanted:
+            return value
+    return default
+
+
 def hostnames_from_rule(rule):
     match = HOST_PATTERN.search(rule or "")
     if not match:
@@ -50,21 +62,22 @@ def image_parts(image):
 def container_metadata(containers):
     metadata = {}
     for container in containers:
-        labels = container.get("Labels") or {}
+        labels = field_value(container, "labels", {}) or {}
+        normalized_labels = {normalized_key(key): value for key, value in labels.items()}
         router_names = {
             key.split(".")[3]
             for key in labels
-            if key.startswith("traefik.http.routers.")
-            and key.count(".") >= 3
+            if normalized_key(key).startswith("traefikhttprouters")
+            and len(key.split(".")) >= 4
         }
-        image, version = image_parts(container.get("Image", ""))
-        state = container.get("State")
+        image, version = image_parts(field_value(container, "image", ""))
+        state = field_value(container, "state")
         values = {
-            "name": clean_metadata_value(labels.get(f"{LABEL_PREFIX}name")),
-            "icon": clean_metadata_value(labels.get(f"{LABEL_PREFIX}icon"), 40),
-            "description": clean_metadata_value(labels.get(f"{LABEL_PREFIX}description"), 240),
-            "category": clean_metadata_value(labels.get(f"{LABEL_PREFIX}category"), 60) or DEFAULT_CATEGORY,
-            "container": clean_metadata_value((container.get("Names") or [""])[0].lstrip("/")),
+            "name": clean_metadata_value(normalized_labels.get(normalized_key(f"{LABEL_PREFIX}name"))),
+            "icon": clean_metadata_value(normalized_labels.get(normalized_key(f"{LABEL_PREFIX}icon")), 40),
+            "description": clean_metadata_value(normalized_labels.get(normalized_key(f"{LABEL_PREFIX}description")), 240),
+            "category": clean_metadata_value(normalized_labels.get(normalized_key(f"{LABEL_PREFIX}category")), 60) or DEFAULT_CATEGORY,
+            "container": clean_metadata_value((field_value(container, "names") or [""])[0].lstrip("/")),
             "image": image,
             "version": version,
             "status": "up" if state == "running" else "down" if state else "unknown",
@@ -78,14 +91,14 @@ def normalize_routers(routers, metadata=None):
     metadata = metadata or {}
     services = {}
     for router in routers:
-        provider = router.get("Provider", "")
-        name = router.get("Name", "")
-        service = router.get("Service", "")
-        if provider != "docker" and not name.endswith("@docker"):
+        provider = str(field_value(router, "provider", "")).lower()
+        name = str(field_value(router, "name", ""))
+        service = str(field_value(router, "service", ""))
+        if provider != "docker" and not name.lower().endswith("@docker"):
             continue
-        if service in TECHNICAL_SERVICES:
+        if service.lower() in {item.lower() for item in TECHNICAL_SERVICES}:
             continue
-        for host in hostnames_from_rule(router.get("Rule", "")):
+        for host in hostnames_from_rule(field_value(router, "rule", "")):
             if "*" in host or host in services:
                 continue
             router_name = name.removesuffix("@docker")
@@ -94,7 +107,7 @@ def normalize_routers(routers, metadata=None):
                 "name": details.get("name") or display_name(host),
                 "host": host,
                 "url": f"https://{host}",
-                "tls": router.get("TLS") is not None,
+                "tls": field_value(router, "tls") is not None,
                 "category": details.get("category") or DEFAULT_CATEGORY,
                 "icon": details.get("icon", ""),
                 "description": details.get("description", ""),

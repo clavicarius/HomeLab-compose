@@ -57,6 +57,14 @@ Berechtigung. Sie beeinflussen weder Traefik-Routing noch Ziel-URL. Fehlende
 Labels fallen auf den Hostnamen, ein Initialen-Icon, `Other` und eine leere
 Beschreibung zurueck. Werte werden vor der Ausgabe begrenzt.
 
+## API-Schreibweise
+
+Traefiks API-Felder werden ohne Annahme einer bestimmten Gross-/Kleinschreibung
+gelesen. Die Felder `name`, `provider`, `rule`, `service` und `tls` werden daher
+in lowercase, PascalCase oder CamelCase akzeptiert, beispielsweise `name`,
+`Name` oder `routerName`. Dasselbe gilt fuer Containerfelder und die
+`homelab.*`-Labelnamen. Die Schreibweise der Werte selbst bleibt unveraendert.
+
 ## Phase 4: Statusinformationen
 
 Die Karten zeigen TLS-Aktivierung, Containerstatus, Containername, Image und

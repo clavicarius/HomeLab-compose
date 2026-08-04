@@ -20,33 +20,50 @@ class DashboardNormalizerTests(unittest.TestCase):
         ]
         self.assertEqual(normalize_routers(routers), [{"name": "Gitea", "host": "gitea.home.arpa", "url": "https://gitea.home.arpa", "tls": True, "category": "Other", "icon": "", "description": "", "status": "unknown", "container": "", "image": "", "version": ""}])
 
+    def test_normalizer_accepts_lowercase_and_camelcase_api_fields(self):
+        routers = [{
+            "name": "gitea@docker",
+            "provider": "docker",
+            "rule": "Host(`gitea.home.arpa`)",
+            "service": "gitea@docker",
+            "tls": {},
+        }]
+        self.assertEqual(normalize_routers(routers)[0]["host"], "gitea.home.arpa")
+        self.assertEqual(normalize_routers([{
+            "RouterName": "gitea@docker",
+            "Provider": "docker",
+            "Rule": "Host(`gitea.home.arpa`)",
+            "Service": "gitea@docker",
+            "TLS": {},
+        }])[0]["host"], "gitea.home.arpa")
+
     def test_container_metadata_reads_and_limits_homelab_labels(self):
         metadata = container_metadata([{
             "Labels": {
-                "traefik.http.routers.gitea.rule": "Host(`gitea.home.arpa`)",
-                "homelab.name": " Git ",
-                "homelab.icon": "git",
-                "homelab.description": "Source hosting",
-                "homelab.category": "Development",
-                },
-                "Names": ["/gitea-homelab"],
-                "Image": "gitea/gitea:1",
-                "State": "running",
+                "Traefik.Http.Routers.gitea.Rule": "Host(`gitea.home.arpa`)",
+                "HomeLab.Name": " Git ",
+                "HomeLab.Icon": "git",
+                "HomeLab.Description": "Source hosting",
+                "HomeLab.Category": "Development",
+            },
+            "Names": ["/gitea-homelab"],
+            "Image": "gitea/gitea:1",
+            "State": "running",
         }])
         self.assertEqual(metadata["gitea"], {
             "name": "Git",
             "icon": "git",
             "description": "Source hosting",
             "category": "Development",
-                "container": "gitea-homelab",
-                "image": "gitea/gitea",
-                "version": "1",
-                "status": "up",
+            "container": "gitea-homelab",
+            "image": "gitea/gitea",
+            "version": "1",
+            "status": "up",
         })
 
-        def test_image_parts_support_tags_and_digests(self):
-            self.assertEqual(image_parts("gitea/gitea:1"), ("gitea/gitea", "1"))
-            self.assertEqual(image_parts("gitea/gitea@sha256:abc"), ("gitea/gitea", "sha256:abc"))
+    def test_image_parts_support_tags_and_digests(self):
+        self.assertEqual(image_parts("gitea/gitea:1"), ("gitea/gitea", "1"))
+        self.assertEqual(image_parts("gitea/gitea@sha256:abc"), ("gitea/gitea", "sha256:abc"))
 
     def test_normalizer_uses_metadata_without_changing_routing(self):
         routers = [{"Name": "gitea@docker", "Provider": "docker", "Rule": "Host(`gitea.home.arpa`)", "Service": "gitea@docker", "TLS": {}}]

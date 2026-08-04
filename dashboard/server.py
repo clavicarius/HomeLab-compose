@@ -37,6 +37,16 @@ def clean_metadata_value(value, maximum_length=120):
     return value.strip()[:maximum_length]
 
 
+def image_parts(image):
+    image = clean_metadata_value(image)
+    if "@sha256:" in image:
+        return image.split("@", 1)[0], image.split("@", 1)[1]
+    image_name, separator, version = image.rpartition(":")
+    if separator and "/" not in version:
+        return image_name, version
+    return image, ""
+
+
 def container_metadata(containers):
     metadata = {}
     for container in containers:
@@ -47,11 +57,17 @@ def container_metadata(containers):
             if key.startswith("traefik.http.routers.")
             and key.count(".") >= 3
         }
+        image, version = image_parts(container.get("Image", ""))
+        state = container.get("State")
         values = {
             "name": clean_metadata_value(labels.get(f"{LABEL_PREFIX}name")),
             "icon": clean_metadata_value(labels.get(f"{LABEL_PREFIX}icon"), 40),
             "description": clean_metadata_value(labels.get(f"{LABEL_PREFIX}description"), 240),
             "category": clean_metadata_value(labels.get(f"{LABEL_PREFIX}category"), 60) or DEFAULT_CATEGORY,
+            "container": clean_metadata_value((container.get("Names") or [""])[0].lstrip("/")),
+            "image": image,
+            "version": version,
+            "status": "up" if state == "running" else "down" if state else "unknown",
         }
         for router_name in router_names:
             metadata[router_name] = values
@@ -82,12 +98,16 @@ def normalize_routers(routers, metadata=None):
                 "category": details.get("category") or DEFAULT_CATEGORY,
                 "icon": details.get("icon", ""),
                 "description": details.get("description", ""),
+                "status": details.get("status", "unknown"),
+                "container": details.get("container", ""),
+                "image": details.get("image", ""),
+                "version": details.get("version", ""),
             }
     return sorted(services.values(), key=lambda item: item["name"].lower())
 
 
 def read_docker_containers(socket_path=DOCKER_SOCKET):
-    request = b"GET /containers/json HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n"
+    request = b"GET /containers/json?all=1 HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n"
     connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     try:
         connection.connect(socket_path)
@@ -116,7 +136,11 @@ class DashboardState:
         with urlopen(request, context=context, timeout=10) as response:
             payload = json.load(response)
         routers = payload if isinstance(payload, list) else []
-        metadata = container_metadata(read_docker_containers(self.docker_socket))
+        try:
+            metadata = container_metadata(read_docker_containers(self.docker_socket))
+        except (OSError, ValueError, json.JSONDecodeError) as error:
+            print(f"Docker metadata refresh failed: {error}", flush=True)
+            metadata = {}
         services = normalize_routers(routers, metadata)
         with self.lock:
             self.services = services

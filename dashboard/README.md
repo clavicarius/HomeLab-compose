@@ -22,8 +22,8 @@ docker compose up -d --build
 Danach ist das Dashboard unter `https://dashboard.home.arpa` erreichbar.
 
 Der Adapter ruft die Traefik-API intern ueber den Hostnamen `traefik.home.arpa`
-auf. `api.insecure` wird nicht aktiviert und der Docker-Socket wird in dieser
-MVP-Phase nicht an das Dashboard weitergereicht.
+auf. `api.insecure` wird nicht aktiviert. Der read-only Docker-Socket wird fuer
+optionale Metadaten und Laufzeitinformationen verwendet.
 
 ## Entwicklung und Tests
 
@@ -55,4 +55,14 @@ Veroeffentlichte Services koennen folgende optionale Docker-Labels verwenden:
 Der Dashboard-Adapter liest diese Labels ueber den Docker-Socket mit read-only
 Berechtigung. Sie beeinflussen weder Traefik-Routing noch Ziel-URL. Fehlende
 Labels fallen auf den Hostnamen, ein Initialen-Icon, `Other` und eine leere
-Beschreibung zurück. Werte werden vor der Ausgabe begrenzt.
+Beschreibung zurueck. Werte werden vor der Ausgabe begrenzt.
+
+## Phase 4: Statusinformationen
+
+Die Karten zeigen TLS-Aktivierung, Containerstatus, Containername, Image und
+Version. Der Backendstatus wird aus dem Docker-Containerstatus abgeleitet:
+`running` wird als `Online`, ein vorhandener gestoppter Container als `Offline`
+und fehlende oder nicht erreichbare Metadaten als `Status unbekannt` angezeigt.
+Der Dashboard-Adapter fragt dafuer `/containers/json?all=1` ueber den read-only
+Docker-Socket ab. Ausfaelle dieser Abfrage lassen die Traefik-Services sichtbar
+und fallen nur bei den Laufzeitdaten auf unbekannt zurueck.

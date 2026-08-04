@@ -49,6 +49,17 @@ async function loadServices() {
               description.textContent = service.description;
               details.append(description);
             }
+            const runtime = document.createElement("small");
+            runtime.className = "runtime";
+            const statusText = service.status === "up"
+              ? "Online"
+              : service.status === "down" ? "Offline" : "Status unbekannt";
+            const tlsText = service.tls ? "TLS" : "HTTP";
+            const imageText = service.image && service.version
+              ? ` · ${service.image}:${service.version}`
+              : service.image ? ` · ${service.image}` : "";
+            runtime.textContent = `${statusText} · ${tlsText}${imageText}`;
+            details.append(runtime);
             const arrow = document.createElement("span");
             arrow.className = "arrow";
             arrow.textContent = "->";

@@ -79,3 +79,9 @@ und fallen nur bei den Laufzeitdaten auf unbekannt zurueck.
 
 Die Docker-API-Antwort wird ueber den Unix-Socket als HTTP gelesen und
 unterstuetzt sowohl `Content-Length` als auch `Transfer-Encoding: chunked`.
+
+## Phase 5: Suche
+
+Die Oberflaeche bietet eine clientseitige Suche nach Anzeigename, Kategorie und
+Hostname. Die Suche verwendet die bereits geladene API-Antwort und benoetigt
+keine zusaetzliche Serverlogik oder Konfiguration.

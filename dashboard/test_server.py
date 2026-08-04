@@ -1,6 +1,6 @@
 import unittest
 
-from dashboard.server import container_metadata, decode_chunked_body, display_name, hostnames_from_rule, image_parts, normalize_routers
+from dashboard.server import backend_statuses, container_metadata, decode_chunked_body, display_name, hostnames_from_rule, image_parts, normalize_routers
 
 
 class DashboardNormalizerTests(unittest.TestCase):
@@ -35,6 +35,14 @@ class DashboardNormalizerTests(unittest.TestCase):
             "Rule": "Host(`gitea.home.arpa`)",
             "Service": "gitea@docker",
             "TLS": {},
+        }])[0]["host"], "gitea.home.arpa")
+
+        self.assertEqual(normalize_routers([{
+            "routerName": "gitea@docker",
+            "provider": "docker",
+            "rule": "Host(`gitea.home.arpa`)",
+            "service": "gitea@docker",
+            "tls": {},
         }])[0]["host"], "gitea.home.arpa")
 
     def test_container_metadata_reads_and_limits_homelab_labels(self):
@@ -79,6 +87,17 @@ class DashboardNormalizerTests(unittest.TestCase):
         service = normalize_routers(routers, metadata)[0]
         self.assertEqual(service["name"], "Git")
         self.assertEqual(service["status"], "unknown")
+
+    def test_backend_statuses_reads_service_and_server_status(self):
+        self.assertEqual(backend_statuses([
+            {"Name": "gitea@docker", "Status": "UP"},
+            {"Name": "adguard@docker", "ServerStatus": {"http://10.0.0.2:3000": "DOWN"}},
+        ]), {"gitea@docker": "up", "adguard@docker": "down"})
+
+    def test_normalizer_prefers_traefik_backend_status(self):
+        router = {"Name": "gitea@docker", "Provider": "docker", "Rule": "Host(`gitea.home.arpa`)", "Service": "gitea@docker", "TLS": {}}
+        metadata = {"gitea": {"status": "up"}}
+        self.assertEqual(normalize_routers([router], metadata, {"gitea@docker": "down"})[0]["status"], "down")
 
 
 if __name__ == "__main__":

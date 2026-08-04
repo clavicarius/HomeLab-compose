@@ -68,7 +68,9 @@ in lowercase, PascalCase oder CamelCase akzeptiert, beispielsweise `name`,
 ## Phase 4: Statusinformationen
 
 Die Karten zeigen TLS-Aktivierung, Containerstatus, Containername, Image und
-Version. Der Backendstatus wird aus dem Docker-Containerstatus abgeleitet:
+Version. Der Backendstatus wird bevorzugt aus Traefiks HTTP-Service-API
+abgeleitet. Falls diese Information nicht verfügbar ist, wird der Docker-
+Containerstatus verwendet:
 `running` wird als `Online`, ein vorhandener gestoppter Container als `Offline`
 und fehlende oder nicht erreichbare Metadaten als `Status unbekannt` angezeigt.
 Der Dashboard-Adapter fragt dafuer `/containers/json?all=1` ueber den read-only

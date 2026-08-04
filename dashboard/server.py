@@ -17,6 +17,9 @@ DEFAULT_CATEGORY = "Other"
 DOCKER_SOCKET = "/var/run/docker.sock"
 LABEL_PREFIX = "homelab."
 STATIC_DIR = Path(__file__).parent / "static"
+FIELD_ALIASES = {
+    "name": {"name", "routername"},
+}
 
 
 def normalized_key(value):
@@ -25,8 +28,9 @@ def normalized_key(value):
 
 def field_value(record, field, default=None):
     wanted = normalized_key(field)
+    aliases = FIELD_ALIASES.get(wanted, {wanted})
     for key, value in record.items():
-        if normalized_key(key) == wanted:
+        if normalized_key(key) in aliases:
             return value
     return default
 
@@ -87,8 +91,9 @@ def container_metadata(containers):
     return metadata
 
 
-def normalize_routers(routers, metadata=None):
+def normalize_routers(routers, metadata=None, backend_statuses=None):
     metadata = metadata or {}
+    backend_statuses = backend_statuses or {}
     services = {}
     for router in routers:
         provider = str(field_value(router, "provider", "")).lower()
@@ -103,6 +108,7 @@ def normalize_routers(routers, metadata=None):
                 continue
             router_name = name.removesuffix("@docker")
             details = metadata.get(router_name, {})
+            status = backend_statuses.get(service.lower(), details.get("status", "unknown"))
             services[host] = {
                 "name": details.get("name") or display_name(host),
                 "host": host,
@@ -111,12 +117,29 @@ def normalize_routers(routers, metadata=None):
                 "category": details.get("category") or DEFAULT_CATEGORY,
                 "icon": details.get("icon", ""),
                 "description": details.get("description", ""),
-                "status": details.get("status", "unknown"),
+                "status": status,
                 "container": details.get("container", ""),
                 "image": details.get("image", ""),
                 "version": details.get("version", ""),
             }
     return sorted(services.values(), key=lambda item: item["name"].lower())
+
+
+def backend_statuses(services):
+    statuses = {}
+    for service in services:
+        name = str(field_value(service, "name", "")).lower()
+        status = str(field_value(service, "status", "")).lower()
+        if status not in {"up", "down"}:
+            server_status = field_value(service, "serverstatus", {}) or {}
+            values = [str(value).lower() for value in server_status.values()]
+            if values and all(value in {"up", "healthy", "running"} for value in values):
+                status = "up"
+            elif values and any(value in {"down", "unhealthy", "stopped"} for value in values):
+                status = "down"
+        if name and status in {"up", "down"}:
+            statuses[name] = status
+    return statuses
 
 
 def read_docker_containers(socket_path=DOCKER_SOCKET):
@@ -170,12 +193,20 @@ class DashboardState:
         with urlopen(request, context=context, timeout=10) as response:
             payload = json.load(response)
         routers = payload if isinstance(payload, list) else []
+        backend_state = {}
+        services_url = self.api_url.rsplit("/", 1)[0] + "/services"
+        try:
+            with urlopen(Request(services_url, headers={"Host": self.api_host}), context=context, timeout=10) as response:
+                service_payload = json.load(response)
+            backend_state = backend_statuses(service_payload if isinstance(service_payload, list) else [])
+        except (OSError, ValueError, json.JSONDecodeError) as error:
+            print(f"Traefik backend status refresh failed: {error}", flush=True)
         try:
             metadata = container_metadata(read_docker_containers(self.docker_socket))
         except (OSError, ValueError, json.JSONDecodeError) as error:
             print(f"Docker metadata refresh failed: {error}", flush=True)
             metadata = {}
-        services = normalize_routers(routers, metadata)
+        services = normalize_routers(routers, metadata, backend_state)
         with self.lock:
             self.services = services
 

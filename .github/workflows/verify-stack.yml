@@ -128,6 +128,10 @@ jobs:
             --env-file .env.ci \
             config
 
+      - name: Run dashboard unit tests
+        if: matrix.stack == 'dashboard'
+        run: python -m unittest test_server
+
       - name: Start stack
         shell: bash
         run: |

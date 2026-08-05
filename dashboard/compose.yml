@@ -1,0 +1,36 @@
+services:
+  dashboard:
+    build: .
+    container_name: homelab-dashboard
+    restart: unless-stopped
+    environment:
+      TRAEFIK_API_URL: ${TRAEFIK_API_URL:-https://traefik-homelab/api/http/routers}
+      TRAEFIK_API_HOST: ${TRAEFIK_API_HOST:-traefik.home.arpa}
+      REFRESH_SECONDS: ${REFRESH_SECONDS:-30}
+      DOCKER_SOCKET: /var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      homelab_macvlan:
+        ipv4_address: ${DASHBOARD_IP}
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED}"
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+      - "traefik.docker.network=${NETWORK_NAME}"
+      - "homelab.name=Home Dashboard"
+      - "homelab.icon=HM"
+      - "homelab.category=Infrastructure"
+      - "homelab.description=Automatischer Einstiegspunkt fuer veroeffentlichte Services"
+
+networks:
+  homelab_macvlan:
+    external: true
+    name: ${NETWORK_NAME}

@@ -95,6 +95,7 @@ Using static IP addresses ensures that services remain permanently reachable and
 | Service | Description | Documentation |
 |---------|-------------|---------------|
 | `traefik` | Standalone reverse proxy stack for central ingress routing in the homelab. | [traefik/README.md](traefik/README.md) |
+| `dashboard` | Automatic home dashboard based on Traefik-published services. | [dashboard/README.md](dashboard/README.md) |
 | `poly-php` | Portable Docker-based development environment for testing multiple PHP versions simultaneously. | [poly-php/README.md](poly-php/README.md) |
 | `adguard` | Docker Compose project for running AdGuard Home in a homelab environment. | [adguard/README.md](adguard/README.md) |
 | `gitea` | Docker Compose project for running Gitea (self-hosted Git service) in a homelab environment. | [gitea/README.md](gitea/README.md) |

@@ -100,6 +100,7 @@ Container mit fester LAN-IP werden über `homelab_macvlan` angebunden. Die Adres
 | PHP 8.5 | 192.168.178.238 | implementiert (`poly-php`) |
 | Portainer | 192.168.178.250 | geplant |
 | AdGuard Home | 192.168.178.252 | implementiert (`adguard`) |
+| Home Dashboard | 192.168.178.253 | implementiert (`dashboard`) |
 
 Weitere Container-IPs im Bereich `192.168.178.225 – 254` vergeben.
 
@@ -274,7 +275,8 @@ Traefik läuft als eigener Stack in `traefik/compose.yml`.
 
 | Zweck | URL |
 |-------|-----|
-| Dashboard | http://192.168.178.225:8088 |
+| Technisches Traefik-Dashboard | https://traefik.home.arpa/dashboard/ |
+| Home Dashboard | https://dashboard.home.arpa |
 | HTTPS-Services | https://<service>.home.arpa |
 
 Das Dashboard ist über den auf dem Host publizierten Port erreichbar. HTTPS-Services laufen über die Traefik-LAN-IP, sobald DNS-Rewrites gesetzt sind.
@@ -329,7 +331,21 @@ Dadurch nutzen alle Clients automatisch:
 
 ---
 
-# 13. Lokale Domainstruktur
+# 13. Home-Dashboard-DNS-Rewrite
+
+Bis eine automatisierte AdGuard-Integration vorhanden ist, muss in AdGuard Home
+ein DNS-Rewrite angelegt werden:
+
+| Domain | Ziel |
+|--------|------|
+| `dashboard.home.arpa` | `192.168.178.225` |
+
+Das Ziel ist die LAN-IP von Traefik, nicht die Dashboard-IP. Traefik routet die
+Anfrage anhand des Hostnamens an den Dashboard-Container.
+
+---
+
+# 14. Lokale Domainstruktur
 
 ## Interne Domain
 
@@ -361,7 +377,7 @@ HOMELAB_EMAIL=admin@home.arpa
 
 ---
 
-# 14. DNS-Rewrites in AdGuard
+# 15. DNS-Rewrites in AdGuard
 
 Webservices zeigen auf die Traefik-IP. Der Drucker wird direkt angesprochen.
 

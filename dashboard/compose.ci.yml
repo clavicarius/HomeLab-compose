@@ -1,0 +1,8 @@
+networks:
+  homelab_macvlan: !override
+    driver: bridge
+    name: ${NETWORK_NAME}
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}

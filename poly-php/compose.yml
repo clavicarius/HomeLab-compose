@@ -50,6 +50,10 @@ services:
       - "traefik.http.routers.php56.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.services.php56.loadbalancer.server.port=80"
       - "traefik.docker.network=${NETWORK_NAME}"
+      - "homelab.name=PHP 5.6"
+      - "homelab.icon=PHP"
+      - "homelab.category=Development"
+      - "homelab.description=PHP 5.6 Entwicklungsumgebung"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
@@ -97,6 +101,10 @@ services:
       - "traefik.http.routers.php74.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.services.php74.loadbalancer.server.port=80"
       - "traefik.docker.network=${NETWORK_NAME}"
+      - "homelab.name=PHP 7.4"
+      - "homelab.icon=PHP"
+      - "homelab.category=Development"
+      - "homelab.description=PHP 7.4 Entwicklungsumgebung"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
@@ -144,6 +152,10 @@ services:
       - "traefik.http.routers.php85.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.services.php85.loadbalancer.server.port=80"
       - "traefik.docker.network=${NETWORK_NAME}"
+      - "homelab.name=PHP 8.5"
+      - "homelab.icon=PHP"
+      - "homelab.category=Development"
+      - "homelab.description=PHP 8.5 Entwicklungsumgebung"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
@@ -228,6 +240,10 @@ services:
       - "traefik.http.routers.phpmyadmin.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
       - "traefik.docker.network=${NETWORK_NAME}"
+      - "homelab.name=phpMyAdmin"
+      - "homelab.icon=DB"
+      - "homelab.category=Infrastructure"
+      - "homelab.description=Weboberflaeche fuer die PHP-Datenbank"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost/ || exit 1"]
       interval: 10s

@@ -55,6 +55,12 @@ function renderServices(query = "") {
           const host = document.createElement("small");
           host.textContent = service.host;
           details.append(name, host);
+          if (service.container) {
+            const containerName = document.createElement("small");
+            containerName.className = "container-name";
+            containerName.textContent = `Container: ${service.container}`;
+            details.append(containerName);
+          }
           if (service.description) {
             const description = document.createElement("small");
             description.className = "description";

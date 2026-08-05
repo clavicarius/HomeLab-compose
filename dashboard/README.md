@@ -68,7 +68,8 @@ in lowercase, PascalCase oder CamelCase akzeptiert, beispielsweise `name`,
 ## Phase 4: Statusinformationen
 
 Die Karten zeigen TLS-Aktivierung, Containerstatus, Containername, Image und
-Version. Der Backendstatus wird bevorzugt aus Traefiks HTTP-Service-API
+Version. Der Containername wird angezeigt, sofern Docker ihn liefert. Der
+Backendstatus wird bevorzugt aus Traefiks HTTP-Service-API
 abgeleitet. Falls diese Information nicht verfügbar ist, wird der Docker-
 Containerstatus verwendet:
 `running` wird als `Online`, ein vorhandener gestoppter Container als `Offline`

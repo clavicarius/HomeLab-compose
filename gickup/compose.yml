@@ -1,0 +1,10 @@
+services:
+  runner:
+    image: buddyspencer/gickup:latest
+    volumes:
+      - ./conf.yml:gickup/conf.yml
+      - ./backup:/backup
+  command: ["/gickup/conf.yml"]
+  environment:
+    - TZ=Europe/Berlin
+#restart: always

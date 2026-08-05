@@ -130,7 +130,8 @@ jobs:
 
       - name: Run dashboard unit tests
         if: matrix.stack == 'dashboard'
-        run: python -m unittest test_server
+        working-directory: ${{ github.workspace }}
+        run: python -m unittest dashboard.test_server
 
       - name: Start stack
         shell: bash

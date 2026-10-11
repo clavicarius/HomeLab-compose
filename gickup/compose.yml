@@ -1,0 +1,39 @@
+# Gickup repository backup service.
+#
+# Gickup connects to Gitea on the shared homelab network and stores local
+# mirrors under ./backups.
+
+services:
+  gickup:
+    container_name: gickup-homelab
+    image: buddyspencer/gickup:0.10.47
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ./backups:/backups
+    configs:
+      - source: gickup_config
+        target: /gickup/conf.yml
+    networks:
+      homelab_macvlan:
+        ipv4_address: ${GICKUP_IP}
+
+configs:
+  gickup_config:
+    content: |
+      source:
+        gitea:
+          - url: "${GITEA_URL}"
+            token: "${GITEA_TOKEN}"
+      destination:
+        local:
+          - path: /backups
+            structured: true
+            mirror: true
+      cron: "${GICKUP_CRON:-0 2 * * *}"
+
+networks:
+  homelab_macvlan:
+    external: true
+    name: ${NETWORK_NAME}

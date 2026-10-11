@@ -98,6 +98,7 @@ Using static IP addresses ensures that services remain permanently reachable and
 | `dashboard` | Automatic home dashboard based on Traefik-published services. | [dashboard/README.md](dashboard/README.md) |
 | `poly-php` | Portable Docker-based development environment for testing multiple PHP versions simultaneously. | [poly-php/README.md](poly-php/README.md) |
 | `adguard` | Docker Compose project for running AdGuard Home in a homelab environment. | [adguard/README.md](adguard/README.md) |
+| `gickup` | Docker Compose project for scheduled local backups of Gitea repositories using Gickup. | [gickup/README.md](gickup/README.md) |
 | `gitea` | Docker Compose project for running Gitea (self-hosted Git service) in a homelab environment. | [gitea/README.md](gitea/README.md) |
 | `forgejo` | Docker Compose project for running Forgejo (self-hosted Git service) in a homelab environment. | [forgejo/README.md](forgejo/README.md) |
 | `forgejo` | Docker Compose project for running Forgejo (self-hosted Git service) in a homelab environment. | [forgejo/README.md](forgejo/README.md) |

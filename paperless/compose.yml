@@ -1,0 +1,86 @@
+# ${PAPERLESS_HOST}.${HOMELAB_DOMAIN}
+# Docker Compose file for Paperless-ngx.
+#
+# Documentation : paperless/README.md
+# Network setup : docs/network-architecture.md
+
+services:
+  paperless:
+    container_name: paperless
+    image: ghcr.io/paperless-ngx/paperless-ngx:2
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
+    networks:
+      - homelab_macvlan
+      - paperless_internal
+    volumes:
+      - ./data:/usr/src/paperless/data
+      - ./media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBNAME: paperless
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: ${PAPERLESS_DB_PASSWORD}
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY}
+      PAPERLESS_URL: https://${PAPERLESS_HOST}.${HOMELAB_DOMAIN}
+      PAPERLESS_TIME_ZONE: ${TZ}
+      PAPERLESS_OCR_LANGUAGE: deu+eng
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED}"
+      - "traefik.http.routers.paperless.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.routers.paperless.entrypoints=websecure"
+      - "traefik.http.routers.paperless.rule=Host(`${PAPERLESS_HOST}.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.services.paperless.loadbalancer.server.port=8000"
+      - "traefik.docker.network=${NETWORK_NAME}"
+      - "homelab.name=Paperless-ngx"
+      - "homelab.icon=Document"
+      - "homelab.category=Productivity"
+      - "homelab.description=Self-hosted document management and OCR"
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    networks:
+      - paperless_internal
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  broker:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - paperless_internal
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  dbdata:
+  redisdata:
+
+networks:
+  homelab_macvlan:
+    external: true
+    name: ${NETWORK_NAME}
+  paperless_internal:
+    internal: true

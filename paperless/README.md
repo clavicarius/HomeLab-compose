@@ -6,8 +6,9 @@ application port is not published directly on the host.
 
 ## Configure
 
-Copy `.env.example` to `.env` and replace the database password and secret key
-with private values before starting the stack. Generate a secret key with:
+Copy `.env.example` to `.env`, set `PAPERLESS_IP` to an unused address on the
+homelab macvlan network, and replace the database password and secret key with
+private values before starting the stack. Generate a secret key with:
 
 ```bash
 openssl rand -hex 32

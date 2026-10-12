@@ -15,8 +15,9 @@ services:
       broker:
         condition: service_healthy
     networks:
-      - homelab_macvlan
-      - paperless_internal
+      homelab_macvlan:
+        ipv4_address: ${PAPERLESS_IP}
+      paperless_internal: {}
     volumes:
       - ./data:/usr/src/paperless/data
       - ./media:/usr/src/paperless/media

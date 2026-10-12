@@ -99,7 +99,7 @@ Container mit fester LAN-IP werden über `homelab_macvlan` angebunden. Die Adres
 | PHP 5.6 | 192.168.178.235 | implementiert (`poly-php`) |
 | PHP 7.4 | 192.168.178.237 | implementiert (`poly-php`) |
 | PHP 8.5 | 192.168.178.238 | implementiert (`poly-php`) |
-| Portainer | 192.168.178.250 | geplant |
+| Portainer | 192.168.178.250 | implementiert (`portainer`) |
 | AdGuard Home | 192.168.178.252 | implementiert (`adguard`) |
 | Home Dashboard | 192.168.178.253 | implementiert (`dashboard`) |
 

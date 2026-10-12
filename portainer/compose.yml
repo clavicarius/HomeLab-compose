@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+      - ./data:/data
     networks:
       homelab_macvlan:
         ipv4_address: ${PORTAINER_IP}
@@ -26,9 +26,6 @@ services:
       - "homelab.icon=Docker"
       - "homelab.category=Infrastructure"
       - "homelab.description=Docker-Umgebungsverwaltung"
-
-volumes:
-  portainer_data:
 
 networks:
   homelab_macvlan:

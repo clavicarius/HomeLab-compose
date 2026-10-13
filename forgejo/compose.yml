@@ -42,7 +42,7 @@ services:
       - USER_UID=${PUID}
       - USER_GID=${PGID}
       - TZ=${TZ}
-    
+
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.forgejo.tls=${TRAEFIK_TLS_ENABLED}"

@@ -26,14 +26,14 @@ services:
   gitea:
     container_name: gitea-homelab
     # https://hub.docker.com/r/gitea/gitea/tags
-    image:  gitea/gitea:1
+    image: gitea/gitea:1
     restart: unless-stopped
     networks:
       homelab_macvlan:
         ipv4_address: ${GITEA_IP}  # fixe IP
     volumes:
       - ./data:/data
-#      - /etc/timezone:/etc/timezone:ro # use for linux systems
+      # - /etc/timezone:/etc/timezone:ro # use for linux systems
       - /etc/TZ:/etc/timezone:ro       # use for synology NAS systems
       - /etc/localtime:/etc/localtime:ro
     ports:

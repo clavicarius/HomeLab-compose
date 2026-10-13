@@ -13,6 +13,12 @@ permissions:
 
 jobs:
   yaml:
-    uses: clavicarius/ci-platform/.github/workflows/quality-yaml.yml@v1
-    with:
-      scan-profile: compose
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run YAML quality checks
+        uses: clavicarius/ci-platform/actions/quality-yaml@v1
+        with:
+          scan-profile: compose

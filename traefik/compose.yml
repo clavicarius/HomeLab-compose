@@ -38,6 +38,10 @@ services:
       - "--providers.file.watch=true"
       - "--api.dashboard=true"
       - "--api.insecure=false"
+      - "--certificatesresolvers.${CERT_RESOLVER}.acme.email=${STEP_CA_ACME_EMAIL}"
+      - "--certificatesresolvers.${CERT_RESOLVER}.acme.storage=/data/acme.json"
+      - "--certificatesresolvers.${CERT_RESOLVER}.acme.caserver=${STEP_CA_ACME_URL}"
+      - "--certificatesresolvers.${CERT_RESOLVER}.acme.httpchallenge.entrypoint=web"
       - "--ping=true"
     ports:
       - "80:80"
@@ -46,10 +50,27 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./certs:/certs:ro
+      - ./acme:/data
       - ./config:/etc/traefik/dynamic:ro
     networks:
       homelab_macvlan:
         ipv4_address: ${TRAEFIK_IP}
+    labels:
+      - "traefik.enable=true"
+      - >-
+        traefik.http.routers.traefik-dashboard.rule=${TRAEFIK_HOST_RULE} &&
+        (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.routers.traefik-dashboard.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.routers.traefik-dashboard-root.rule=${TRAEFIK_HOST_RULE} && Path(`/`)"
+      - "traefik.http.routers.traefik-dashboard-root.entrypoints=websecure"
+      - "traefik.http.routers.traefik-dashboard-root.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard-root.middlewares=to-dashboard@file"
+      - "traefik.http.routers.traefik-dashboard-root.priority=1"
+      - "traefik.http.routers.traefik-dashboard-root.tls=${TRAEFIK_TLS_ENABLED}"
+      - "traefik.http.routers.traefik-dashboard-root.tls.certresolver=${CERT_RESOLVER}"
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
       interval: 10s

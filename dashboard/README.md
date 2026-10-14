@@ -16,7 +16,7 @@ liefert der statischen Oberflaeche normalisierte Services.
 
 ```bash
 ../scripts/create-env.sh
-docker compose up -d --build
+../scripts/docker-up.sh --build
 ```
 
 Danach ist das Dashboard unter `https://dashboard.home.arpa` erreichbar.

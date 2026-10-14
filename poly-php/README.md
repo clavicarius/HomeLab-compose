@@ -74,7 +74,7 @@ Der Ordner **html/** ist das DocumentRoot für alle PHP‑Container.
 Container bauen und starten:
 
 ```
-docker compose up -d --build
+../scripts/docker-up.sh --build
 ```
 
 Container stoppen:
@@ -282,7 +282,7 @@ Für produktive Systeme wird empfohlen:
 # macvlan-Netzwerk muss existieren (Repository-Root)
 # ./scripts/create-macvlan.sh
 
-docker compose up -d --build
+../scripts/docker-up.sh --build
 ```
 
 **Homelab:** DNS-Rewrites in AdGuard für `*.home.arpa` → `192.168.178.225`, dann `TRAEFIK_ENABLED=true` setzen.

@@ -23,12 +23,12 @@ From this directory:
 
 ```bash
 docker compose pull
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 Paperless stores documents in `media/`, watched imports in `consume/`, and
 exports in `export/`. Application data is in `data/`; PostgreSQL and Redis use
 Docker-managed volumes. Back up these directories and volumes together.
 
-To update, run `docker compose pull` followed by `docker compose up -d`. Stop
+To update, run `../scripts/docker-update.sh`. Stop
 the stack with `docker compose down`; persistent data is retained.

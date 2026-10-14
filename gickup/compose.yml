@@ -31,7 +31,7 @@ configs:
           - path: /backups
             structured: true
             mirror: true
-      cron: "${GICKUP_CRON:-0 2 * * *}"
+      cron: "${GICKUP_CRON:-0 23 * * *}"
 
 networks:
   homelab_macvlan:

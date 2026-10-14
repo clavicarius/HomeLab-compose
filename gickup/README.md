@@ -33,7 +33,7 @@ Start Gickup:
 ## Backups
 
 Gickup creates local mirror clones in `./backups`, organized by Gitea host,
-owner, and repository. Backups run daily at 02:00 by default; set
+owner, and repository. Backups run daily at 23:00 (11 p.m.) by default; set
 `GICKUP_CRON` to change the schedule. The container uses the `TZ` value from
 the shared environment file (UTC if unset).
 

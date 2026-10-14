@@ -57,7 +57,9 @@ services:
         ipv4_address: ${TRAEFIK_IP}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik-dashboard.rule=${TRAEFIK_HOST_RULE} && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))"
+      - >-
+        traefik.http.routers.traefik-dashboard.rule=${TRAEFIK_HOST_RULE} &&
+        (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
       - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
       - "traefik.http.routers.traefik-dashboard.service=api@internal"
       - "traefik.http.routers.traefik-dashboard.tls=${TRAEFIK_TLS_ENABLED}"

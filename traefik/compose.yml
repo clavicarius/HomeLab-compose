@@ -67,7 +67,7 @@ services:
       - "traefik.http.routers.traefik-dashboard-root.rule=${TRAEFIK_HOST_RULE} && Path(`/`)"
       - "traefik.http.routers.traefik-dashboard-root.entrypoints=websecure"
       - "traefik.http.routers.traefik-dashboard-root.service=api@internal"
-      - "traefik.http.routers.traefik-dashboard-root.middlewares=to-dashboard"
+      - "traefik.http.routers.traefik-dashboard-root.middlewares=to-dashboard@file"
       - "traefik.http.routers.traefik-dashboard-root.priority=1"
       - "traefik.http.routers.traefik-dashboard-root.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.routers.traefik-dashboard-root.tls.certresolver=${CERT_RESOLVER}"

@@ -1,0 +1,24 @@
+name: Quality YAML
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run YAML quality checks
+        uses: clavicarius/ci-platform/actions/quality-yaml@v1
+        with:
+          scan-profile: compose

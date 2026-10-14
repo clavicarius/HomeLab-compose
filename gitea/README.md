@@ -102,7 +102,7 @@ Gateway: ${GATEWAY}
 
 ```bash
 docker compose pull
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 Containerstatus prüfen
@@ -143,7 +143,7 @@ Container aktualisieren:
 
 ```bash
 docker compose pull
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 Nicht benötigte Images entfernen:

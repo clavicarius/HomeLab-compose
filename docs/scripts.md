@@ -16,6 +16,7 @@ Each script contains a documentation header with description, usage, and related
 | [`docker-up.sh`](#docker-upsh) | Starts a Docker Compose stack in detached mode |
 | [`docker-down.sh`](#docker-downsh) | Stops a running Docker Compose stack |
 | [`docker-update.sh`](#docker-updatesh) | Pulls latest images and restarts a Docker Compose stack |
+| [`docker_compose.py`](#multi-hostname-rendering) | Renders hostname lists into Traefik rules |
 | [`git-author-env.sh`](#git-author-envsh) | Loads git identity variables from `.git-author` into the shell |
 
 ---
@@ -107,8 +108,8 @@ gitea                          homelab_macvlan    192.168.178.248
 Creates a local `.env` file by merging `.env.common.example` (repository root) and the
 service-specific `.env.example` (current directory).
 
-Use this when a stack expects a local `.env` file. The preferred runtime workflow is still
-`docker compose --env-file ../.env.common --env-file .env ...` as used by `docker-up.sh`.
+Use this when a stack expects a local `.env` file. The runtime workflow uses
+`docker-up.sh` so configured hostname lists are rendered before Compose starts.
 
 **Usage** (run from the service directory, e.g. `adguard/` or `gitea/`):
 
@@ -143,15 +144,30 @@ Use this when a stack expects a local `.env` file. The preferred runtime workflo
 
 These three scripts are convenience wrappers around Docker Compose commands.
 Run them from the service directory (e.g. `adguard/`, `gitea/`, `poly-php/`).
+`docker-up.sh` and `docker-update.sh` require Python 3 for hostname rendering.
 
 ### docker-up.sh
 
 Starts the Docker Compose stack in detached mode using `.env.common` and the local `.env`.
+The wrapper renders configured host lists before invoking Docker Compose.
 
 ```bash
 cd adguard
 ../scripts/docker-up.sh
 ```
+
+Add comma-separated hostnames to the service's `.env`:
+
+```dotenv
+HOSTS=git.homelab.internal,forgejo.homelab.internal,scm.homelab.internal
+```
+
+Short names are expanded with `HOMELAB_DOMAIN`. Every hostname is routed through
+the same Traefik router, service, middleware, and TLS configuration. The ACME
+resolver obtains certificates for all hosts in the generated rule. Use
+`docker-up.sh` or `docker-update.sh` to apply changes; direct `docker compose up`
+does not render host lists. For stacks with multiple routed containers, use one
+`<SERVICE>_HOSTS` variable per router (for example, `PHP56_HOSTS`).
 
 Recommended startup order for homelab routing:
 1. `adguard`
@@ -189,11 +205,21 @@ cd adguard
 **Workflow:**
 1. `docker-compose pull` — fetch latest image versions
 2. `docker-compose down` — stop and remove containers
-3. `docker compose up -d` — start containers with updated images
+3. `docker-up.sh` — start containers with updated images and render host lists
 
 Current implementation uses the local `.env` for `pull/down` and explicit dual env-file loading for `up`.
 
 **See also:** [docker-up.sh](#docker-upsh) · [docker-down.sh](#docker-downsh)
+
+---
+
+### Multi-hostname rendering
+
+[`docker_compose.py`](../scripts/docker_compose.py) converts each comma-separated
+`HOSTS` or `<SERVICE>_HOSTS` value into a single Traefik rule. Short entries are
+qualified with `HOMELAB_DOMAIN`; fully qualified names are retained as written.
+Existing single-host environment variables remain the fallback for older `.env`
+files.
 
 ---
 

@@ -25,7 +25,7 @@ Traefik options, come from `.env.common`.
 
 ```bash
 docker compose pull
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 Portainer is available directly at `https://${PORTAINER_IP}:9443` or, when

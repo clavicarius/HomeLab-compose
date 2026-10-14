@@ -116,7 +116,7 @@ Voraussetzung: `homelab_macvlan` existiert (`./scripts/create-macvlan.sh`).
 
 ```bash
 docker compose pull
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 Containerstatus prüfen:
@@ -174,7 +174,7 @@ Voraussetzungen:
 
 ```bash
 docker compose pull
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 Nicht benötigte Images entfernen:

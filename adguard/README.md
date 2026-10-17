@@ -78,8 +78,8 @@ TRAEFIK_TLS_ENABLED=false
 
 | Verzeichnis | Beschreibung                  |
 | ----------- | ----------------------------- |
-| `./conf`    | Konfiguration                 |
-| `./work`    | Datenbank, Filterlisten, Logs |
+| `${ADGUARD_CONF_PATH}` | Konfiguration                 |
+| `${ADGUARD_WORK_PATH}` | Datenbank, Filterlisten, Logs |
 
 Die Daten bleiben dadurch auch nach einem Container-Update erhalten.
 

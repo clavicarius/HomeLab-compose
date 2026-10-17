@@ -25,10 +25,10 @@ services:
         ipv4_address: ${PAPERLESS_IP}
       paperless_internal: {}
     volumes:
-      - ./data:/usr/src/paperless/data
-      - ./media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
+      - ${PAPERLESS_DATA_PATH}:/usr/src/paperless/data
+      - ${PAPERLESS_MEDIA_PATH}:/usr/src/paperless/media
+      - ${PAPERLESS_EXPORT_PATH}:/usr/src/paperless/export
+      - ${PAPERLESS_CONSUME_PATH}:/usr/src/paperless/consume
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
@@ -57,7 +57,7 @@ services:
     networks:
       - paperless_internal
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - ${PAPERLESS_DB_DATA_PATH}:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
@@ -74,7 +74,7 @@ services:
     networks:
       - paperless_internal
     volumes:
-      - ./redisdata:/data
+      - ${PAPERLESS_REDIS_DATA_PATH}:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s

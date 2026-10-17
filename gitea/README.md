@@ -58,7 +58,7 @@ GITEA_SSH_PORT=222
 
 | Verzeichnis | Beschreibung                  |
 | ----------- | ----------------------------- |
-| `./data`    | Repositorys, Konfiguration, Datenbank |
+| `${GITEA_DATA_PATH}` | Repositorys, Konfiguration, Datenbank |
 
 Die Daten bleiben dadurch auch nach einem Container-Update erhalten.
 

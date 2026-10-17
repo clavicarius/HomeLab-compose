@@ -26,13 +26,15 @@ Zwischen den beiden Dateien wird jeweils eine Leerzeile eingefügt.
 
 ## Host-Pfade
 
-Jede service-spezifische `.env.example` mit Daten-Bind-Mounts enthält ihr
-eigenes `DOCKER_ROOT` und die vollständigen Pfade zu den Daten- und
-Konfigurationsverzeichnissen. Der Beispielwert `..` erhält die bisherigen
+`DOCKER_ROOT` wird zentral in `../.env.common` definiert. `create-env.sh` führt
+diese gemeinsame Datei mit der service-spezifischen `.env.example` zusammen,
+so dass der gemeinsame Wert auch in der erzeugten `.env` des Dienstes enthalten
+ist. Die `*_PATH`-Werte in den service-spezifischen Beispielen werden relativ
+zu diesem Root aufgelöst. Der Beispielwert `..` erhält die bisherigen
 Verzeichnisse im Repository. Für einen anderen Speicherort kann `DOCKER_ROOT`
-in der jeweiligen `.env` auf einen Host-Pfad gesetzt werden, zum Beispiel
-`/volume1/docker`; die `*_PATH`-Werte werden dort aufgelöst. Vor einem Wechsel
-des Speicherorts müssen vorhandene Daten dorthin kopiert werden.
+in `.env.common` auf einen Host-Pfad gesetzt werden, zum Beispiel
+`/volume1/docker`. Vor einem Wechsel des Speicherorts müssen vorhandene Daten
+dorthin kopiert werden.
 
 Die Host-Pfade für Docker-Socket und Zeitzonendateien werden ebenfalls in
 `.env.common` konfiguriert.
@@ -75,7 +77,9 @@ Die Reihenfolge der zusammengeführten Dateien ist:
 1. `../.env.common`
 2. `.env.example`
 
-Dadurch können projektspezifische Werte gemeinsame Standardwerte überschreiben, sofern dieselbe Variable mehrfach definiert ist. In den meisten Anwendungen wird dabei der zuletzt definierte Wert verwendet.
+Dadurch können projektspezifische Werte gemeinsame Standardwerte überschreiben,
+sofern dieselbe Variable mehrfach definiert ist. In den meisten Anwendungen
+wird dabei der zuletzt definierte Wert verwendet.
 
 ## Beispiel
 

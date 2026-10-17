@@ -90,6 +90,7 @@ jobs:
           # Use a dedicated private test subnet in CI so that gateway and fixed
           # service IPs are guaranteed to be within the same network.
           sed -i "s|^DOCKER_ROOT=.*|DOCKER_ROOT=${GITHUB_WORKSPACE}|" .env.ci
+          sed -i "s|\${DOCKER_ROOT}|${GITHUB_WORKSPACE}|g" .env.ci
           sed -i 's/^SUBNET=.*/SUBNET=172.25.0.0\/24/' .env.ci
           sed -i 's/^GATEWAY=.*/GATEWAY=172.25.0.1/' .env.ci
 

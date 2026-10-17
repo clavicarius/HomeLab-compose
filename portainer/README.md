@@ -37,6 +37,6 @@ direct access from the LAN, the HTTPS interface listens on port 9443.
 
 ## Persistent data
 
-Portainer's configuration and database are stored in `./data`, which is mounted
-at `/data` inside the container. The Docker socket is mounted to let Portainer
-manage the local Docker Engine.
+Portainer's configuration and database are stored at the host path configured
+by `PORTAINER_DATA_PATH`, which is mounted at `/data` inside the container. The Docker socket source is configurable in
+`.env.common` and lets Portainer manage the local Docker Engine.

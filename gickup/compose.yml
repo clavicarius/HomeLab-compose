@@ -1,7 +1,7 @@
 # Gickup repository backup service.
 #
 # Gickup connects to Gitea on the shared homelab network and stores local
-# mirrors under ./backups.
+# mirrors under the host path configured by GICKUP_BACKUPS_PATH.
 
 services:
   gickup:
@@ -11,7 +11,7 @@ services:
     environment:
       TZ: ${TZ:-UTC}
     volumes:
-      - ./backups:/backups
+      - ${DOCKER_ROOT}/${GICKUP_BACKUPS_PATH}:/backups
     configs:
       - source: gickup_config
         target: /gickup/conf.yml

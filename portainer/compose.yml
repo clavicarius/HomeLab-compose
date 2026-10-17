@@ -10,8 +10,8 @@ services:
     container_name: portainer-homelab
     restart: unless-stopped
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./data:/data
+      - ${DOCKER_SOCKET_PATH}:/var/run/docker.sock
+      - ${DOCKER_ROOT}/${PORTAINER_DATA_PATH}:/data
     networks:
       homelab_macvlan:
         ipv4_address: ${PORTAINER_IP}

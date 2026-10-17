@@ -24,6 +24,20 @@ Mindestens eine der beiden Dateien muss vorhanden sein.
 
 Zwischen den beiden Dateien wird jeweils eine Leerzeile eingefügt.
 
+## Host-Pfade
+
+`DOCKER_ROOT` aus `.env.common` ist die gemeinsame Basis für Daten- und
+Konfigurationsverzeichnisse, die in Container eingebunden werden. Der
+Beispielwert `..` erhält die bisherigen Verzeichnisse im Repository. Für einen
+anderen Speicherort kann dort ein Host-Pfad gesetzt werden, zum Beispiel
+`/volume1/docker`. Die einzelnen `.env.example`-Dateien enthalten die
+Unterverzeichnisse relativ zu `DOCKER_ROOT`; diese Verzeichnisse müssen am
+gewählten Speicherort vorhanden sein. Vor einem Wechsel des Speicherorts müssen
+vorhandene Daten dorthin kopiert werden.
+
+Die Host-Pfade für Docker-Socket und Zeitzonendateien werden ebenfalls in
+`.env.common` konfiguriert.
+
 ## Verwendung
 
 ### Interaktiv

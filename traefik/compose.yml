@@ -17,8 +17,8 @@ services:
   #   ${TRAEFIK_DASHBOARD_PORT}  — insecure dashboard/API
   #
   # Volumes:
-  #   /var/run/docker.sock:ro — read-only Docker socket for service discovery
-  #   ./certs:ro              — optional TLS certificates
+  #   ${DOCKER_SOCKET_PATH}:ro              — read-only Docker socket for discovery
+  #   ${DOCKER_ROOT}/${TRAEFIK_CERTS_PATH}:ro — optional TLS certificates
   #
   # Static IP: ${TRAEFIK_IP} on the external homelab network.
   traefik:
@@ -44,9 +44,9 @@ services:
       - "443:443"
       - "${TRAEFIK_DASHBOARD_PORT:-8088}:8080"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./certs:/certs:ro
-      - ./config:/etc/traefik/dynamic:ro
+      - ${DOCKER_SOCKET_PATH}:/var/run/docker.sock:ro
+      - ${DOCKER_ROOT}/${TRAEFIK_CERTS_PATH}:/certs:ro
+      - ${DOCKER_ROOT}/${TRAEFIK_CONFIG_PATH}:/etc/traefik/dynamic:ro
     networks:
       homelab_macvlan:
         ipv4_address: ${TRAEFIK_IP}

@@ -810,7 +810,7 @@ services:
     container_name: service-name
     restart: unless-stopped
     volumes:
-      - ./data:/data
+      - ${DOCKER_ROOT}/${SERVICE_DATA_PATH}:/data
     networks:
       homelab_macvlan:
         ipv4_address: ${SERVICE_IP}

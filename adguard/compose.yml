@@ -17,8 +17,8 @@ services:
   #   port 3000        — Admin web UI (initial setup wizard and dashboard)
   #
   # Volumes:
-  #   ./conf  — persistent AdGuard configuration (filters, DNS settings, users)
-  #   ./work  — runtime data (query logs, statistics, filter lists)
+  #   ${DOCKER_ROOT}/${ADGUARD_CONF_PATH} — persistent configuration
+  #   ${DOCKER_ROOT}/${ADGUARD_WORK_PATH} — runtime data
   #
   # Healthcheck: polls /control/status every 30 s via wget.
   adguardhome:
@@ -30,8 +30,8 @@ services:
       homelab_macvlan:
         ipv4_address: ${ADGUARD_IP}  # fixe IP
     volumes:
-      - ./conf:/opt/adguardhome/conf
-      - ./work:/opt/adguardhome/work
+      - ${DOCKER_ROOT}/${ADGUARD_CONF_PATH}:/opt/adguardhome/conf
+      - ${DOCKER_ROOT}/${ADGUARD_WORK_PATH}:/opt/adguardhome/work
 
     environment:
       - PUID=${PUID}

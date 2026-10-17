@@ -5,6 +5,14 @@ alwaysApply: true
 
 # Git commit identity
 
+## Branch naming
+
+When creating a branch for a pull request targeting `main` or `develop`, use one of these prefixes:
+`feature/`, `enhancement/`, `bugfix/`, `hotfix/`, `release/`, or `chore/`.
+Use only lowercase letters, numbers, dots, underscores, and hyphens after the prefix
+(for example, `feature/add-login-page`). The branch must match:
+`^(feature|enhancement|bugfix|hotfix|release|chore)/[a-z0-9._-]+$`.
+
 Before `git commit`, `git rebase`, or other operations that record author/committer:
 
 1. Read `.git-author` in the repository root (gitignored, per-developer).

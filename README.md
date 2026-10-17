@@ -136,13 +136,24 @@ For agent commits, copy `.git-author.example` to `.git-author` and set your name
 
 This only needs to be done once.
 
-### 4. Navigate to the desired service
+### 4. Configure the shared data root
+
+`DOCKER_ROOT` in `.env.common` is the shared base for service data and
+configuration. The example value `..` keeps the existing folders in this
+repository in use. To store data elsewhere, set it to a host path (for example
+`/volume1/docker`). The `create-env.sh` deployment helper merges `.env.common`
+into each service's `.env`, where the service-specific `*_PATH` values use the
+shared root. Create or move existing service folders to that location. The
+Docker socket and host timezone file sources are also configurable in
+`.env.common`.
+
+### 5. Navigate to the desired service
 
 ```bash
 cd <service>
 ```
 
-### 5. Copy the example environment file
+### 6. Copy the example environment file
 
 If the service provides one:
 
@@ -150,7 +161,7 @@ If the service provides one:
 cp .env.example .env
 ```
 
-### 6. Start the service
+### 7. Start the service
 
 ```bash
 ../scripts/docker-up.sh
@@ -167,6 +178,21 @@ cp .env.example .env
 - Pin image versions whenever possible
 - Use the shared external `homelab_macvlan` network
 - Assign static IP addresses to services connected to the macvlan network
+
+### Branch naming
+
+Pull request branches targeting `main` or `develop` must use one of these lowercase prefixes:
+`feature/`, `enhancement/`, `bugfix/`, `hotfix/`, `release/`, or `chore/`.
+After the prefix, use one or more lowercase letters, numbers, dots, underscores, or hyphens.
+
+```text
+feature/add-login-page
+bugfix/nullpointer-user-service
+release/v2.4.0
+```
+
+The `Validate Branch Name / Validate branch name` workflow check must be configured as a required status check
+for protected branches.
 
 ---
 

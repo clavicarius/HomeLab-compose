@@ -68,5 +68,10 @@ if [ "$FOUND" -eq 0 ]; then
   exit 1
 fi
 
+DOCKER_ROOT_VALUE=$(sed -n 's/^DOCKER_ROOT=//p' .env | head -n 1)
+if [ -n "$DOCKER_ROOT_VALUE" ]; then
+  sed -i "s|\${DOCKER_ROOT}|${DOCKER_ROOT_VALUE}|g" .env
+fi
+
 echo "Using environment:"
 cat .env

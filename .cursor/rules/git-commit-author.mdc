@@ -12,6 +12,7 @@ When creating a branch for a pull request targeting `main` or `develop`, use one
 Use only lowercase letters, numbers, dots, underscores, and hyphens after the prefix
 (for example, `feature/add-login-page`). The branch must match:
 `^(feature|enhancement|bugfix|hotfix|release|chore)/[a-z0-9._-]+$`.
+This rule is also in the shared `AGENTS.md`; keep both instructions consistent.
 
 Before `git commit`, `git rebase`, or other operations that record author/committer:
 

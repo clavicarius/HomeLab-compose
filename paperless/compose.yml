@@ -6,7 +6,7 @@
 
 services:
   paperless:
-    container_name: paperless
+    container_name: paperless-homelab
     image: paperlessngx/paperless-ngx:3.3
     restart: unless-stopped
     depends_on:
@@ -51,7 +51,7 @@ services:
     networks:
       - paperless_internal
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - ./dbdata:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
@@ -68,7 +68,7 @@ services:
     networks:
       - paperless_internal
     volumes:
-      - redisdata:/data
+      - ./redisdata:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s

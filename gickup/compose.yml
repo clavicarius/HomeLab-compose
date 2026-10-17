@@ -11,7 +11,7 @@ services:
     environment:
       TZ: ${TZ:-UTC}
     volumes:
-      - ${DOCKER_ROOT}/${GICKUP_BACKUPS_PATH}:/backups
+      - ${GICKUP_BACKUPS_PATH}:/backups
     configs:
       - source: gickup_config
         target: /gickup/conf.yml

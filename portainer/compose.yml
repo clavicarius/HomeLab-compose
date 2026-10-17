@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${DOCKER_SOCKET_PATH}:/var/run/docker.sock
-      - ${DOCKER_ROOT}/${PORTAINER_DATA_PATH}:/data
+      - ${PORTAINER_DATA_PATH}:/data
     networks:
       homelab_macvlan:
         ipv4_address: ${PORTAINER_IP}

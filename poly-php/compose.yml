@@ -32,10 +32,10 @@ services:
     ports:
       - "${PHP56_PORT}:80"
     volumes:
-      - ${DOCKER_ROOT}/${POLYPHP_HTML_PATH}:/var/www/html
-      - ${DOCKER_ROOT}/${POLYPHP_PHP_CONFIG_PATH}:/usr/local/etc/php/php.ini
-      - ${DOCKER_ROOT}/${POLYPHP_XDEBUG_CONFIG_PATH}:/usr/local/etc/php/conf.d/xdebug.ini
-      - ${DOCKER_ROOT}/${POLYPHP_PHP56_LOGS_PATH}:/var/log/apache2
+      - ${POLYPHP_HTML_PATH}:/var/www/html
+      - ${POLYPHP_PHP_CONFIG_PATH}:/usr/local/etc/php/php.ini
+      - ${POLYPHP_XDEBUG_CONFIG_PATH}:/usr/local/etc/php/conf.d/xdebug.ini
+      - ${POLYPHP_PHP56_LOGS_PATH}:/var/log/apache2
     depends_on:
       db:
         condition: service_healthy
@@ -84,9 +84,9 @@ services:
     ports:
       - "${PHP74_PORT}:80"
     volumes:
-      - ${DOCKER_ROOT}/${POLYPHP_HTML_PATH}:/var/www/html
-      - ${DOCKER_ROOT}/${POLYPHP_PHP_CONFIG_PATH}:/usr/local/etc/php/php.ini
-      - ${DOCKER_ROOT}/${POLYPHP_PHP74_LOGS_PATH}:/var/log/apache2
+      - ${POLYPHP_HTML_PATH}:/var/www/html
+      - ${POLYPHP_PHP_CONFIG_PATH}:/usr/local/etc/php/php.ini
+      - ${POLYPHP_PHP74_LOGS_PATH}:/var/log/apache2
     depends_on:
       db:
         condition: service_healthy
@@ -135,9 +135,9 @@ services:
     ports:
       - "${PHP85_PORT}:80"
     volumes:
-      - ${DOCKER_ROOT}/${POLYPHP_HTML_PATH}:/var/www/html
-      - ${DOCKER_ROOT}/${POLYPHP_PHP_CONFIG_PATH}:/usr/local/etc/php/php.ini
-      - ${DOCKER_ROOT}/${POLYPHP_PHP85_LOGS_PATH}:/var/log/apache2
+      - ${POLYPHP_HTML_PATH}:/var/www/html
+      - ${POLYPHP_PHP_CONFIG_PATH}:/usr/local/etc/php/php.ini
+      - ${POLYPHP_PHP85_LOGS_PATH}:/var/log/apache2
     depends_on:
       db:
         condition: service_healthy
@@ -189,8 +189,8 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - ${DOCKER_ROOT}/${POLYPHP_MYSQL_DATA_PATH}:/var/lib/mysql
-      - ${DOCKER_ROOT}/${POLYPHP_DB_INIT_PATH}:/docker-entrypoint-initdb.d
+      - ${POLYPHP_MYSQL_DATA_PATH}:/var/lib/mysql
+      - ${POLYPHP_DB_INIT_PATH}:/docker-entrypoint-initdb.d
     networks:
       - poly_internal
     healthcheck:

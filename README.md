@@ -138,12 +138,13 @@ This only needs to be done once.
 
 ### 4. Configure the shared data root
 
-`DOCKER_ROOT` in `.env.common` is the base directory for host-mounted service
-data and configuration. The example value `..` keeps the existing folders in
-this repository in use. To store them elsewhere, set it to a host path (for
-example `/volume1/docker`) and create or move the service folders named by the
-`*_PATH` variables in each service's `.env.example`. The Docker socket and host
-timezone file sources are also configurable in `.env.common`.
+Each service with data bind mounts defines its own `DOCKER_ROOT` and complete
+host paths in its `.env.example`. The example value `..` keeps the existing
+folders in this repository in use. To store data elsewhere, set `DOCKER_ROOT`
+in the service's `.env` to a host path (for example `/volume1/docker`); its
+`*_PATH` values are expanded there. Create or move existing service folders to
+that location. The Docker socket and host timezone file sources remain
+configurable in `.env.common`.
 
 ### 5. Navigate to the desired service
 

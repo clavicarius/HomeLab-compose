@@ -58,7 +58,7 @@ FORGEJO_SSH_PORT=222
 
 | Verzeichnis | Beschreibung                  |
 | ----------- | ----------------------------- |
-| `${DOCKER_ROOT}/${FORGEJO_DATA_PATH}` | Repositorys, Konfiguration, Datenbank |
+| `${FORGEJO_DATA_PATH}` | Repositorys, Konfiguration, Datenbank |
 
 Die Daten bleiben dadurch auch nach einem Container-Update erhalten.
 

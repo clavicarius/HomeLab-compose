@@ -17,8 +17,8 @@ services:
   #   ${FORGEJO_SSH_PORT}:22 — SSH access for git clone/push/pull
   #
   # Volumes:
-  #   ${DOCKER_ROOT}/${FORGEJO_DATA_PATH} — repositories, configuration, and database
-  #   ${HOST_LOCALTIME_PATH}             — localtime from the host
+  #   ${FORGEJO_DATA_PATH}    — repositories, configuration, and database
+  #   ${HOST_LOCALTIME_PATH} — localtime from the host
   #
   # Database: SQLite3 (default); path /data/gitea/gitea.db inside the container.
   # Healthcheck: polls the web root every 30 s via wget.
@@ -31,7 +31,7 @@ services:
       homelab_macvlan:
         ipv4_address: ${FORGEJO_IP}  # fixe IP
     volumes:
-      - ${DOCKER_ROOT}/${FORGEJO_DATA_PATH}:/data
+      - ${FORGEJO_DATA_PATH}:/data
       - ${HOST_LOCALTIME_PATH}:/etc/localtime:ro
     ports:
       - "${FORGEJO_PORT}:3000"  # web-ui

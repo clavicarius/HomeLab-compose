@@ -18,7 +18,7 @@ services:
   #
   # Volumes:
   #   ${DOCKER_SOCKET_PATH}:ro              — read-only Docker socket for discovery
-  #   ${DOCKER_ROOT}/${TRAEFIK_CERTS_PATH}:ro — optional TLS certificates
+  #   ${TRAEFIK_CERTS_PATH}:ro — optional TLS certificates
   #
   # Static IP: ${TRAEFIK_IP} on the external homelab network.
   traefik:
@@ -45,8 +45,8 @@ services:
       - "${TRAEFIK_DASHBOARD_PORT:-8088}:8080"
     volumes:
       - ${DOCKER_SOCKET_PATH}:/var/run/docker.sock:ro
-      - ${DOCKER_ROOT}/${TRAEFIK_CERTS_PATH}:/certs:ro
-      - ${DOCKER_ROOT}/${TRAEFIK_CONFIG_PATH}:/etc/traefik/dynamic:ro
+      - ${TRAEFIK_CERTS_PATH}:/certs:ro
+      - ${TRAEFIK_CONFIG_PATH}:/etc/traefik/dynamic:ro
     networks:
       homelab_macvlan:
         ipv4_address: ${TRAEFIK_IP}

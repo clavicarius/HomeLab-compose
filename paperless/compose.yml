@@ -39,6 +39,8 @@ services:
       PAPERLESS_URL: https://${PAPERLESS_HOST}.${HOMELAB_DOMAIN}
       PAPERLESS_TIME_ZONE: ${TZ}
       PAPERLESS_OCR_LANGUAGE: deu+eng
+      USERMAP_UID: ${PUID}
+      USERMAP_GID: ${PGID}
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.paperless.tls=${TRAEFIK_TLS_ENABLED}"

@@ -1,5 +1,7 @@
 # Git branch naming
 
+Every container service added or changed in a Compose stack must define an enabled, working `healthcheck`. Do not disable health checks; stack CI enforces this requirement.
+
 When creating a branch for a pull request targeting `main` or `develop`, use one of these prefixes:
 `feature/`, `enhancement/`, `bugfix/`, `hotfix/`, `release/`, or `chore/`.
 Use only lowercase letters, numbers, dots, underscores, and hyphens after the prefix

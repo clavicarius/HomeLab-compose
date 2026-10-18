@@ -21,6 +21,8 @@ vendor/
 
 # Docker
 *.log
+paperless/dbdata/
+paperless/redisdata/
 
 # Python cache
 __pycache__/

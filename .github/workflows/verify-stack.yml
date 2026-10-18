@@ -190,8 +190,7 @@ jobs:
       - name: Check verification result
         shell: bash
         run: |
-          if [ "${{ needs.verify.result }}" != "success" ] \
-             && [ "${{ needs.verify.result }}" != "skipped" ]; then
+          if [ "${{ needs.verify.result }}" != "success" ]; then
             echo "Compose verification failed"
             exit 1
           fi

@@ -179,6 +179,21 @@ cp .env.example .env
 - Use the shared external `homelab_macvlan` network
 - Assign static IP addresses to services connected to the macvlan network
 
+### Branch naming
+
+Pull request branches targeting `main` or `develop` must use one of these lowercase prefixes:
+`feature/`, `enhancement/`, `bugfix/`, `hotfix/`, `release/`, or `chore/`.
+After the prefix, use one or more lowercase letters, numbers, dots, underscores, or hyphens.
+
+```text
+feature/add-login-page
+bugfix/nullpointer-user-service
+release/v2.4.0
+```
+
+The `Validate Branch Name / Validate branch name` workflow check must be configured as a required status check
+for protected branches.
+
 ---
 
 ## License

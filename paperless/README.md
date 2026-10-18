@@ -22,6 +22,7 @@ settings, and Docker network name.
 From this directory:
 
 ```bash
+mkdir -p data media export consume dbdata redisdata
 docker compose pull
 docker compose up -d
 ```

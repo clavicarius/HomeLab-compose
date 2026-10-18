@@ -8,6 +8,12 @@ services:
     container_name: gickup-homelab
     image: buddyspencer/gickup:0.10.47
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "^/gickup/gickup"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     environment:
       TZ: ${TZ:-UTC}
     volumes:

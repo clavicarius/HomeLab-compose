@@ -178,6 +178,7 @@ cp .env.example .env
 - Pin image versions whenever possible
 - Use the shared external `homelab_macvlan` network
 - Assign static IP addresses to services connected to the macvlan network
+- Every container service must define and use an enabled Compose health check; stack CI verifies this requirement
 
 ### Branch naming
 

@@ -45,6 +45,13 @@ cp .env.common.example .env.common
 ../scripts/create-env.sh
 ```
 
+`TRAEFIK_HOSTS` konfiguriert alle Hostnamen des Dashboards. Der gemeinsame
+ACME-Resolver verwendet `STEP_CA_ACME_URL`; die CA muss unter dieser URL vom
+Traefik-Container erreichbar sein und Zertifikate fuer die konfigurierten
+Hostnamen ausstellen koennen. Traefik speichert ACME-Daten im ignorierten
+Verzeichnis `acme/`. Der Root der CA muss fuer den Traefik-Container vertrauenswuerdig
+sein.
+
 ---
 
 ## Reihenfolge im Homelab

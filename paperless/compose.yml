@@ -6,7 +6,7 @@
 
 services:
   paperless:
-    container_name: paperless
+    container_name: paperless-homelab
     image: paperlessngx/paperless-ngx:3.3
     restart: unless-stopped
     depends_on:
@@ -14,15 +14,21 @@ services:
         condition: service_healthy
       broker:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--output", "/dev/null", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     networks:
       homelab_macvlan:
         ipv4_address: ${PAPERLESS_IP}
       paperless_internal: {}
     volumes:
-      - ./data:/usr/src/paperless/data
-      - ./media:/usr/src/paperless/media
-      - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
+      - ${PAPERLESS_DATA_PATH}:/usr/src/paperless/data
+      - ${PAPERLESS_MEDIA_PATH}:/usr/src/paperless/media
+      - ${PAPERLESS_EXPORT_PATH}:/usr/src/paperless/export
+      - ${PAPERLESS_CONSUME_PATH}:/usr/src/paperless/consume
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
@@ -33,6 +39,8 @@ services:
       PAPERLESS_URL: https://${PAPERLESS_HOST}.${HOMELAB_DOMAIN}
       PAPERLESS_TIME_ZONE: ${TZ}
       PAPERLESS_OCR_LANGUAGE: deu+eng
+      USERMAP_UID: ${PUID}
+      USERMAP_GID: ${PGID}
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.paperless.tls=${TRAEFIK_TLS_ENABLED}"
@@ -52,7 +60,7 @@ services:
     networks:
       - paperless_internal
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - ${PAPERLESS_DB_DATA_PATH}:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
@@ -64,12 +72,12 @@ services:
       retries: 5
 
   broker:
-    image: redis:7-alpine
+    image: redis:8-alpine
     restart: unless-stopped
     networks:
       - paperless_internal
     volumes:
-      - redisdata:/data
+      - ${PAPERLESS_REDIS_DATA_PATH}:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s

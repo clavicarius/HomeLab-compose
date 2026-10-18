@@ -17,9 +17,9 @@ services:
   #   ${GITEA_SSH_PORT}:22 — SSH access for git clone/push/pull
   #
   # Volumes:
-  #   ./data          — repositories, Gitea configuration, and SQLite database
-  #   /etc/timezone   — timezone file from the host (Synology NAS path used)
-  #   /etc/localtime  — localtime from the host
+  #   ${GITEA_DATA_PATH}        — repositories, configuration, and database
+  #   ${HOST_TIMEZONE_PATH}    — timezone file from the host
+  #   ${HOST_LOCALTIME_PATH}   — localtime from the host
   #
   # Database: SQLite3 (default); path /data/gitea/gitea.db inside the container.
   # Healthcheck: polls the web root every 30 s via wget.
@@ -32,10 +32,10 @@ services:
       homelab_macvlan:
         ipv4_address: ${GITEA_IP}  # fixe IP
     volumes:
-      - ./data:/data
-      # - /etc/timezone:/etc/timezone:ro # use for linux systems
-      - /etc/TZ:/etc/timezone:ro       # use for synology NAS systems
-      - /etc/localtime:/etc/localtime:ro
+      - ${GITEA_DATA_PATH}:/data
+      # - ${HOST_TIMEZONE_PATH}:/etc/timezone:ro # use for linux systems
+      - ${HOST_TIMEZONE_PATH}:/etc/timezone:ro
+      - ${HOST_LOCALTIME_PATH}:/etc/localtime:ro
     ports:
       - "${GITEA_PORT}:3000"  # web-ui
       - "${GITEA_SSH_PORT}:2222"  # ssh

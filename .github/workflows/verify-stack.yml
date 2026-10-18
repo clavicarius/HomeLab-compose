@@ -89,6 +89,8 @@ jobs:
 
           # Use a dedicated private test subnet in CI so that gateway and fixed
           # service IPs are guaranteed to be within the same network.
+          sed -i "s|^DOCKER_ROOT=.*|DOCKER_ROOT=${GITHUB_WORKSPACE}|" .env.ci
+          sed -i "s|\${DOCKER_ROOT}|${GITHUB_WORKSPACE}|g" .env.ci
           sed -i 's/^SUBNET=.*/SUBNET=172.25.0.0\/24/' .env.ci
           sed -i 's/^GATEWAY=.*/GATEWAY=172.25.0.1/' .env.ci
 
@@ -127,6 +129,30 @@ jobs:
             ${{ steps.compose.outputs.compose_args }} \
             --env-file .env.ci \
             config
+
+          MISSING=$(
+            docker compose \
+              ${{ steps.compose.outputs.compose_args }} \
+              --env-file .env.ci \
+              config --format json |
+            jq -r '
+              .services
+              | to_entries[]
+              | select(
+                  .value.healthcheck == null
+                  or .value.healthcheck.disable == true
+                  or .value.healthcheck.test == ["NONE"]
+                  or (.value.healthcheck.test // [] | length) == 0
+                )
+              | .key
+            '
+          )
+
+          if [ -n "$MISSING" ]; then
+            echo "Every service must define an enabled healthcheck:"
+            echo "$MISSING"
+            exit 1
+          fi
 
       - name: Run dashboard unit tests
         if: matrix.stack == 'dashboard'
@@ -188,8 +214,7 @@ jobs:
       - name: Check verification result
         shell: bash
         run: |
-          if [ "${{ needs.verify.result }}" != "success" ] \
-             && [ "${{ needs.verify.result }}" != "skipped" ]; then
+          if [ "${{ needs.verify.result }}" != "success" ]; then
             echo "Compose verification failed"
             exit 1
           fi

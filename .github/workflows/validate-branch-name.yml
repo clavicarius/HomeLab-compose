@@ -1,0 +1,34 @@
+name: Validate Branch Name
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  validate-branch-name:
+    name: Validate branch name
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout ci-platform validator
+        uses: actions/checkout@v4
+        with:
+          repository: clavicarius/ci-platform
+          ref: v1
+          path: .ci-platform
+
+      - name: Prepare ci-platform validator script
+        run: |
+          mkdir -p scripts
+          cp .ci-platform/scripts/validate-branch-name.sh scripts/validate-branch-name.sh
+
+      - name: Validate source branch name
+        uses: clavicarius/ci-platform/actions/validate-branch-name@v1
+        with:
+          branch-name: ${{ github.head_ref }}
+          branch-regex: '^(feature|enhancement|bugfix|hotfix|release|chore|copilot)/[a-z0-9._-]+$'

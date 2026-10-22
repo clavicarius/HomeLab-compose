@@ -28,3 +28,44 @@ jobs:
         with:
           csv-file: .github/gh-labels.csv
           github-token: ${{ github.token }}
+
+      - name: Enforce CSV as source of truth
+        if: hashFiles('.github/gh-labels.csv') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import csv
+          import json
+          import os
+          import subprocess
+
+          repository = os.environ["GITHUB_REPOSITORY"]
+          with open(".github/gh-labels.csv", encoding="utf-8-sig", newline="") as source:
+              configured = {
+                  row["name"].strip()
+                  for row in csv.DictReader(source, delimiter=";")
+                  if row.get("name", "").strip()
+              }
+
+          pages = json.loads(
+              subprocess.check_output(
+                  [
+                      "gh",
+                      "api",
+                      "--paginate",
+                      "--slurp",
+                      f"repos/{repository}/labels?per_page=100",
+                  ],
+                  text=True,
+              )
+          )
+          existing = {label["name"] for page in pages for label in page}
+
+          for name in sorted(existing - configured):
+              print(f"Removing label {name!r}")
+              subprocess.run(
+                  ["gh", "label", "delete", name, "--repo", repository, "--yes"],
+                  check=True,
+              )
+          PY

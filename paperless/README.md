@@ -23,13 +23,14 @@ From this directory:
 
 ```bash
 mkdir -p data media export consume dbdata redisdata
-docker compose pull
-docker compose up -d
+docker compose up -d --build
 ```
 
 Paperless stores documents in `media/`, watched imports in `consume/`, and
 exports in `export/`. Application data is in `data/`; PostgreSQL and Redis use
-Docker-managed volumes. Back up these directories and volumes together.
+Docker-managed volumes. The local Paperless image extends the official image
+with ExifTool (`exiftool`). Back up these directories and volumes together.
 
-To update, run `docker compose pull` followed by `docker compose up -d`. Stop
-the stack with `docker compose down`; persistent data is retained.
+To update, run `docker compose pull db broker`, then
+`docker compose build --pull` and `docker compose up -d`. Stop the stack with
+`docker compose down`; persistent data is retained.

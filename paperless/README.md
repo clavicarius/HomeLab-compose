@@ -15,7 +15,8 @@ openssl rand -hex 32
 ```
 
 The shared `.env.common` file supplies the homelab domain, timezone, Traefik
-settings, and Docker network name.
+settings, and Docker network name. `PAPERLESS_SCRIPT_PATH` selects the host
+directory mounted for the consume scripts; it defaults to `./scripts`.
 
 ## Start and maintain
 

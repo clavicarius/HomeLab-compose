@@ -7,7 +7,8 @@
 services:
   paperless:
     container_name: paperless-homelab
-    image: paperlessngx/paperless-ngx:3.3
+    image: paperless-homelab:3.3
+    build: .
     restart: unless-stopped
     depends_on:
       db:

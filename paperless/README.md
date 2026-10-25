@@ -31,5 +31,10 @@ Paperless stores documents in `media/`, watched imports in `consume/`, and
 exports in `export/`. Application data is in `data/`; PostgreSQL and Redis use
 Docker-managed volumes. Back up these directories and volumes together.
 
+The scripts in `scripts/` are mounted read-only and configured as Paperless's
+pre- and post-consume hooks. The pre-consume hook is an empty placeholder; the
+post-consume hook prints the consumed document's metadata to the container log.
+Keep custom hook scripts executable so Paperless can run them.
+
 To update, run `docker compose pull` followed by `docker compose up -d`. Stop
 the stack with `docker compose down`; persistent data is retained.

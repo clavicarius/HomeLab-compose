@@ -29,6 +29,7 @@ services:
       - ${PAPERLESS_MEDIA_PATH}:/usr/src/paperless/media
       - ${PAPERLESS_EXPORT_PATH}:/usr/src/paperless/export
       - ${PAPERLESS_CONSUME_PATH}:/usr/src/paperless/consume
+      - ./scripts:/usr/src/paperless/scripts:ro
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
@@ -39,6 +40,8 @@ services:
       PAPERLESS_URL: https://${PAPERLESS_HOST}.${HOMELAB_DOMAIN}
       PAPERLESS_TIME_ZONE: ${TZ}
       PAPERLESS_OCR_LANGUAGE: deu+eng
+      PAPERLESS_PRE_CONSUME_SCRIPT: /usr/src/paperless/scripts/pre_consume.sh
+      PAPERLESS_POST_CONSUME_SCRIPT: /usr/src/paperless/scripts/post_consume.sh
       USERMAP_UID: ${PUID}
       USERMAP_GID: ${PGID}
     labels:

@@ -23,6 +23,8 @@ vendor/
 *.log
 paperless/dbdata/
 paperless/redisdata/
+paperless/media/
+
 
 # Python cache
 __pycache__/

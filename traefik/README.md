@@ -13,7 +13,8 @@ Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-archi
 - `compose.yml` - Traefik-Stack fuer den regulaeren Betrieb
 - `compose.ci.yml` - CI-Override
 - `.env.example` - Beispielkonfiguration fuer servicespezifische Variablen
-- `certs/` - Zertifikate
+- `letsencrypt/` - persistenter ACME-Status und Zertifikate (nicht versioniert)
+- `certs/` - optionale Zertifikate
 - `config/` - Laufzeitkonfiguration
 
 ---
@@ -21,6 +22,20 @@ Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-archi
 ## Konfiguration
 
 Gemeinsame Konfiguration aus `.env.common.example` kopieren und Werte fuer Netzwerk, Traefik-IP, Dashboard-Port und Domain eintragen. Die servicespezifische `.env` ist optional und kann aus `.env.example` erstellt werden.
+
+Fuer Let’s Encrypt:
+
+1. `HOMELAB_TLD` in `.env.common` auf die eigene Domain setzen (z. B. `example.de`). Daraus ergibt sich `HOMELAB_DOMAIN=home.${HOMELAB_TLD}`.
+2. In Hetzner DNS einen API-Token mit Lese- und Schreibzugriff auf die DNS-Zone anlegen und ausschliesslich in `traefik/.env` als `HETZNER_API_TOKEN` eintragen. Den Token niemals committen.
+3. Den persistenten ACME-Speicher vorbereiten:
+
+   ```bash
+   mkdir -p letsencrypt
+   touch letsencrypt/acme.json
+   chmod 600 letsencrypt/acme.json
+   ```
+
+Traefik verwendet Hetzner fuer die DNS-01-Challenge und fordert automatisch ein Zertifikat fuer `home.${HOMELAB_TLD}` und `*.home.${HOMELAB_TLD}` an. Fuer die Challenge muessen die passenden DNS-Eintraege in Hetzner verwaltet werden koennen. `letsencrypt/acme.json` enthaelt den ACME-Zustand und ist vom Git-Repository ausgeschlossen; das Verzeichnis muss bei Backups und Host-Migrationen erhalten bleiben.
 
 ---
 
@@ -81,14 +96,14 @@ Traefik veroeffentlicht HTTP auf Port 80, HTTPS auf Port 443 und das Dashboard a
 
 ```bash
 # DNS-Rewrite pruefen
-nslookup gitea.home.arpa 192.168.178.252
+nslookup adguard.home.example.de 192.168.178.252
 
-# HTTP Redirect / Routing pruefen
-curl -I http://adguard.home.arpa
-curl -k https://adguard.home.arpa
+# HTTPS-Routing und Zertifikatskette pruefen (ohne -k)
+curl -I https://adguard.home.example.de
+openssl s_client -showcerts -connect adguard.home.example.de:443 -servername adguard.home.example.de </dev/null 2>/dev/null | openssl x509 -noout -ext subjectAltName
 ```
 
-Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `compose.yml` und die DNS-Rewrites in AdGuard pruefen.
+Beim ersten HTTPS-Aufruf stellt Traefik das Zertifikat aus. Die Ausgabe von `openssl` muss `home.example.de` und `*.home.example.de` als Subject Alternative Names enthalten. Traefik verwaltet die Erneuerung automatisch; der persistente ACME-Speicher muss daher auch bei Container-Updates und Neustarts eingebunden bleiben. Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `compose.yml` und die DNS-Rewrites in AdGuard pruefen.
 
 ---
 

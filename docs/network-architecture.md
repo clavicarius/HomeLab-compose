@@ -276,13 +276,13 @@ Traefik läuft als eigener Stack in `traefik/compose.yml`.
 
 | Zweck | URL |
 |-------|-----|
-| Technisches Traefik-Dashboard | https://traefik.home.arpa/dashboard/ |
-| Home Dashboard | https://dashboard.home.arpa |
-| HTTPS-Services | https://<service>.home.arpa |
+| Technisches Traefik-Dashboard | https://traefik.home.${HOMELAB_TLD}/dashboard/ |
+| Home Dashboard | https://dashboard.home.${HOMELAB_TLD} |
+| HTTPS-Services | https://<service>.home.${HOMELAB_TLD} |
 
 Das Dashboard ist über den auf dem Host publizierten Port erreichbar. HTTPS-Services laufen über die Traefik-LAN-IP, sobald DNS-Rewrites gesetzt sind.
 
-Optional kann fuer interne Domains ein mkcert-Wildcard-Zertifikat ueber `traefik/certs/` und `traefik/config/tls.yml` bereitgestellt werden, um Browser-Warnungen zu vermeiden.
+Traefik stellt ueber Hetzner DNS-01 automatisch ein Let’s-Encrypt-Wildcard-Zertifikat fuer `home.${HOMELAB_TLD}` und `*.home.${HOMELAB_TLD}` aus. Konfiguration und Ablauf stehen in [traefik/README.md](../traefik/README.md).
 
 ---
 

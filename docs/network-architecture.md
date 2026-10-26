@@ -276,13 +276,13 @@ Traefik läuft als eigener Stack in `traefik/compose.yml`.
 
 | Zweck | URL |
 |-------|-----|
-| Technisches Traefik-Dashboard | https://traefik.home.${HOMELAB_TLD}/dashboard/ |
-| Home Dashboard | https://dashboard.home.${HOMELAB_TLD} |
-| HTTPS-Services | https://<service>.home.${HOMELAB_TLD} |
+| Technisches Traefik-Dashboard | https://traefik.${HOMELAB_DOMAIN}/dashboard/ |
+| Home Dashboard | https://dashboard.${HOMELAB_DOMAIN} |
+| HTTPS-Services | https://<service>.${HOMELAB_DOMAIN} |
 
 Das Dashboard ist über den auf dem Host publizierten Port erreichbar. HTTPS-Services laufen über die Traefik-LAN-IP, sobald DNS-Rewrites gesetzt sind.
 
-Traefik stellt ueber Hetzner DNS-01 automatisch ein Let’s-Encrypt-Wildcard-Zertifikat fuer `home.${HOMELAB_TLD}` und `*.home.${HOMELAB_TLD}` aus. Konfiguration und Ablauf stehen in [traefik/README.md](../traefik/README.md).
+Traefik stellt ueber Hetzner DNS-01 automatisch ein Let’s-Encrypt-Wildcard-Zertifikat fuer `${HOMELAB_DOMAIN}` und `*.${HOMELAB_DOMAIN}` aus. Konfiguration und Ablauf stehen in [traefik/README.md](../traefik/README.md).
 
 ---
 
@@ -328,7 +328,7 @@ Die FRITZ!Box verteilt per DHCP folgenden DNS-Server:
 Dadurch nutzen alle Clients automatisch:
 
 - AdGuard Home (DNS-Filter, Rewrites)
-- lokale Namensauflösung für `*.home.arpa`
+- lokale Namensauflösung für `*.${HOMELAB_DOMAIN}`
 
 ---
 
@@ -339,7 +339,7 @@ ein DNS-Rewrite angelegt werden:
 
 | Domain | Ziel |
 |--------|------|
-| `dashboard.home.arpa` | `192.168.178.225` |
+| `dashboard.${HOMELAB_DOMAIN}` | `192.168.178.225` |
 
 Das Ziel ist die LAN-IP von Traefik, nicht die Dashboard-IP. Traefik routet die
 Anfrage anhand des Hostnamens an den Dashboard-Container.
@@ -351,14 +351,14 @@ Anfrage anhand des Hostnamens an den Dashboard-Container.
 ## Interne Domain
 
 ```text
-home.arpa
+home.example.de
 ```
 
 Domain und E-Mail werden zentral in `.env.common` konfiguriert:
 
 ```env
-HOMELAB_DOMAIN=home.arpa
-HOMELAB_EMAIL=admin@home.arpa
+HOMELAB_DOMAIN=home.example.de
+HOMELAB_EMAIL=admin@home.example.de
 ```
 
 ## Service-Phasen

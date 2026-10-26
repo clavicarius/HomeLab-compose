@@ -25,7 +25,7 @@ Gemeinsame Konfiguration aus `.env.common.example` kopieren und Werte fuer Netzw
 
 Fuer Let’s Encrypt:
 
-1. `HOMELAB_TLD` in `.env.common` auf die eigene Domain setzen (z. B. `example.de`). Daraus ergibt sich `HOMELAB_DOMAIN=home.${HOMELAB_TLD}`.
+1. `HOMELAB_DOMAIN` in `.env.common` auf die eigene Homelab-Domain setzen (z. B. `home.example.de`).
 2. In Hetzner DNS einen API-Token mit Lese- und Schreibzugriff auf die DNS-Zone anlegen und ausschliesslich in `traefik/.env` als `HETZNER_API_TOKEN` eintragen. Den Token niemals committen.
 3. Den persistenten ACME-Speicher vorbereiten:
 
@@ -35,7 +35,7 @@ Fuer Let’s Encrypt:
    chmod 600 letsencrypt/acme.json
    ```
 
-Traefik verwendet Hetzner fuer die DNS-01-Challenge und fordert automatisch ein Zertifikat fuer `home.${HOMELAB_TLD}` und `*.home.${HOMELAB_TLD}` an. Fuer die Challenge muessen die passenden DNS-Eintraege in Hetzner verwaltet werden koennen. `letsencrypt/acme.json` enthaelt den ACME-Zustand und ist vom Git-Repository ausgeschlossen; das Verzeichnis muss bei Backups und Host-Migrationen erhalten bleiben.
+Traefik verwendet Hetzner fuer die DNS-01-Challenge und fordert automatisch ein Zertifikat fuer `${HOMELAB_DOMAIN}` und `*.${HOMELAB_DOMAIN}` an. Fuer die Challenge muessen die passenden DNS-Eintraege in Hetzner verwaltet werden koennen. `letsencrypt/acme.json` enthaelt den ACME-Zustand und ist vom Git-Repository ausgeschlossen; das Verzeichnis muss bei Backups und Host-Migrationen erhalten bleiben.
 
 ---
 

@@ -276,13 +276,15 @@ Traefik läuft als eigener Stack in `traefik/compose.yml`.
 
 | Zweck | URL |
 |-------|-----|
-| Technisches Traefik-Dashboard | https://traefik.home.arpa/dashboard/ |
-| Home Dashboard | https://dashboard.home.arpa |
-| HTTPS-Services | https://<service>.home.arpa |
+| Technisches Traefik-Dashboard | https://traefik.${HOMELAB_DOMAIN}/dashboard/ |
+| Home Dashboard | https://dashboard.${HOMELAB_DOMAIN} |
+| HTTPS-Services | https://<service>.${HOMELAB_DOMAIN} |
 
 Das Dashboard ist über den auf dem Host publizierten Port erreichbar. HTTPS-Services laufen über die Traefik-LAN-IP, sobald DNS-Rewrites gesetzt sind.
 
-Optional kann fuer interne Domains ein mkcert-Wildcard-Zertifikat ueber `traefik/certs/` und `traefik/config/tls.yml` bereitgestellt werden, um Browser-Warnungen zu vermeiden.
+Traefik stellt ueber Hetzner DNS-01 automatisch ein Let’s-Encrypt-Wildcard-Zertifikat fuer `${HOMELAB_DOMAIN}` und `*.${HOMELAB_DOMAIN}` aus. Konfiguration und Ablauf stehen in [traefik/README.md](../traefik/README.md).
+
+Als Alternative fuer rein interne Domains kann ein mkcert-Wildcard-Zertifikat verwendet werden. Dabei muessen die mkcert-Root-CA auf den zugreifenden Clients installiert und die Zertifikatsdateien in Traefiks `certs/`-Verzeichnis abgelegt werden; Details stehen ebenfalls in der [Traefik-Dokumentation](../traefik/README.md#mkcert-tls-optional).
 
 ---
 
@@ -328,7 +330,7 @@ Die FRITZ!Box verteilt per DHCP folgenden DNS-Server:
 Dadurch nutzen alle Clients automatisch:
 
 - AdGuard Home (DNS-Filter, Rewrites)
-- lokale Namensauflösung für `*.home.arpa`
+- lokale Namensauflösung für `*.${HOMELAB_DOMAIN}`
 
 ---
 
@@ -339,7 +341,7 @@ ein DNS-Rewrite angelegt werden:
 
 | Domain | Ziel |
 |--------|------|
-| `dashboard.home.arpa` | `192.168.178.225` |
+| `dashboard.${HOMELAB_DOMAIN}` | `192.168.178.225` |
 
 Das Ziel ist die LAN-IP von Traefik, nicht die Dashboard-IP. Traefik routet die
 Anfrage anhand des Hostnamens an den Dashboard-Container.
@@ -351,30 +353,25 @@ Anfrage anhand des Hostnamens an den Dashboard-Container.
 ## Interne Domain
 
 ```text
-home.arpa
+${HOMELAB_DOMAIN}
 ```
 
-Domain und E-Mail werden zentral in `.env.common` konfiguriert:
-
-```env
-HOMELAB_DOMAIN=home.arpa
-HOMELAB_EMAIL=admin@home.arpa
-```
+Domain und E-Mail werden zentral in `.env.common` als `HOMELAB_DOMAIN` und `HOMELAB_EMAIL` konfiguriert.
 
 ## Service-Phasen
 
 | Domain | Ziel | Phase |
 |--------|------|-------|
-| adguard.home.arpa | Traefik → AdGuard | Phase 1 (Basis) |
-| gitea.home.arpa | Traefik → Gitea | Phase 1 (Basis) |
-| portainer.home.arpa | Traefik → Portainer | Phase 1 (Management) |
-| php56.home.arpa | Traefik → PHP 5.6 | Phase 1 (Basis) |
-| php74.home.arpa | Traefik → PHP 7.4 | Phase 1 (Basis) |
-| php85.home.arpa | Traefik → PHP 8.5 | Phase 1 (Basis) |
-| phpmyadmin.home.arpa | Traefik → phpMyAdmin | Phase 1 (Basis) |
-| paperless.home.arpa | Traefik → Paperless | Phase 2 |
-| wordpress.home.arpa | Traefik → WordPress | Phase 2 |
-| drucker.home.arpa | Drucker (direkt) | unabhängig |
+| `adguard.${HOMELAB_DOMAIN}` | Traefik → AdGuard | Phase 1 (Basis) |
+| `gitea.${HOMELAB_DOMAIN}` | Traefik → Gitea | Phase 1 (Basis) |
+| `portainer.${HOMELAB_DOMAIN}` | Traefik → Portainer | Phase 1 (Management) |
+| `php56.${HOMELAB_DOMAIN}` | Traefik → PHP 5.6 | Phase 1 (Basis) |
+| `php74.${HOMELAB_DOMAIN}` | Traefik → PHP 7.4 | Phase 1 (Basis) |
+| `php85.${HOMELAB_DOMAIN}` | Traefik → PHP 8.5 | Phase 1 (Basis) |
+| `phpmyadmin.${HOMELAB_DOMAIN}` | Traefik → phpMyAdmin | Phase 1 (Basis) |
+| `paperless.${HOMELAB_DOMAIN}` | Traefik → Paperless | Phase 2 |
+| `wordpress.${HOMELAB_DOMAIN}` | Traefik → WordPress | Phase 2 |
+| `drucker.${HOMELAB_DOMAIN}` | Drucker (direkt) | unabhängig |
 
 ---
 
@@ -385,15 +382,15 @@ Webservices zeigen auf die Traefik-IP. Der Drucker wird direkt angesprochen.
 ## DNS-Einträge
 
 ```text
-adguard.home.arpa       -> 192.168.178.225
-portainer.home.arpa     -> 192.168.178.225
-paperless.home.arpa     -> 192.168.178.225
-wordpress.home.arpa     -> 192.168.178.225
-php56.home.arpa         -> 192.168.178.225
-php74.home.arpa         -> 192.168.178.225
-php85.home.arpa         -> 192.168.178.225
-phpmyadmin.home.arpa    -> 192.168.178.225
-drucker.home.arpa       -> 192.168.178.20
+adguard.${HOMELAB_DOMAIN}       -> 192.168.178.225
+portainer.${HOMELAB_DOMAIN}     -> 192.168.178.225
+paperless.${HOMELAB_DOMAIN}     -> 192.168.178.225
+wordpress.${HOMELAB_DOMAIN}     -> 192.168.178.225
+php56.${HOMELAB_DOMAIN}         -> 192.168.178.225
+php74.${HOMELAB_DOMAIN}         -> 192.168.178.225
+php85.${HOMELAB_DOMAIN}         -> 192.168.178.225
+phpmyadmin.${HOMELAB_DOMAIN}    -> 192.168.178.225
+drucker.${HOMELAB_DOMAIN}       -> 192.168.178.20
 ```
 
 ---
@@ -419,11 +416,11 @@ labels:
 
 | Domain | Zielcontainer | Port |
 |--------|-----------------|------|
-| adguard.home.arpa | adguard-homelab | 3000 |
-| portainer.home.arpa | portainer | 9000 |
-| paperless.home.arpa | paperless | 8000 |
-| wordpress.home.arpa | wordpress | 80 |
-| php85.home.arpa | lamp-php85 | 80 |
+| `adguard.${HOMELAB_DOMAIN}` | adguard-homelab | 3000 |
+| `portainer.${HOMELAB_DOMAIN}` | portainer | 9000 |
+| `paperless.${HOMELAB_DOMAIN}` | paperless | 8000 |
+| `wordpress.${HOMELAB_DOMAIN}` | wordpress | 80 |
+| `php85.${HOMELAB_DOMAIN}` | lamp-php85 | 80 |
 
 ---
 
@@ -514,7 +511,7 @@ Die Architektur bietet:
 - zentrale Reverse-Proxy-Verwaltung über Traefik
 - einfache Docker-Erweiterbarkeit über Labels
 - stabile Netzwerkstruktur mit dokumentierten IP-Bereichen
-- saubere lokale Domains unter `home.arpa`
+- saubere lokale Domains unter `${HOMELAB_DOMAIN}`
 - einfache Wartung
 - geringe Komplexität
 
@@ -761,15 +758,15 @@ Filters → DNS rewrites
 
 | Domain | Ziel |
 |--------|------|
-| adguard.home.arpa | 192.168.178.225 |
-| portainer.home.arpa | 192.168.178.225 |
-| paperless.home.arpa | 192.168.178.225 |
-| wordpress.home.arpa | 192.168.178.225 |
-| php56.home.arpa | 192.168.178.225 |
-| php74.home.arpa | 192.168.178.225 |
-| php85.home.arpa | 192.168.178.225 |
-| phpmyadmin.home.arpa | 192.168.178.225 |
-| drucker.home.arpa | 192.168.178.20 |
+| `adguard.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `portainer.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `paperless.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `wordpress.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `php56.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `php74.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `php85.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `phpmyadmin.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `drucker.${HOMELAB_DOMAIN}` | 192.168.178.20 |
 
 ---
 
@@ -902,7 +899,7 @@ Automatische Updates vermeiden bei:
 Prüfen:
 
 ```bash
-nslookup portainer.home.arpa 192.168.178.252
+nslookup portainer.${HOMELAB_DOMAIN} 192.168.178.252
 ```
 
 Erwartet:

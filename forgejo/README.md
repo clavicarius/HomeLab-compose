@@ -40,10 +40,7 @@ GATEWAY=192.168.178.1
 
 ### Homelab
 
-```env
-HOMELAB_DOMAIN=home.arpa
-HOMELAB_EMAIL=admin@home.arpa
-```
+`HOMELAB_DOMAIN` und `HOMELAB_EMAIL` werden zentral in `.env.common` konfiguriert.
 
 ### Forgejo
 
@@ -182,14 +179,13 @@ Der Container prüft alle 30 Sekunden die Erreichbarkeit des Webinterfaces.
 Die `.env` enthält bereits alle benötigten Variablen.
 
 ```env
-HOMELAB_DOMAIN=home.arpa
 FORGEJO_HOST=Forgejo
 ```
 
 Später kann Forgejo beispielsweise unter
 
 ```
-https://forgejo.home.arpa
+https://forgejo.${HOMELAB_DOMAIN}
 ```
 
 über Traefik veröffentlicht werden.

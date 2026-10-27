@@ -1,19 +1,16 @@
 http:
   routers:
     dashboard:
-      # file provider does not interpolate env vars — hostname must be literal
-      # replace with proper domain and path to dashboard
-      rule: Host(`traefik.home.arpa`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
-      # rule: Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      # TODO-TO-BE-REPLACED: use HOMELAB_DOMAIN when file-provider interpolation is available.
+      rule: Host(`traefik.home.example.com`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
       entryPoints:
         - websecure
       service: api@internal
       tls: {}
 
     dashboard-root-redirect:
-      # replace with proper domain and path to dashboard
-      rule: Host(`traefik.home.arpa`)
-      # rule: Host(`${TRAEFIK_HOST}.${HOMELAB_DOMAIN}`)
+      # TODO-TO-BE-REPLACED: use HOMELAB_DOMAIN when file-provider interpolation is available.
+      rule: Host(`traefik.home.example.com`)
       entryPoints:
         - websecure
       middlewares:

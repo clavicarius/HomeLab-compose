@@ -112,10 +112,10 @@ Mit `TRAEFIK_ENABLED=true` und DNS-Rewrites in AdGuard (→ `192.168.178.225`):
 
 | PHP-Version | HTTPS |
 |---|---|
-| PHP 5.6 | https://php56.home.arpa |
-| PHP 7.4 | https://php74.home.arpa |
-| PHP 8.5 | https://php85.home.arpa |
-| phpMyAdmin | https://phpmyadmin.home.arpa |
+| PHP 5.6 | https://php56.${HOMELAB_DOMAIN} |
+| PHP 7.4 | https://php74.${HOMELAB_DOMAIN} |
+| PHP 8.5 | https://php85.${HOMELAB_DOMAIN} |
+| phpMyAdmin | https://phpmyadmin.${HOMELAB_DOMAIN} |
 
 ---
 
@@ -285,6 +285,6 @@ Für produktive Systeme wird empfohlen:
 docker compose up -d --build
 ```
 
-**Homelab:** DNS-Rewrites in AdGuard für `*.home.arpa` → `192.168.178.225`, dann `TRAEFIK_ENABLED=true` setzen.
+**Homelab:** DNS-Rewrites in AdGuard für `*.${HOMELAB_DOMAIN}` → `192.168.178.225`, dann `TRAEFIK_ENABLED=true` setzen.
 
 **Lokale Entwicklung ohne DNS:** Host-Ports (siehe Tabelle oben) oder Einträge in der Hosts-Datei. Details zum zentralen Routing stehen in [traefik/README.md](../traefik/README.md).

@@ -5,7 +5,8 @@ services:
     restart: unless-stopped
     environment:
       TRAEFIK_API_URL: ${TRAEFIK_API_URL:-https://traefik-homelab/api/http/routers}
-      TRAEFIK_API_HOST: ${TRAEFIK_API_HOST:-traefik.home.arpa}
+      TRAEFIK_API_HOST: ${TRAEFIK_API_HOST:-traefik.${HOMELAB_DOMAIN}}
+      HOMELAB_DOMAIN: ${HOMELAB_DOMAIN}
       REFRESH_SECONDS: ${REFRESH_SECONDS:-30}
       DOCKER_SOCKET: /var/run/docker.sock
     volumes:

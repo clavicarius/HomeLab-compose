@@ -1,7 +1,7 @@
 # Paperless-ngx
 
 Docker Compose stack for Paperless-ngx with PostgreSQL and Redis. Paperless is
-available through Traefik at `https://paperless.${HOMELAB_DOMAIN}` by default; its
+available through Traefik at `https://paperless.home.arpa` by default; its
 application port is not published directly on the host.
 
 ## Configure

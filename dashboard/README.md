@@ -9,7 +9,7 @@ liefert der statischen Oberflaeche normalisierte Services.
 
 - gemeinsames externes Netzwerk `homelab_macvlan`
 - laufender Traefik-Stack
-- DNS-Rewrite `dashboard.${HOMELAB_DOMAIN} -> TRAEFIK_IP` in AdGuard Home
+- DNS-Rewrite `dashboard.home.arpa -> TRAEFIK_IP` in AdGuard Home
 - `.env.common` und eine lokale `.env` aus `.env.example`
 
 ## Start
@@ -19,9 +19,9 @@ liefert der statischen Oberflaeche normalisierte Services.
 docker compose up -d --build
 ```
 
-Danach ist das Dashboard unter `https://dashboard.${HOMELAB_DOMAIN}` erreichbar.
+Danach ist das Dashboard unter `https://dashboard.home.arpa` erreichbar.
 
-Der Adapter ruft die Traefik-API intern ueber den Hostnamen `traefik.${HOMELAB_DOMAIN}`
+Der Adapter ruft die Traefik-API intern ueber den Hostnamen `traefik.home.arpa`
 auf. `api.insecure` wird nicht aktiviert. Der read-only Docker-Socket wird fuer
 optionale Metadaten und Laufzeitinformationen verwendet.
 

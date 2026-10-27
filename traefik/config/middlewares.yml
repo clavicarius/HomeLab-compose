@@ -8,6 +8,7 @@ http:
     to-dashboard:
       redirectRegex:
         regex: ".*"
-        # TODO-TO-BE-REPLACED: use HOMELAB_DOMAIN when file-provider interpolation is available.
-        replacement: "https://traefik.home.example.com/dashboard/"
+        # replace with proper domain and path to dashboard
+        replacement: "https://traefik.home.arpa/dashboard/"
+        # replacement: "https://${TRAEFIK_HOST}.${HOMELAB_DOMAIN}/dashboard/"
         permanent: false

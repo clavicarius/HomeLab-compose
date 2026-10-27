@@ -39,7 +39,7 @@ services:
       - "--api.dashboard=true"
       - "--api.insecure=false"
       - "--ping=true"
-      - "--log.level=DEBUG"
+      - "--log.level=${TRAEFIK_LOG_LEVEL:-INFO}"
       - "--entrypoints.websecure.http.tls.certresolver=letsencrypt"
       - "--entrypoints.websecure.http.tls.domains[0].main=${HOMELAB_DOMAIN}"
       - "--entrypoints.websecure.http.tls.domains[0].sans=*.${HOMELAB_DOMAIN}"

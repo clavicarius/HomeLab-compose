@@ -2,7 +2,7 @@
 
 Dieser Ordner enthaelt den zentralen Traefik Reverse-Proxy-Stack fuer das Homelab.
 
-Traefik veroeffentlicht Webservices ueber Hostnamen wie `service.home.example.com` und nutzt Docker-Labels zur automatischen Service-Erkennung.
+Traefik veroeffentlicht Webservices ueber Hostnamen wie `service.${HOMELAB_DOMAIN}` und nutzt Docker-Labels zur automatischen Service-Erkennung.
 
 Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-architecture.md)
 
@@ -94,27 +94,29 @@ Traefik veroeffentlicht HTTP auf Port 80, HTTPS auf Port 443 und das Dashboard a
 
 ## Typische Validierung
 
+Vor den Befehlen den gleichen Domain-Wert wie in `.env.common` in der Shell setzen, zum Beispiel `export HOMELAB_DOMAIN=home.example.com`.
+
 ```bash
 # DNS-Rewrite pruefen
-nslookup adguard.home.example.com 192.168.178.252
+nslookup adguard.${HOMELAB_DOMAIN} 192.168.178.252
 
 # HTTPS-Routing und Zertifikatskette pruefen (ohne -k)
-curl -I https://adguard.home.example.com
-openssl s_client -showcerts -connect adguard.home.example.com:443 -servername adguard.home.example.com </dev/null 2>/dev/null | openssl x509 -noout -ext subjectAltName
+curl -I https://adguard.${HOMELAB_DOMAIN}
+openssl s_client -showcerts -connect adguard.${HOMELAB_DOMAIN}:443 -servername adguard.${HOMELAB_DOMAIN} </dev/null 2>/dev/null | openssl x509 -noout -ext subjectAltName
 ```
 
-Beim ersten HTTPS-Aufruf stellt Traefik das Zertifikat aus. Die Ausgabe von `openssl` muss `home.example.com` und `*.home.example.com` als Subject Alternative Names enthalten. Traefik verwaltet die Erneuerung automatisch; der persistente ACME-Speicher muss daher auch bei Container-Updates und Neustarts eingebunden bleiben. Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `compose.yml` und die DNS-Rewrites in AdGuard pruefen.
+Beim ersten HTTPS-Aufruf stellt Traefik das Zertifikat aus. Die Ausgabe von `openssl` muss `${HOMELAB_DOMAIN}` und `*.${HOMELAB_DOMAIN}` als Subject Alternative Names enthalten. Traefik verwaltet die Erneuerung automatisch; der persistente ACME-Speicher muss daher auch bei Container-Updates und Neustarts eingebunden bleiben. Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `compose.yml` und die DNS-Rewrites in AdGuard pruefen.
 
 ---
 
 ## Mkcert TLS (optional)
 
-Fuer eine interne Wildcard-Zertifikatskette ohne Browser-Warnungen kann `mkcert` verwendet werden.
+Fuer rein interne Domains kann mkcert als Alternative zu Let’s Encrypt verwendet werden. Vor dem Befehl muss `HOMELAB_DOMAIN` wie oben in der Shell gesetzt sein. Die mkcert-Root-CA muss auf den zugreifenden Clients installiert werden.
 
 1. Zertifikate erzeugen:
 
 ```bash
-mkcert home.example.com "*.home.example.com"
+mkcert "${HOMELAB_DOMAIN}" "*.${HOMELAB_DOMAIN}"
 ```
 
 2. Die erzeugten Dateien nach `traefik/certs/` kopieren:

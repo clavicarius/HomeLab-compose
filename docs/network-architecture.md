@@ -353,30 +353,25 @@ Anfrage anhand des Hostnamens an den Dashboard-Container.
 ## Interne Domain
 
 ```text
-home.example.com
+${HOMELAB_DOMAIN}
 ```
 
-Domain und E-Mail werden zentral in `.env.common` konfiguriert:
-
-```env
-HOMELAB_DOMAIN=home.example.com
-HOMELAB_EMAIL=admin@home.example.com
-```
+Domain und E-Mail werden zentral in `.env.common` als `HOMELAB_DOMAIN` und `HOMELAB_EMAIL` konfiguriert.
 
 ## Service-Phasen
 
 | Domain | Ziel | Phase |
 |--------|------|-------|
-| adguard.home.example.com | Traefik → AdGuard | Phase 1 (Basis) |
-| gitea.home.example.com | Traefik → Gitea | Phase 1 (Basis) |
-| portainer.home.example.com | Traefik → Portainer | Phase 1 (Management) |
-| php56.home.example.com | Traefik → PHP 5.6 | Phase 1 (Basis) |
-| php74.home.example.com | Traefik → PHP 7.4 | Phase 1 (Basis) |
-| php85.home.example.com | Traefik → PHP 8.5 | Phase 1 (Basis) |
-| phpmyadmin.home.example.com | Traefik → phpMyAdmin | Phase 1 (Basis) |
-| paperless.home.example.com | Traefik → Paperless | Phase 2 |
-| wordpress.home.example.com | Traefik → WordPress | Phase 2 |
-| drucker.home.example.com | Drucker (direkt) | unabhängig |
+| `adguard.${HOMELAB_DOMAIN}` | Traefik → AdGuard | Phase 1 (Basis) |
+| `gitea.${HOMELAB_DOMAIN}` | Traefik → Gitea | Phase 1 (Basis) |
+| `portainer.${HOMELAB_DOMAIN}` | Traefik → Portainer | Phase 1 (Management) |
+| `php56.${HOMELAB_DOMAIN}` | Traefik → PHP 5.6 | Phase 1 (Basis) |
+| `php74.${HOMELAB_DOMAIN}` | Traefik → PHP 7.4 | Phase 1 (Basis) |
+| `php85.${HOMELAB_DOMAIN}` | Traefik → PHP 8.5 | Phase 1 (Basis) |
+| `phpmyadmin.${HOMELAB_DOMAIN}` | Traefik → phpMyAdmin | Phase 1 (Basis) |
+| `paperless.${HOMELAB_DOMAIN}` | Traefik → Paperless | Phase 2 |
+| `wordpress.${HOMELAB_DOMAIN}` | Traefik → WordPress | Phase 2 |
+| `drucker.${HOMELAB_DOMAIN}` | Drucker (direkt) | unabhängig |
 
 ---
 
@@ -387,15 +382,15 @@ Webservices zeigen auf die Traefik-IP. Der Drucker wird direkt angesprochen.
 ## DNS-Einträge
 
 ```text
-adguard.home.example.com       -> 192.168.178.225
-portainer.home.example.com     -> 192.168.178.225
-paperless.home.example.com     -> 192.168.178.225
-wordpress.home.example.com     -> 192.168.178.225
-php56.home.example.com         -> 192.168.178.225
-php74.home.example.com         -> 192.168.178.225
-php85.home.example.com         -> 192.168.178.225
-phpmyadmin.home.example.com    -> 192.168.178.225
-drucker.home.example.com       -> 192.168.178.20
+adguard.${HOMELAB_DOMAIN}       -> 192.168.178.225
+portainer.${HOMELAB_DOMAIN}     -> 192.168.178.225
+paperless.${HOMELAB_DOMAIN}     -> 192.168.178.225
+wordpress.${HOMELAB_DOMAIN}     -> 192.168.178.225
+php56.${HOMELAB_DOMAIN}         -> 192.168.178.225
+php74.${HOMELAB_DOMAIN}         -> 192.168.178.225
+php85.${HOMELAB_DOMAIN}         -> 192.168.178.225
+phpmyadmin.${HOMELAB_DOMAIN}    -> 192.168.178.225
+drucker.${HOMELAB_DOMAIN}       -> 192.168.178.20
 ```
 
 ---
@@ -421,11 +416,11 @@ labels:
 
 | Domain | Zielcontainer | Port |
 |--------|-----------------|------|
-| adguard.home.example.com | adguard-homelab | 3000 |
-| portainer.home.example.com | portainer | 9000 |
-| paperless.home.example.com | paperless | 8000 |
-| wordpress.home.example.com | wordpress | 80 |
-| php85.home.example.com | lamp-php85 | 80 |
+| `adguard.${HOMELAB_DOMAIN}` | adguard-homelab | 3000 |
+| `portainer.${HOMELAB_DOMAIN}` | portainer | 9000 |
+| `paperless.${HOMELAB_DOMAIN}` | paperless | 8000 |
+| `wordpress.${HOMELAB_DOMAIN}` | wordpress | 80 |
+| `php85.${HOMELAB_DOMAIN}` | lamp-php85 | 80 |
 
 ---
 
@@ -516,7 +511,7 @@ Die Architektur bietet:
 - zentrale Reverse-Proxy-Verwaltung über Traefik
 - einfache Docker-Erweiterbarkeit über Labels
 - stabile Netzwerkstruktur mit dokumentierten IP-Bereichen
-- saubere lokale Domains unter `home.example.com`
+- saubere lokale Domains unter `${HOMELAB_DOMAIN}`
 - einfache Wartung
 - geringe Komplexität
 
@@ -763,15 +758,15 @@ Filters → DNS rewrites
 
 | Domain | Ziel |
 |--------|------|
-| adguard.home.example.com | 192.168.178.225 |
-| portainer.home.example.com | 192.168.178.225 |
-| paperless.home.example.com | 192.168.178.225 |
-| wordpress.home.example.com | 192.168.178.225 |
-| php56.home.example.com | 192.168.178.225 |
-| php74.home.example.com | 192.168.178.225 |
-| php85.home.example.com | 192.168.178.225 |
-| phpmyadmin.home.example.com | 192.168.178.225 |
-| drucker.home.example.com | 192.168.178.20 |
+| `adguard.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `portainer.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `paperless.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `wordpress.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `php56.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `php74.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `php85.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `phpmyadmin.${HOMELAB_DOMAIN}` | 192.168.178.225 |
+| `drucker.${HOMELAB_DOMAIN}` | 192.168.178.20 |
 
 ---
 
@@ -904,7 +899,7 @@ Automatische Updates vermeiden bei:
 Prüfen:
 
 ```bash
-nslookup portainer.home.example.com 192.168.178.252
+nslookup portainer.${HOMELAB_DOMAIN} 192.168.178.252
 ```
 
 Erwartet:

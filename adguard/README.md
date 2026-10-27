@@ -55,10 +55,7 @@ Das Netzwerk wird einmalig im Repository-Root angelegt:
 
 ### Homelab
 
-```env
-HOMELAB_DOMAIN=home.example.com
-HOMELAB_EMAIL=admin@home.example.com
-```
+`HOMELAB_DOMAIN` und `HOMELAB_EMAIL` werden zentral in `.env.common` konfiguriert.
 
 ### AdGuard
 
@@ -161,13 +158,13 @@ Lokale Domains für Webservices werden in AdGuard als DNS-Rewrites angelegt und 
 Die `compose.yml` enthält Traefik-Labels. Sobald Traefik läuft und `TRAEFIK_ENABLED=true` gesetzt ist, ist AdGuard zusätzlich erreichbar unter:
 
 ```text
-https://adguard.home.example.com
+https://adguard.${HOMELAB_DOMAIN}
 ```
 
 Voraussetzungen:
 
 * Traefik-Stack läuft (`poly-php/compose.yml`)
-* DNS-Rewrite `adguard.home.example.com → 192.168.178.225` in AdGuard
+* DNS-Rewrite `adguard.${HOMELAB_DOMAIN} → 192.168.178.225` in AdGuard
 * `TRAEFIK_ENABLED=true` in `.env.common`
 
 ## Updates

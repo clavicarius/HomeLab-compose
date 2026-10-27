@@ -40,10 +40,7 @@ GATEWAY=192.168.178.1
 
 ### Homelab
 
-```env
-HOMELAB_DOMAIN=home.example.com
-HOMELAB_EMAIL=admin@home.example.com
-```
+`HOMELAB_DOMAIN` und `HOMELAB_EMAIL` werden zentral in `.env.common` konfiguriert.
 
 ### Gitea
 
@@ -182,14 +179,13 @@ Der Container prüft alle 30 Sekunden die Erreichbarkeit des Webinterfaces.
 Die `.env` enthält bereits alle benötigten Variablen.
 
 ```env
-HOMELAB_DOMAIN=home.example.com
 GITEA_HOST=gitea
 ```
 
 Später kann Gitea beispielsweise unter
 
 ```
-https://gitea.home.example.com
+https://gitea.${HOMELAB_DOMAIN}
 ```
 
 über Traefik veröffentlicht werden.

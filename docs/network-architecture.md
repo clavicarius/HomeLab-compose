@@ -284,6 +284,8 @@ Das Dashboard ist über den auf dem Host publizierten Port erreichbar. HTTPS-Ser
 
 Traefik stellt ueber Hetzner DNS-01 automatisch ein Let’s-Encrypt-Wildcard-Zertifikat fuer `${HOMELAB_DOMAIN}` und `*.${HOMELAB_DOMAIN}` aus. Konfiguration und Ablauf stehen in [traefik/README.md](../traefik/README.md).
 
+Als Alternative fuer rein interne Domains kann ein mkcert-Wildcard-Zertifikat verwendet werden. Dabei muessen die mkcert-Root-CA auf den zugreifenden Clients installiert und die Zertifikatsdateien in Traefiks `certs/`-Verzeichnis abgelegt werden; Details stehen ebenfalls in der [Traefik-Dokumentation](../traefik/README.md#mkcert-tls-optional).
+
 ---
 
 # 10. DSM-Portanpassung

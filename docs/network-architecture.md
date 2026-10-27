@@ -245,10 +245,9 @@ Traefik-Routing pro Service wird über Labels gesteuert. In `.env.common`:
 
 ```env
 TRAEFIK_ENABLED=true
-TRAEFIK_TLS_ENABLED=true
 ```
 
-Standardmäßig sind beide Werte `false` — Services sind dann nur direkt über ihre LAN-IP bzw. Host-Ports erreichbar.
+`TRAEFIK_ENABLED=false` deaktiviert das Traefik-Routing. Geroutete Services verwenden TLS zentral über den `websecure`-EntryPoint und dessen konfigurierten Zertifikatsresolver.
 
 ---
 
@@ -411,7 +410,6 @@ labels:
   - "traefik.enable=${TRAEFIK_ENABLED}"
   - "traefik.http.routers.adguard.rule=Host(`${ADGUARD_HOST}.${HOMELAB_DOMAIN}`)"
   - "traefik.http.routers.adguard.entrypoints=websecure"
-  - "traefik.http.routers.adguard.tls=${TRAEFIK_TLS_ENABLED}"
   - "traefik.http.services.adguard.loadbalancer.server.port=3000"
 ```
 
@@ -788,7 +786,6 @@ In `.env.common`:
 
 ```env
 TRAEFIK_ENABLED=true
-TRAEFIK_TLS_ENABLED=true
 ```
 
 Container neu starten:
@@ -818,7 +815,6 @@ services:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.service-name.rule=Host(`${SERVICE_HOST}.${HOMELAB_DOMAIN}`)"
       - "traefik.http.routers.service-name.entrypoints=websecure"
-      - "traefik.http.routers.service-name.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.services.service-name.loadbalancer.server.port=8080"
 
 networks:

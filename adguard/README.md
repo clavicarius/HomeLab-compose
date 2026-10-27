@@ -71,7 +71,6 @@ ADGUARD_IP=192.168.178.252
 
 ```env
 TRAEFIK_ENABLED=false
-TRAEFIK_TLS_ENABLED=false
 ```
 
 ## Verzeichnisse

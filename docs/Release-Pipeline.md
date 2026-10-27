@@ -1,22 +1,26 @@
-# Release Pipeline
+# Compose Verification Pipeline
 
 ## Ziel
 
-Für jeden Docker Compose Stack soll automatisiert überprüft werden, ob dieser erfolgreich gestartet werden kann. Jeder Stack wird dabei unabhängig von den anderen validiert, sodass Fehler eindeutig einem einzelnen Service zugeordnet werden können.
+Der Workflow `verify-stack.yml` validiert die Compose-Konfigurationen und startet
+jeden erkannten Stack auf einem eigenen GitHub-Actions-Runner. Er läuft bei
+Pull Requests nach `main` und bei Pushes auf `main`.
 
 ## Anforderungen
 
-- GitHub Actions als CI/CD-Plattform verwenden.
-- Jeder Compose-Stack erhält einen eigenen Workflow-Job.
-- Die Jobs werden parallel ausgeführt.
-- Ein Fehler in einem Stack darf die Ausführung der übrigen Stacks nicht verhindern.
-- Nach Abschluss der Pipeline muss eindeutig ersichtlich sein, welcher Stack erfolgreich validiert wurde und welcher fehlgeschlagen ist.
+- Stack-Verzeichnisse mit `compose.yml` oder `docker-compose.yml` werden
+	automatisch erkannt.
+- Jeder erkannte Stack erhält einen eigenen Matrix-Job; `fail-fast` ist
+	deaktiviert, damit andere Jobs nach einem Fehler weiterlaufen.
+- CI erzeugt eine Test-Umgebung aus `.env.common.example` und dem jeweiligen
+	`.env.example` und ersetzt Netzwerk- und Pfadwerte durch CI-Werte.
 
 ## Umsetzung
 
 ### 1. Stacks automatisch erkennen
 
-Die Pipeline soll alle Verzeichnisse im Repository (mit Ausnahme von `.github` und weiteren Infrastrukturverzeichnissen) als eigenständige Compose-Stacks erkennen.
+Die Suche reicht zwei bis drei Verzeichnisebenen tief und berücksichtigt
+Verzeichnisse, die eine der unterstützten Compose-Hauptdateien enthalten.
 
 ### 2. Matrix-Strategie verwenden
 
@@ -28,54 +32,46 @@ Jeder Job führt folgende Schritte aus:
 
 1. Repository auschecken.
 2. In das Stack-Verzeichnis wechseln.
-3. Docker Compose Stack starten.
-4. Auf den erfolgreichen Start der Container warten.
-5. Den Zustand der Container prüfen.
-6. Optional einen stack-spezifischen Health Check ausführen.
-7. Bei Fehlern die Container-Logs ausgeben.
-8. Den Stack vollständig wieder herunterfahren und aufräumen.
+3. `docker compose config` ausführen.
+4. Prüfen, dass jeder Container-Service einen aktivierten Healthcheck besitzt.
+5. Den Stack mit `docker compose up -d --wait` starten.
+6. Prüfen, dass alle Container den Status `running` haben.
+7. Beim Dashboard-Stack zusätzlich die Unit-Tests ausführen.
 
 ### 4. Health Checks
 
-Jeder Stack kann optional ein Skript `healthcheck.sh` bereitstellen.
+Compose-Healthchecks sind verpflichtend und werden vor dem Start auf
+Vorhandensein und Aktivierung geprüft. `up --wait` wartet auf den Zustand
+dieser Checks.
 
-Ist dieses vorhanden, wird es automatisch ausgeführt. Dadurch können servicespezifische Prüfungen implementiert werden, beispielsweise:
+## Ablauf
 
-- HTTP-Endpunkte prüfen
-- Datenbankverbindungen testen
-- Login-Seiten erreichen
-- API-Health-Endpunkte aufrufen
-
-Fehlt das Skript, erfolgt lediglich die Überprüfung, ob alle Container erfolgreich gestartet wurden.
-
-## Release-Prozess
-
-Der Workflow besteht aus drei Phasen:
+Der Workflow besteht aus diesen Stufen:
 
 ```text
-Lint
- ├── compose config
- ├── YAML-Validierung
- └── Shell-Skripte prüfen
+Discover stacks
+ └── Compose-Dateien finden
 
 ↓
 
-Verify
- ├── Stack A
- ├── Stack B
- ├── Stack C
- └── ...
+Verify (parallel)
+ ├── Compose-Konfiguration und Healthchecks prüfen
+ ├── Stack starten und Status prüfen
+ └── Dashboard-Unit-Tests ausführen
 
 ↓
 
-Release
- └── GitHub Release (nur wenn alle Verify-Jobs erfolgreich waren)
+Verify Compose Stacks
+ └── Gesamtstatus auswerten
 ```
+
+Dieser Workflow erstellt kein GitHub Release und fährt die Stacks nicht
+explizit herunter. Die separate Tag-Erstellung ist in
+[VERSIONING.md](VERSIONING.md) beschrieben.
 
 ## Vorteile
 
 - Unabhängige Validierung jedes Compose-Stacks.
 - Fehler lassen sich eindeutig einem Service zuordnen.
-- Gute Skalierbarkeit bei wachsender Anzahl an Services.
-- Einfache Erweiterung um individuelle Health Checks.
-- Saubere Trennung zwischen Konfigurationsprüfung, Deployment-Test und Release.
+- Neue Compose-Stacks werden automatisch in die Matrix aufgenommen.
+- Fehler einzelner Stacks verhindern nicht den Start der übrigen Matrix-Jobs.

@@ -46,9 +46,4 @@ source ./scripts/git-author-env.sh
 git rebase HEAD~3 --exec "git commit --amend --no-edit --reset-author"
 ```
 
-## Agent
-
-Cursor reads `.cursor/rules/git-commit-author.mdc` and:
-
-- loads `.git-author` before git operations
-- writes plain commit messages only — **no git trailers** (`Co-authored-by`, `Signed-off-by`, tool attribution, etc.)
+The repository's shared AI-agent instructions are in [AGENTS.md](../AGENTS.md).

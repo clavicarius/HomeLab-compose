@@ -41,8 +41,8 @@ GATEWAY=192.168.178.1
 ### Homelab
 
 ```env
-HOMELAB_DOMAIN=home.arpa
-HOMELAB_EMAIL=admin@home.arpa
+HOMELAB_DOMAIN=home.example.com
+HOMELAB_EMAIL=admin@home.example.com
 ```
 
 ### Forgejo
@@ -177,22 +177,14 @@ Dieses enthält:
 
 Der Container prüft alle 30 Sekunden die Erreichbarkeit des Webinterfaces.
 
-## Geplante Traefik-Integration
+## Traefik-Integration
 
-Die `.env` enthält bereits alle benötigten Variablen.
+Die `compose.yml` enthaelt bereits Traefik-Labels. Wenn `TRAEFIK_ENABLED=true`
+gesetzt ist und der DNS-Rewrite auf die Traefik-IP zeigt, ist Forgejo zusaetzlich
+unter `https://${FORGEJO_HOST}.${HOMELAB_DOMAIN}` erreichbar.
 
-```env
-HOMELAB_DOMAIN=home.arpa
-FORGEJO_HOST=Forgejo
-```
-
-Später kann Forgejo beispielsweise unter
-
-```
-https://forgejo.home.arpa
-```
-
-über Traefik veröffentlicht werden.
+Der SSH-Zugriff bleibt ueber den konfigurierten Host-Port
+`${FORGEJO_SSH_PORT}` verfuegbar.
 
 ## Hinweise
 

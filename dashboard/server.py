@@ -269,7 +269,7 @@ def handler_for(state):
 def main():
     state = DashboardState(
         os.environ.get("TRAEFIK_API_URL", "https://traefik-homelab/api/http/routers"),
-        os.environ.get("TRAEFIK_API_HOST", f"traefik.{os.environ['HOMELAB_DOMAIN']}"),
+        os.environ.get("TRAEFIK_API_HOST") or f"traefik.{os.environ['HOMELAB_DOMAIN']}",
         int(os.environ.get("REFRESH_SECONDS", "30")),
         os.environ.get("DOCKER_SOCKET", DOCKER_SOCKET),
     )

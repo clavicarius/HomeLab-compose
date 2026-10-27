@@ -23,7 +23,6 @@ services:
         ipv4_address: ${PORTAINER_IP}
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
-      - "traefik.http.routers.portainer.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.rule=Host(`${PORTAINER_HOST}.${HOMELAB_DOMAIN}`)"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"

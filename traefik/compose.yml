@@ -39,6 +39,16 @@ services:
       - "--api.dashboard=true"
       - "--api.insecure=false"
       - "--ping=true"
+      - "--log.level=${TRAEFIK_LOG_LEVEL:-INFO}"
+      - "--entrypoints.websecure.http.tls.certresolver=letsencrypt"
+      - "--entrypoints.websecure.http.tls.domains[0].main=${HOMELAB_DOMAIN}"
+      - "--entrypoints.websecure.http.tls.domains[0].sans=*.${HOMELAB_DOMAIN}"
+      - "--certificatesresolvers.letsencrypt.acme.email=${HOMELAB_EMAIL:-}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=hetzner"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
+    environment:
+      HETZNER_API_TOKEN: ${HETZNER_API_TOKEN:-}
     ports:
       - "80:80"
       - "443:443"
@@ -47,6 +57,7 @@ services:
       - ${DOCKER_SOCKET_PATH}:/var/run/docker.sock:ro
       - ${TRAEFIK_CERTS_PATH}:/certs:ro
       - ${TRAEFIK_CONFIG_PATH}:/etc/traefik/dynamic:ro
+      - ${TRAEFIK_LETSENCRYPT_PATH}:/letsencrypt
     networks:
       homelab_macvlan:
         ipv4_address: ${TRAEFIK_IP}

@@ -8,7 +8,6 @@ http:
       entryPoints:
         - websecure
       service: api@internal
-      tls: {}
 
     dashboard-root-redirect:
       # replace with proper domain and path to dashboard
@@ -20,4 +19,3 @@ http:
         - to-dashboard
       service: api@internal
       priority: 1
-      tls: {}

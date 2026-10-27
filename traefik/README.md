@@ -2,7 +2,7 @@
 
 Dieser Ordner enthaelt den zentralen Traefik Reverse-Proxy-Stack fuer das Homelab.
 
-Traefik veroeffentlicht Webservices ueber Hostnamen wie `service.home.arpa` und nutzt Docker-Labels zur automatischen Service-Erkennung.
+Traefik veroeffentlicht Webservices ueber Hostnamen wie `service.home.example.com` und nutzt Docker-Labels zur automatischen Service-Erkennung.
 
 Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-architecture.md)
 
@@ -25,8 +25,8 @@ Gemeinsame Konfiguration aus `.env.common.example` kopieren und Werte fuer Netzw
 
 Fuer Let’s Encrypt:
 
-1. `HOMELAB_DOMAIN` in `.env.common` auf die eigene Homelab-Domain setzen (z. B. `home.example.de`).
-2. In Hetzner DNS einen API-Token mit Lese- und Schreibzugriff auf die DNS-Zone anlegen und ausschliesslich in `traefik/.env` als `HETZNER_API_TOKEN` eintragen. Den Token niemals committen.
+1. `HOMELAB_DOMAIN` in `.env.common` auf die eigene Homelab-Domain setzen (z. B. `home.example.com`).
+2. Fuer ein gueltiges Let’s-Encrypt-Zertifikat muss die Domain `example.com` dem Benutzer gehoeren bzw. muessen die benoetigten DNS-Berechtigungen fuer diese Zone vorliegen. In Hetzner DNS einen API-Token mit Lese- und Schreibzugriff auf die DNS-Zone `example.com` anlegen und ausschliesslich in `traefik/.env` als `HETZNER_API_TOKEN` eintragen. Den Token niemals committen.
 3. Den persistenten ACME-Speicher vorbereiten:
 
    ```bash
@@ -96,14 +96,14 @@ Traefik veroeffentlicht HTTP auf Port 80, HTTPS auf Port 443 und das Dashboard a
 
 ```bash
 # DNS-Rewrite pruefen
-nslookup adguard.home.example.de 192.168.178.252
+nslookup adguard.home.example.com 192.168.178.252
 
 # HTTPS-Routing und Zertifikatskette pruefen (ohne -k)
-curl -I https://adguard.home.example.de
-openssl s_client -showcerts -connect adguard.home.example.de:443 -servername adguard.home.example.de </dev/null 2>/dev/null | openssl x509 -noout -ext subjectAltName
+curl -I https://adguard.home.example.com
+openssl s_client -showcerts -connect adguard.home.example.com:443 -servername adguard.home.example.com </dev/null 2>/dev/null | openssl x509 -noout -ext subjectAltName
 ```
 
-Beim ersten HTTPS-Aufruf stellt Traefik das Zertifikat aus. Die Ausgabe von `openssl` muss `home.example.de` und `*.home.example.de` als Subject Alternative Names enthalten. Traefik verwaltet die Erneuerung automatisch; der persistente ACME-Speicher muss daher auch bei Container-Updates und Neustarts eingebunden bleiben. Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `compose.yml` und die DNS-Rewrites in AdGuard pruefen.
+Beim ersten HTTPS-Aufruf stellt Traefik das Zertifikat aus. Die Ausgabe von `openssl` muss `home.example.com` und `*.home.example.com` als Subject Alternative Names enthalten. Traefik verwaltet die Erneuerung automatisch; der persistente ACME-Speicher muss daher auch bei Container-Updates und Neustarts eingebunden bleiben. Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `compose.yml` und die DNS-Rewrites in AdGuard pruefen.
 
 ---
 
@@ -114,7 +114,7 @@ Fuer eine interne Wildcard-Zertifikatskette ohne Browser-Warnungen kann `mkcert`
 1. Zertifikate erzeugen:
 
 ```bash
-mkcert home.arpa "*.home.arpa"
+mkcert home.example.com "*.home.example.com"
 ```
 
 2. Die erzeugten Dateien nach `traefik/certs/` kopieren:

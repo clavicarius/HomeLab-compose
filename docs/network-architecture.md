@@ -351,30 +351,30 @@ Anfrage anhand des Hostnamens an den Dashboard-Container.
 ## Interne Domain
 
 ```text
-home.example.de
+home.example.com
 ```
 
 Domain und E-Mail werden zentral in `.env.common` konfiguriert:
 
 ```env
-HOMELAB_DOMAIN=home.example.de
-HOMELAB_EMAIL=admin@home.example.de
+HOMELAB_DOMAIN=home.example.com
+HOMELAB_EMAIL=admin@home.example.com
 ```
 
 ## Service-Phasen
 
 | Domain | Ziel | Phase |
 |--------|------|-------|
-| adguard.home.arpa | Traefik → AdGuard | Phase 1 (Basis) |
-| gitea.home.arpa | Traefik → Gitea | Phase 1 (Basis) |
-| portainer.home.arpa | Traefik → Portainer | Phase 1 (Management) |
-| php56.home.arpa | Traefik → PHP 5.6 | Phase 1 (Basis) |
-| php74.home.arpa | Traefik → PHP 7.4 | Phase 1 (Basis) |
-| php85.home.arpa | Traefik → PHP 8.5 | Phase 1 (Basis) |
-| phpmyadmin.home.arpa | Traefik → phpMyAdmin | Phase 1 (Basis) |
-| paperless.home.arpa | Traefik → Paperless | Phase 2 |
-| wordpress.home.arpa | Traefik → WordPress | Phase 2 |
-| drucker.home.arpa | Drucker (direkt) | unabhängig |
+| adguard.home.example.com | Traefik → AdGuard | Phase 1 (Basis) |
+| gitea.home.example.com | Traefik → Gitea | Phase 1 (Basis) |
+| portainer.home.example.com | Traefik → Portainer | Phase 1 (Management) |
+| php56.home.example.com | Traefik → PHP 5.6 | Phase 1 (Basis) |
+| php74.home.example.com | Traefik → PHP 7.4 | Phase 1 (Basis) |
+| php85.home.example.com | Traefik → PHP 8.5 | Phase 1 (Basis) |
+| phpmyadmin.home.example.com | Traefik → phpMyAdmin | Phase 1 (Basis) |
+| paperless.home.example.com | Traefik → Paperless | Phase 2 |
+| wordpress.home.example.com | Traefik → WordPress | Phase 2 |
+| drucker.home.example.com | Drucker (direkt) | unabhängig |
 
 ---
 
@@ -385,15 +385,15 @@ Webservices zeigen auf die Traefik-IP. Der Drucker wird direkt angesprochen.
 ## DNS-Einträge
 
 ```text
-adguard.home.arpa       -> 192.168.178.225
-portainer.home.arpa     -> 192.168.178.225
-paperless.home.arpa     -> 192.168.178.225
-wordpress.home.arpa     -> 192.168.178.225
-php56.home.arpa         -> 192.168.178.225
-php74.home.arpa         -> 192.168.178.225
-php85.home.arpa         -> 192.168.178.225
-phpmyadmin.home.arpa    -> 192.168.178.225
-drucker.home.arpa       -> 192.168.178.20
+adguard.home.example.com       -> 192.168.178.225
+portainer.home.example.com     -> 192.168.178.225
+paperless.home.example.com     -> 192.168.178.225
+wordpress.home.example.com     -> 192.168.178.225
+php56.home.example.com         -> 192.168.178.225
+php74.home.example.com         -> 192.168.178.225
+php85.home.example.com         -> 192.168.178.225
+phpmyadmin.home.example.com    -> 192.168.178.225
+drucker.home.example.com       -> 192.168.178.20
 ```
 
 ---
@@ -419,11 +419,11 @@ labels:
 
 | Domain | Zielcontainer | Port |
 |--------|-----------------|------|
-| adguard.home.arpa | adguard-homelab | 3000 |
-| portainer.home.arpa | portainer | 9000 |
-| paperless.home.arpa | paperless | 8000 |
-| wordpress.home.arpa | wordpress | 80 |
-| php85.home.arpa | lamp-php85 | 80 |
+| adguard.home.example.com | adguard-homelab | 3000 |
+| portainer.home.example.com | portainer | 9000 |
+| paperless.home.example.com | paperless | 8000 |
+| wordpress.home.example.com | wordpress | 80 |
+| php85.home.example.com | lamp-php85 | 80 |
 
 ---
 
@@ -514,7 +514,7 @@ Die Architektur bietet:
 - zentrale Reverse-Proxy-Verwaltung über Traefik
 - einfache Docker-Erweiterbarkeit über Labels
 - stabile Netzwerkstruktur mit dokumentierten IP-Bereichen
-- saubere lokale Domains unter `home.arpa`
+- saubere lokale Domains unter `home.example.com`
 - einfache Wartung
 - geringe Komplexität
 
@@ -761,15 +761,15 @@ Filters → DNS rewrites
 
 | Domain | Ziel |
 |--------|------|
-| adguard.home.arpa | 192.168.178.225 |
-| portainer.home.arpa | 192.168.178.225 |
-| paperless.home.arpa | 192.168.178.225 |
-| wordpress.home.arpa | 192.168.178.225 |
-| php56.home.arpa | 192.168.178.225 |
-| php74.home.arpa | 192.168.178.225 |
-| php85.home.arpa | 192.168.178.225 |
-| phpmyadmin.home.arpa | 192.168.178.225 |
-| drucker.home.arpa | 192.168.178.20 |
+| adguard.home.example.com | 192.168.178.225 |
+| portainer.home.example.com | 192.168.178.225 |
+| paperless.home.example.com | 192.168.178.225 |
+| wordpress.home.example.com | 192.168.178.225 |
+| php56.home.example.com | 192.168.178.225 |
+| php74.home.example.com | 192.168.178.225 |
+| php85.home.example.com | 192.168.178.225 |
+| phpmyadmin.home.example.com | 192.168.178.225 |
+| drucker.home.example.com | 192.168.178.20 |
 
 ---
 
@@ -902,7 +902,7 @@ Automatische Updates vermeiden bei:
 Prüfen:
 
 ```bash
-nslookup portainer.home.arpa 192.168.178.252
+nslookup portainer.home.example.com 192.168.178.252
 ```
 
 Erwartet:

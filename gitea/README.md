@@ -40,7 +40,10 @@ GATEWAY=192.168.178.1
 
 ### Homelab
 
-`HOMELAB_DOMAIN` und `HOMELAB_EMAIL` werden zentral in `.env.common` konfiguriert.
+```env
+HOMELAB_DOMAIN=home.arpa
+HOMELAB_EMAIL=admin@home.arpa
+```
 
 ### Gitea
 
@@ -179,13 +182,14 @@ Der Container prüft alle 30 Sekunden die Erreichbarkeit des Webinterfaces.
 Die `.env` enthält bereits alle benötigten Variablen.
 
 ```env
+HOMELAB_DOMAIN=home.arpa
 GITEA_HOST=gitea
 ```
 
 Später kann Gitea beispielsweise unter
 
 ```
-https://gitea.${HOMELAB_DOMAIN}
+https://gitea.home.arpa
 ```
 
 über Traefik veröffentlicht werden.

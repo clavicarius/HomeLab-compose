@@ -38,7 +38,7 @@ The goals of this repository are to provide:
 
 Each service directory should contain:
 
-- `compose.yaml` – Docker Compose configuration
+- `compose.yml` – Docker Compose configuration
 - `.env.example` – Example environment variables (optional)
 - `README.md` – Service-specific documentation
 
@@ -50,18 +50,20 @@ For a full description of every script (usage, options, dependencies), see **[do
 
 ## Networking
 
-All Compose projects share a single external Docker **macvlan** network.
+LAN-facing Compose services use a shared external Docker **macvlan** network.
+Some stacks also define private networks for internal communication.
 
 ### Network Configuration
 
 | Property | Value |
 |----------|-------|
-| Network Name | `homelab_macvlan` |
+| Network Name | `homelab_macvlan` (example default) |
 | Driver | `macvlan` |
-| Subnet | 192.168.178.224/27 |
-| Gateway | 192.168.178.1 |
+| Subnet | `192.168.178.224/27` (example default) |
+| Gateway | `192.168.178.1` (example default) |
 
-The network is created **once** and then shared by all Compose projects and can be configured via `.env.common`.
+The network is created **once** and then shared by the Compose projects. Its
+name and network settings are configurable via `.env.common`.
 
 Example:
 
@@ -101,7 +103,6 @@ Using static IP addresses ensures that services remain permanently reachable and
 | `gickup` | Docker Compose project for scheduled local backups of Gitea repositories using Gickup. | [gickup/README.md](gickup/README.md) |
 | `gitea` | Docker Compose project for running Gitea (self-hosted Git service) in a homelab environment. | [gitea/README.md](gitea/README.md) |
 | `forgejo` | Docker Compose project for running Forgejo (self-hosted Git service) in a homelab environment. | [forgejo/README.md](forgejo/README.md) |
-| `forgejo` | Docker Compose project for running Forgejo (self-hosted Git service) in a homelab environment. | [forgejo/README.md](forgejo/README.md) |
 | `paperless` | Docker Compose stack for Paperless-ngx document management, published through Traefik. | [paperless/README.md](paperless/README.md) |
 | `portainer` | Standalone Docker Compose stack for managing the homelab's Docker environment. | [portainer/README.md](portainer/README.md) |
 
@@ -138,14 +139,14 @@ This only needs to be done once.
 
 ### 4. Configure the shared data root
 
-`DOCKER_ROOT` in `.env.common` is the shared base for service data and
-configuration. The example value `..` keeps the existing folders in this
-repository in use. To store data elsewhere, set it to a host path (for example
-`/volume1/docker`). The `create-env.sh` deployment helper merges `.env.common`
-into each service's `.env`, where the service-specific `*_PATH` values use the
-shared root. Create or move existing service folders to that location. The
-Docker socket and host timezone file sources are also configurable in
-`.env.common`.
+`DOCKER_DATA_ROOT` in `.env.common` is the shared base for service data and
+configuration paths. The example value `..` keeps the existing folders in
+this repository in use. To store data elsewhere, set it to a host path (for
+example `/volume1/docker`). The `create-env.sh` helper merges `.env.common`
+with the service's `.env.example`; Compose also loads both files at runtime
+through the Docker helper scripts. Create or move existing service folders to
+the configured location. The Docker socket and host timezone file sources are
+also configurable in `.env.common`.
 
 ### 5. Navigate to the desired service
 

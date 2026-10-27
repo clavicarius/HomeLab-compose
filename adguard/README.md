@@ -22,7 +22,8 @@ adguard/
 
 ## Umgebungsvariablen
 
-Die Konfiguration wird aus `.env.common.example` (Repository-Root) und optional `adguard/.env.example` zusammengeführt:
+Die Konfiguration wird aus `.env.common` (Repository-Root) und
+`adguard/.env.example` zusammengeführt:
 
 ```bash
 cd adguard
@@ -56,8 +57,8 @@ Das Netzwerk wird einmalig im Repository-Root angelegt:
 ### Homelab
 
 ```env
-HOMELAB_DOMAIN=home.arpa
-HOMELAB_EMAIL=admin@home.arpa
+HOMELAB_DOMAIN=home.example.com
+HOMELAB_EMAIL=admin@home.example.com
 ```
 
 ### AdGuard
@@ -70,8 +71,11 @@ ADGUARD_IP=192.168.178.252
 ### Traefik
 
 ```env
-TRAEFIK_ENABLED=false
+TRAEFIK_ENABLED=true
 ```
+
+Der Beispielwert in `.env.common.example` aktiviert das Routing. Mit
+`TRAEFIK_ENABLED=false` kann es deaktiviert werden.
 
 ## Verzeichnisse
 
@@ -157,16 +161,15 @@ Lokale Domains für Webservices werden in AdGuard als DNS-Rewrites angelegt und 
 
 ## Traefik-Integration
 
-Die `compose.yml` enthält Traefik-Labels. Sobald Traefik läuft und `TRAEFIK_ENABLED=true` gesetzt ist, ist AdGuard zusätzlich erreichbar unter:
-
-```text
-https://adguard.home.arpa
-```
+Die `compose.yml` enthält Traefik-Labels. Sobald Traefik läuft und
+`TRAEFIK_ENABLED=true` gesetzt ist, ist AdGuard zusaetzlich unter
+`https://adguard.<HOMELAB_DOMAIN>` erreichbar. Traefik leitet intern an Port
+`9080` weiter.
 
 Voraussetzungen:
 
-* Traefik-Stack läuft (`poly-php/compose.yml`)
-* DNS-Rewrite `adguard.home.arpa → 192.168.178.225` in AdGuard
+* Traefik-Stack läuft (`traefik/compose.yml`)
+* DNS-Rewrite `adguard.<HOMELAB_DOMAIN> → 192.168.178.225` in AdGuard
 * `TRAEFIK_ENABLED=true` in `.env.common`
 
 ## Updates
@@ -207,7 +210,8 @@ Diese enthalten:
 
 ## Healthcheck
 
-Der Container prüft alle 30 Sekunden die Erreichbarkeit des Webinterfaces.
+Der Container prueft alle 30 Sekunden die Erreichbarkeit von
+`http://127.0.0.1:9080/`.
 
 ## Hinweise
 

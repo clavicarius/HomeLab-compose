@@ -41,8 +41,8 @@ GATEWAY=192.168.178.1
 ### Homelab
 
 ```env
-HOMELAB_DOMAIN=home.arpa
-HOMELAB_EMAIL=admin@home.arpa
+HOMELAB_DOMAIN=home.example.com
+HOMELAB_EMAIL=admin@home.example.com
 ```
 
 ### Gitea
@@ -51,7 +51,7 @@ HOMELAB_EMAIL=admin@home.arpa
 GITEA_HOST=gitea
 GITEA_IP=192.168.178.248
 GITEA_PORT=3000
-GITEA_SSH_PORT=222
+GITEA_SSH_PORT=2222
 ```
 
 ## Verzeichnisse
@@ -67,7 +67,7 @@ Die Daten bleiben dadurch auch nach einem Container-Update erhalten.
 | Port               | Beschreibung                          |
 | ------------------ | ------------------------------------- |
 | 3000               | Weboberfläche im Container            |
-| 22                 | SSH im Container                      |
+| 2222               | SSH im Container                      |
 | `${GITEA_PORT}`    | veröffentlichter Webport auf dem Host |
 | `${GITEA_SSH_PORT}`| veröffentlichter SSH-Port auf dem Host|
 
@@ -77,11 +77,8 @@ Die Weboberfläche ist anschließend erreichbar unter
 http://<Docker-Host>:${GITEA_PORT}
 ```
 
-beispielsweise
-
-```
-http://192.168.178.248:3000
-```
+Alternativ ist Gitea unter `http://${GITEA_IP}:3000` direkt ueber seine
+macvlan-IP erreichbar.
 
 ## Netzwerk
 
@@ -177,22 +174,14 @@ Dieses enthält:
 
 Der Container prüft alle 30 Sekunden die Erreichbarkeit des Webinterfaces.
 
-## Geplante Traefik-Integration
+## Traefik-Integration
 
-Die `.env` enthält bereits alle benötigten Variablen.
+Die `compose.yml` enthaelt bereits Traefik-Labels. Wenn `TRAEFIK_ENABLED=true`
+gesetzt ist und der DNS-Rewrite auf die Traefik-IP zeigt, ist Gitea zusaetzlich
+unter `https://${GITEA_HOST}.${HOMELAB_DOMAIN}` erreichbar.
 
-```env
-HOMELAB_DOMAIN=home.arpa
-GITEA_HOST=gitea
-```
-
-Später kann Gitea beispielsweise unter
-
-```
-https://gitea.home.arpa
-```
-
-über Traefik veröffentlicht werden.
+Der SSH-Zugriff bleibt ueber den konfigurierten Host-Port
+`${GITEA_SSH_PORT}` verfuegbar.
 
 ## Hinweise
 

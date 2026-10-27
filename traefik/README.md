@@ -13,14 +13,19 @@ Weitere Architekturdetails: [docs/network-architecture.md](../docs/network-archi
 - `compose.yml` - Traefik-Stack fuer den regulaeren Betrieb
 - `compose.ci.yml` - CI-Override
 - `.env.example` - Beispielkonfiguration fuer servicespezifische Variablen
-- `certs/` - Zertifikate
+- `certs/` - optionale lokale Zertifikate
 - `config/` - Laufzeitkonfiguration
+- `letsencrypt/` - ACME-Zertifikatsspeicher
 
 ---
 
 ## Konfiguration
 
-Gemeinsame Konfiguration aus `.env.common.example` kopieren und Werte fuer Netzwerk, Traefik-IP, Dashboard-Port und Domain eintragen. Die servicespezifische `.env` ist optional und kann aus `.env.example` erstellt werden.
+Gemeinsame Konfiguration aus `.env.common.example` kopieren und Netzwerkwerte
+sowie eine eigene Domain setzen. Erzeuge anschliessend die service-spezifische
+`.env` mit `create-env.sh` und trage dort einen Hetzner-DNS-API-Token mit
+Berechtigung zum Aendern der Domainzone ein. Die `.env` ist fuer den Stack
+erforderlich.
 
 ---
 
@@ -73,7 +78,24 @@ Update:
 ../scripts/docker-update.sh
 ```
 
-Traefik veroeffentlicht HTTP auf Port 80, HTTPS auf Port 443 und das Dashboard auf `${TRAEFIK_DASHBOARD_PORT}` (Standard: 8088).
+Traefik veroeffentlicht HTTP auf Port 80 und HTTPS auf Port 443. Der Host-Port
+`${TRAEFIK_DASHBOARD_PORT}` (Standard: 8088) wird auf Container-Port 8080
+gemappt; die API ist jedoch nicht insecure freigeschaltet. Das Dashboard wird
+ueber die HTTPS-Route `https://traefik.home.arpa/dashboard/` bereitgestellt.
+Diese Host-Regel ist derzeit in `config/dashboard.yml` fest eingetragen. Wenn
+du eine andere Domain verwendest, passe sie dort ebenfalls an und richte einen
+DNS-Rewrite auf die Traefik-IP ein.
+
+## Let's Encrypt
+
+Der Compose-Stack ist fuer ein Wildcard-Zertifikat per DNS-Challenge bei
+Hetzner konfiguriert. Setze `HOMELAB_DOMAIN` auf eine eigene oeffentliche
+Domain, `HOMELAB_EMAIL` auf eine erreichbare Adresse und `HETZNER_API_TOKEN`
+in `traefik/.env`. Traefik speichert ACME-Daten unter
+`TRAEFIK_LETSENCRYPT_PATH`; halte diesen Pfad persistent und sichere ihn.
+
+Eine interne Domain wie `home.arpa` kann nicht von Let's Encrypt zertifiziert
+werden. Verwende dafuer stattdessen ein lokal vertrautes mkcert-Zertifikat.
 
 ---
 
@@ -94,7 +116,13 @@ Wenn ein Service nicht geroutet wird, zuerst die Traefik-Labels im jeweiligen `c
 
 ## Mkcert TLS (optional)
 
-Fuer eine interne Wildcard-Zertifikatskette ohne Browser-Warnungen kann `mkcert` verwendet werden.
+Fuer eine interne Wildcard-Zertifikatskette ohne Browser-Warnungen kann
+`mkcert` verwendet werden. Die lokale CA muss auf allen Clients vertraut sein.
+Die mitgelieferte `config/tls.yml` referenziert `certs/wildcard.pem` und
+`certs/wildcard-key.pem` als Standardzertifikat. Diese Dateien muessen daher
+vorhanden sein; ohne sie meldet der Traefik-File-Provider einen Ladefehler.
+Wenn ausschliesslich Let's Encrypt verwendet wird, entferne oder passe den
+`defaultCertificate`-Abschnitt in `config/tls.yml` an.
 
 1. Zertifikate erzeugen:
 

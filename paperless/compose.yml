@@ -46,7 +46,6 @@ services:
       USERMAP_GID: ${PGID}
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
-      - "traefik.http.routers.paperless.tls=${TRAEFIK_TLS_ENABLED}"
       - "traefik.http.routers.paperless.entrypoints=websecure"
       - "traefik.http.routers.paperless.rule=Host(`${PAPERLESS_HOST}.${HOMELAB_DOMAIN}`)"
       - "traefik.http.services.paperless.loadbalancer.server.port=8000"

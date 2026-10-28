@@ -94,6 +94,17 @@ Domain, `HOMELAB_EMAIL` auf eine erreichbare Adresse und `HETZNER_API_TOKEN`
 in `traefik/.env`. Traefik speichert ACME-Daten unter
 `TRAEFIK_LETSENCRYPT_PATH`; halte diesen Pfad persistent und sichere ihn.
 
+Empfohlener Ablauf:
+
+1. `TRAEFIK_ACME_CA_SERVER` auf die Staging-CA
+   (`https://acme-staging-v02.api.letsencrypt.org/directory`) setzen und testen.
+2. Auf Produktion (`https://acme-v02.api.letsencrypt.org/directory`)
+   zurueckstellen und die Staging-`acme.json` vorher loeschen.
+3. `acme.json` mit Mode 600 ablegen (`chmod 600 acme.json`).
+
+Der Token darf nicht committed werden (`.env` ist ignoriert). Split-DNS
+(z.B. `*.lab.<domain>` auf `TRAEFIK_IP`) wird im LAN-DNS (AdGuard) eingerichtet.
+
 Eine interne Domain wie `home.arpa` kann nicht von Let's Encrypt zertifiziert
 werden. Verwende dafuer stattdessen ein lokal vertrautes mkcert-Zertifikat.
 

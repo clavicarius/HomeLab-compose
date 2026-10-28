@@ -31,4 +31,4 @@ jobs:
         uses: clavicarius/ci-platform/actions/validate-branch-name@v1
         with:
           branch-name: ${{ github.head_ref }}
-          branch-regex: '^(feature|enhancement|bugfix|hotfix|release|chore|copilot)/[a-z0-9._-]+$'
+          branch-regex: '^(feature|enhancement|bugfix|hotfix|release|chore|copilot)/[a-z0-9._-]+$|^dependabot/[a-z0-9._-]+(/[a-z0-9._-]+)*$'

@@ -7,7 +7,7 @@
 services:
   wordpress:
     container_name: wordpress-homelab
-    image: wordpress:6-php8.3-apache
+    image: wordpress:7-php8.3-apache
     restart: unless-stopped
     depends_on:
       db:

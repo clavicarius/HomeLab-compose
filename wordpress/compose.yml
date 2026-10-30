@@ -1,0 +1,79 @@
+# ${WORDPRESS_HOST}.${HOMELAB_DOMAIN}
+# Docker Compose file for WordPress.
+#
+# Documentation : wordpress/README.md
+# Network setup : docs/network-architecture.md
+
+services:
+  wordpress:
+    container_name: wordpress-homelab
+    image: wordpress:7-php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - php
+        - -r
+        - >-
+          $$status = 0;
+          foreach (@get_headers('http://127.0.0.1/') ?: [] as $$header) {
+          if (preg_match('/^HTTP\/\S+ ([0-9]{3})\b/', $$header, $$match)) {
+          $$status = (int) $$match[1];
+          }
+          }
+          exit($$status >= 200 && $$status < 300 ? 0 : 1);
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      homelab_macvlan:
+        ipv4_address: ${WORDPRESS_IP}
+      wordpress_internal: {}
+    volumes:
+      - ${WORDPRESS_DATA_PATH}:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      TZ: ${TZ}
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLED}"
+      - "traefik.http.routers.wordpress.entrypoints=websecure"
+      - "traefik.http.routers.wordpress.rule=Host(`${WORDPRESS_HOST}.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.services.wordpress.loadbalancer.server.port=80"
+      - "traefik.docker.network=${NETWORK_NAME}"
+      - "homelab.name=WordPress"
+      - "homelab.icon=WordPress"
+      - "homelab.category=Web"
+      - "homelab.description=Self-hosted publishing platform"
+
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    networks:
+      - wordpress_internal
+    volumes:
+      - ${WORDPRESS_DB_DATA_PATH}:/var/lib/mysql
+    environment:
+      MARIADB_DATABASE: ${WORDPRESS_DB_NAME}
+      MARIADB_USER: ${WORDPRESS_DB_USER}
+      MARIADB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${WORDPRESS_DB_ROOT_PASSWORD}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  homelab_macvlan:
+    external: true
+    name: ${NETWORK_NAME}
+  wordpress_internal:
+    internal: true

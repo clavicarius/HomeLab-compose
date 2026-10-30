@@ -104,6 +104,7 @@ Using static IP addresses ensures that services remain permanently reachable and
 | `gitea` | Docker Compose project for running Gitea (self-hosted Git service) in a homelab environment. | [gitea/README.md](gitea/README.md) |
 | `forgejo` | Docker Compose project for running Forgejo (self-hosted Git service) in a homelab environment. | [forgejo/README.md](forgejo/README.md) |
 | `paperless` | Docker Compose stack for Paperless-ngx document management, published through Traefik. | [paperless/README.md](paperless/README.md) |
+| `wordpress` | Independent WordPress and MariaDB stack, published through Traefik. | [wordpress/README.md](wordpress/README.md) |
 | `portainer` | Standalone Docker Compose stack for managing the homelab's Docker environment. | [portainer/README.md](portainer/README.md) |
 
 ---

@@ -79,7 +79,11 @@ Lists the IP addresses of all running containers attached to the shared macvlan 
 **Usage** (run from the repository root or any service directory):
 
 ```bash
+# from the repository root
 ./scripts/list-container-ips.sh
+
+# from a service directory
+../scripts/list-container-ips.sh
 ```
 
 **Configuration** (read from `.env.common` and `.env`, with defaults):
@@ -105,7 +109,7 @@ gitea                          homelab_macvlan    192.168.178.248
 
 ### create-env.sh
 
-Creates a local `.env` file by merging `.env.common.example` (repository root) and the
+Creates a local `.env` file by merging `.env.common` (repository root) and the
 service-specific `.env.example` (current directory).
 
 Use this when a stack expects a local `.env` file. The runtime workflow uses
@@ -126,7 +130,7 @@ Use this when a stack expects a local `.env` file. The runtime workflow uses
 
 | File | Description |
 |------|-------------|
-| `../.env.common.example` | Shared configuration for all services |
+| `../.env.common` | Shared configuration for all services |
 | `.env.example` | Service-specific configuration |
 
 **Exit codes:**
@@ -187,7 +191,7 @@ cd adguard
 ../scripts/docker-down.sh
 ```
 
-Current implementation uses `docker-compose down`.
+Runs `docker compose --env-file ../.env.common --env-file .env down`.
 
 **See also:** [docker-up.sh](#docker-upsh)
 
@@ -203,11 +207,9 @@ cd adguard
 ```
 
 **Workflow:**
-1. `docker-compose pull` — fetch latest image versions
-2. `docker-compose down` — stop and remove containers
-3. `docker-up.sh` — start containers with updated images and render host lists
+1. `docker-update.sh` — pull images, stop the stack, then start with updated images and rendered host lists
 
-Current implementation uses the local `.env` for `pull/down` and explicit dual env-file loading for `up`.
+Each command loads both `../.env.common` and the local `.env`.
 
 **See also:** [docker-up.sh](#docker-upsh) · [docker-down.sh](#docker-downsh)
 
@@ -265,4 +267,4 @@ cp .git-author.example .git-author
 | `0` | Variables successfully exported |
 | `1` | `.git-author` not found, or required variables are missing |
 
-**See also:** [docs/git-author.md](git-author.md) · [.cursor/rules/git-commit-author.mdc](../.cursor/rules/git-commit-author.mdc)
+**See also:** [docs/git-author.md](git-author.md)

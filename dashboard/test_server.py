@@ -1,6 +1,29 @@
 import unittest
+from unittest.mock import patch
 
+from dashboard import server
 from dashboard.server import backend_statuses, container_metadata, decode_chunked_body, display_name, hostnames_from_rule, image_parts, normalize_routers
+
+
+class DashboardStartupTests(unittest.TestCase):
+    def test_explicit_api_host_does_not_require_homelab_domain(self):
+        environment = {
+            "TRAEFIK_API_HOST": "traefik.home.example.com",
+            "TRAEFIK_API_URL": "https://traefik.home.example.com/api/http/routers",
+        }
+        with patch.dict("os.environ", environment, clear=True):
+            with patch("dashboard.server.DashboardState") as state:
+                with patch("dashboard.server.threading.Thread"):
+                    with patch("dashboard.server.ThreadingHTTPServer") as http_server:
+                        server.main()
+
+        state.assert_called_once_with(
+            environment["TRAEFIK_API_URL"],
+            environment["TRAEFIK_API_HOST"],
+            30,
+            server.DOCKER_SOCKET,
+        )
+        http_server.return_value.serve_forever.assert_called_once_with()
 
 
 class DashboardNormalizerTests(unittest.TestCase):

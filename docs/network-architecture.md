@@ -722,7 +722,7 @@ Siehe [adguard/README.md](../adguard/README.md).
 
 ```bash
 cd adguard
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 ## Webinterface (Ersteinrichtung)
@@ -792,7 +792,7 @@ Filters → DNS rewrites
 
 ```bash
 cd traefik
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 ## Traefik aktivieren
@@ -806,7 +806,7 @@ TRAEFIK_ENABLED=true
 Container neu starten:
 
 ```bash
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 Weitere Details: [traefik/README.md](../traefik/README.md)

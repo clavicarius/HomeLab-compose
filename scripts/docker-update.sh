@@ -8,6 +8,7 @@
 #
 # Dependencies:
 #   - Docker Compose v2
+#   - Python 3
 #   - .env.common in the repository root
 #   - .env in the current service directory
 #
@@ -21,6 +22,6 @@
 #   docker-down.sh  — stop the stack only
 #   docs/scripts.md — overview of all helper scripts
 
-docker compose --env-file ../.env.common --env-file .env pull
-docker compose --env-file ../.env.common --env-file .env down
-docker compose --env-file ../.env.common --env-file .env up -d
+python3 ../scripts/docker_compose.py --env-file ../.env.common --env-file .env pull
+python3 ../scripts/docker_compose.py --env-file ../.env.common --env-file .env down
+python3 ../scripts/docker_compose.py --env-file ../.env.common --env-file .env up -d

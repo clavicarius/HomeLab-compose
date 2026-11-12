@@ -25,7 +25,7 @@ From this directory:
 ```bash
 mkdir -p data media export consume dbdata redisdata
 docker compose pull
-docker compose up -d
+../scripts/docker-up.sh
 ```
 
 Paperless stores documents in `media/`, watched imports in `consume/`, and
@@ -39,5 +39,5 @@ pre- and post-consume hooks. The pre-consume hook is an empty placeholder; the
 post-consume hook prints the consumed document's metadata to the container log.
 Keep custom hook scripts executable so Paperless can run them.
 
-To update, run `docker compose pull` followed by `docker compose up -d`. Stop
+To update, run `../scripts/docker-update.sh`. Stop
 the stack with `docker compose down`; persistent data is retained.

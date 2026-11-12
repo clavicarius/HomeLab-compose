@@ -4,10 +4,12 @@
 #
 # Usage:
 #   ./scripts/docker-up.sh
+#   ./scripts/docker-up.sh --build
 #   (run from the service directory, e.g. adguard/ or gitea/)
 #
 # Dependencies:
 #   - Docker Compose v2
+#   - Python 3
 #   - .env.common in the repository root
 #   - .env in the current service directory
 #
@@ -16,4 +18,4 @@
 #   docker-update.sh  — pull latest images and restart
 #   docs/scripts.md   — overview of all helper scripts
 
-docker compose --env-file ../.env.common --env-file .env up -d
+python3 ../scripts/docker_compose.py --env-file ../.env.common --env-file .env up -d "$@"

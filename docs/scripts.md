@@ -160,18 +160,34 @@ cd adguard
 ../scripts/docker-up.sh
 ```
 
-Add comma-separated hostnames to the service's `.env`:
+For simple host lists, add comma-separated hostnames to the service's `.env`:
 
 ```dotenv
 HOSTS=git.homelab.internal,forgejo.homelab.internal,scm.homelab.internal
 ```
 
-Short names are expanded with `HOMELAB_DOMAIN`. Every hostname is routed through
-the same Traefik router, service, middleware, and TLS configuration. The ACME
-resolver obtains certificates for all hosts in the generated rule. Use
-`docker-up.sh` or `docker-update.sh` to apply changes; direct `docker compose up`
-does not render host lists. For stacks with multiple routed containers, use one
-`<SERVICE>_HOSTS` variable per router (for example, `PHP56_HOSTS`).
+Short names are expanded with `HOMELAB_DOMAIN`. For complete control over the
+Traefik expression, set the service-specific rule variable instead:
+
+```dotenv
+GITEA_HOST_RULE='Host(`gitea.example.com`) || (Host(`git.example.com`) && PathPrefix(`/`))'
+```
+
+Compose uses this rule as-is; it can include any valid Traefik rule expression.
+The equivalent variables for other single-router services are
+`ADGUARD_HOST_RULE`, `DASHBOARD_HOST_RULE`, `FORGEJO_HOST_RULE`,
+`PAPERLESS_HOST_RULE`, and `PORTAINER_HOST_RULE`. The `*_HOSTS` variables remain
+available to generate standard `Host(...) || Host(...)` rules, and take effect
+when no explicit `*_HOST_RULE` is set. For stacks with multiple routed
+containers, use one `<SERVICE>_HOST_RULE` or `<SERVICE>_HOSTS` variable per
+router (for example, `PHP56_HOST_RULE`).
+
+Every hostname in the rule uses the same Traefik router, service, middleware,
+and TLS configuration. The ACME resolver obtains certificates for the hosts
+the rule matches. Use `docker-up.sh` or `docker-update.sh` to apply generated
+host lists. To inspect interpolation, run
+`docker compose --env-file ../.env.common --env-file .env config`; the explicit
+rule variables are read directly from the env files.
 
 Recommended startup order for homelab routing:
 1. `adguard`

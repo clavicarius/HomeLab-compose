@@ -3,12 +3,21 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 
 _HOST_PATTERN = re.compile(
     r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?"
     r"(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
 )
+_STACK_RULES = {
+    "adguard": "ADGUARD_HOST_RULE",
+    "dashboard": "DASHBOARD_HOST_RULE",
+    "forgejo": "FORGEJO_HOST_RULE",
+    "gitea": "GITEA_HOST_RULE",
+    "paperless": "PAPERLESS_HOST_RULE",
+    "portainer": "PORTAINER_HOST_RULE",
+}
 
 
 def build_host_rule(hosts, domain=""):
@@ -68,7 +77,7 @@ def env_file_arguments(arguments):
     return paths
 
 
-def add_host_rules(arguments, environment):
+def add_host_rules(arguments, environment, stack_name=""):
     config = {}
     for path in env_file_arguments(arguments):
         config.update(read_env_file(path))
@@ -109,10 +118,19 @@ def add_host_rules(arguments, environment):
         if name == "HOSTS" or name.endswith("_HOSTS")
     }
     for name, hosts in host_lists.items():
+        stack_rule_name = _STACK_RULES.get(stack_name) if name == "HOSTS" else None
+        if stack_rule_name and config.get(stack_rule_name):
+            continue
         if not hosts:
             raise ValueError(f"{name} must contain at least one hostname")
         rule_name = "HOST_RULE" if name == "HOSTS" else f"{name[:-6]}_HOST_RULE"
-        environment[rule_name] = build_host_rule(hosts, domain)
+        if config.get(rule_name):
+            continue
+        rule = build_host_rule(hosts, domain)
+        environment[rule_name] = rule
+        if name == "HOSTS":
+            if stack_rule_name:
+                environment[stack_rule_name] = rule
     if "CERT_RESOLVER" not in config:
         environment.setdefault("CERT_RESOLVER", "stepca")
     if "STEP_CA_ACME_URL" not in config:
@@ -123,7 +141,7 @@ def main():
     arguments = sys.argv[1:]
     environment = os.environ.copy()
     try:
-        add_host_rules(arguments, environment)
+        add_host_rules(arguments, environment, Path.cwd().name)
     except ValueError as error:
         print(error, file=sys.stderr)
         return 2

@@ -37,12 +37,27 @@ class BuildHostRuleTests(unittest.TestCase):
                 encoding="utf-8",
             )
             environment = {}
-            add_host_rules(["--env-file", str(env_file)], environment)
+            add_host_rules(["--env-file", str(env_file)], environment, "forgejo")
 
         self.assertEqual(
             environment["HOST_RULE"],
             "Host(`git.homelab.internal`) || Host(`forgejo.homelab.internal`)",
         )
+        self.assertEqual(environment["FORGEJO_HOST_RULE"], environment["HOST_RULE"])
+
+    def test_preserves_an_explicit_service_rule(self):
+        explicit_rule = "Host(`git.example.com`) || (Host(`code.example.com`) && PathPrefix(`/`))"
+        with tempfile.TemporaryDirectory() as directory:
+            env_file = Path(directory) / ".env"
+            env_file.write_text(
+                "HOMELAB_DOMAIN=example.com\n"
+                "HOSTS=\n",
+                encoding="utf-8",
+            )
+            environment = {"GITEA_HOST_RULE": explicit_rule}
+            add_host_rules(["--env-file", str(env_file)], environment, "gitea")
+
+        self.assertEqual(environment["GITEA_HOST_RULE"], explicit_rule)
 
     def test_uses_existing_single_hostname_settings(self):
         environment = {
@@ -62,7 +77,6 @@ class BuildHostRuleTests(unittest.TestCase):
             environment["PHP56_HOST_RULE"],
             "Host(`php56.homelab.internal`) || Host(`legacy-php.homelab.internal`)",
         )
-
 
 if __name__ == "__main__":
     unittest.main()

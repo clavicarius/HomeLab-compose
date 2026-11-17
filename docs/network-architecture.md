@@ -419,10 +419,20 @@ Labels in `adguard/compose.yml`:
 ```yaml
 labels:
   - "traefik.enable=${TRAEFIK_ENABLED}"
-  - "traefik.http.routers.adguard.rule=Host(`${ADGUARD_HOST}.${HOMELAB_DOMAIN}`)"
+  - "traefik.http.routers.adguard.rule=${ADGUARD_HOST_RULE}"
   - "traefik.http.routers.adguard.entrypoints=websecure"
   - "traefik.http.services.adguard.loadbalancer.server.port=9080"
 ```
+
+Die Router-Regel kommt aus `<SERVICE>_HOST_RULE` in der `.env` des Services.
+Weitere Hostnamen werden dort ergänzt, `compose.yml` bleibt unverändert; alle
+Hostnamen teilen sich Router, Middlewares und TLS-Konfiguration:
+
+```env
+ADGUARD_HOST_RULE="Host(`adguard.${HOMELAB_DOMAIN}`) || Host(`dns.${HOMELAB_DOMAIN}`)"
+```
+
+Die aufgelöste Regel prüft `docker compose config`.
 
 ## Routing-Übersicht
 
@@ -828,7 +838,7 @@ services:
         ipv4_address: ${SERVICE_IP}
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
-      - "traefik.http.routers.service-name.rule=Host(`${SERVICE_HOST}.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.service-name.rule=${SERVICE_HOST_RULE}"
       - "traefik.http.routers.service-name.entrypoints=websecure"
       - "traefik.http.services.service-name.loadbalancer.server.port=8080"
     # Jeder Service braucht einen aktivierten, zum Image passenden Healthcheck.

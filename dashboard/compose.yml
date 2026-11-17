@@ -20,7 +20,7 @@ services:
         ipv4_address: ${DASHBOARD_IP}
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
-      - "traefik.http.routers.dashboard.rule=Host(`dashboard.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.dashboard.rule=${DASHBOARD_HOST_RULE}"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
       - "traefik.docker.network=${NETWORK_NAME}"

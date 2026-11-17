@@ -45,7 +45,7 @@ services:
       poly_internal:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
-      - "traefik.http.routers.php56.rule=Host(`php56.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.php56.rule=${POLYPHP56_HOST_RULE}"
       - "traefik.http.routers.php56.entrypoints=websecure"
       - "traefik.http.services.php56.loadbalancer.server.port=80"
       - "traefik.docker.network=${NETWORK_NAME}"
@@ -95,7 +95,7 @@ services:
       poly_internal:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
-      - "traefik.http.routers.php74.rule=Host(`php74.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.php74.rule=${POLYPHP74_HOST_RULE}"
       - "traefik.http.routers.php74.entrypoints=websecure"
       - "traefik.http.services.php74.loadbalancer.server.port=80"
       - "traefik.docker.network=${NETWORK_NAME}"
@@ -145,7 +145,7 @@ services:
       poly_internal:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
-      - "traefik.http.routers.php85.rule=Host(`php85.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.php85.rule=${POLYPHP85_HOST_RULE}"
       - "traefik.http.routers.php85.entrypoints=websecure"
       - "traefik.http.services.php85.loadbalancer.server.port=80"
       - "traefik.docker.network=${NETWORK_NAME}"
@@ -232,7 +232,7 @@ services:
       poly_internal:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
-      - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.phpmyadmin.rule=${POLYPHPADM_HOST_RULE}"
       - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
       - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
       - "traefik.docker.network=${NETWORK_NAME}"

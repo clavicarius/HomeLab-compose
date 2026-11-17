@@ -44,7 +44,7 @@ services:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.wordpress.entrypoints=websecure"
-      - "traefik.http.routers.wordpress.rule=Host(`${WORDPRESS_HOST}.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.wordpress.rule=${WORDPRESS_HOST_RULE}"
       - "traefik.http.services.wordpress.loadbalancer.server.port=80"
       - "traefik.docker.network=${NETWORK_NAME}"
       - "homelab.name=WordPress"

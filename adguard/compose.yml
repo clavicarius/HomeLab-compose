@@ -41,7 +41,7 @@ services:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.adguard.entrypoints=websecure"
-      - "traefik.http.routers.adguard.rule=Host(`${ADGUARD_HOST}.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.adguard.rule=${ADGUARD_HOST_RULE}"
       - "traefik.http.services.adguard.loadbalancer.server.port=9080"
       - "traefik.docker.network=${NETWORK_NAME}"
       - "homelab.name=AdGuard"

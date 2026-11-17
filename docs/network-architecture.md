@@ -203,7 +203,7 @@ networks:
 ```yaml
 services:
   adguardhome:
-    image: adguard/adguardhome:latest
+    image: adguard/adguardhome:v0.107.80
     networks:
       homelab_macvlan:
         ipv4_address: ${ADGUARD_IP}

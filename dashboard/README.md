@@ -87,3 +87,12 @@ unterstuetzt sowohl `Content-Length` als auch `Transfer-Encoding: chunked`.
 Die Oberflaeche bietet eine clientseitige Suche nach Anzeigename, Kategorie und
 Hostname. Die Suche verwendet die bereits geladene API-Antwort und benoetigt
 keine zusaetzliche Serverlogik oder Konfiguration.
+
+## Image versions
+
+Images are pinned to dedicated tags (never `latest`). When updating an image in
+`compose.yml`, update this table as well.
+
+| Service | Image | Tag | Available tags |
+|---|---|---|---|
+| dashboard | `python (build)` | `3.13-alpine` | [hub.docker.com](https://hub.docker.com/_/python/tags) |

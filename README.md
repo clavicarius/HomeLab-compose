@@ -177,7 +177,7 @@ cp .env.example .env
 - One `README.md` per service
 - Store secrets outside version control
 - Prefer named volumes for persistent data
-- Pin image versions whenever possible
+- Pin image versions to dedicated tags (never `latest`) and document them, with a link to the tags page, in the service `README.md`
 - Use the shared external `homelab_macvlan` network
 - Assign static IP addresses to services connected to the macvlan network
 - Every container service must define and use an enabled Compose health check; stack CI verifies this requirement

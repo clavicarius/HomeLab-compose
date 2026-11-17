@@ -40,3 +40,12 @@ the shared environment file (UTC if unset).
 
 To restore a repository, clone its mirror from `backups/` or push it to a Git
 server. Logs are available with `docker compose logs -f`.
+
+## Image versions
+
+Images are pinned to dedicated tags (never `latest`). When updating an image in
+`compose.yml`, update this table as well.
+
+| Service | Image | Tag | Available tags |
+|---|---|---|---|
+| gickup | `buddyspencer/gickup` | `0.10.47` | [hub.docker.com](https://hub.docker.com/r/buddyspencer/gickup/tags) |

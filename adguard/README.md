@@ -218,3 +218,12 @@ Der Container prueft alle 30 Sekunden die Erreichbarkeit von
 * Das offizielle AdGuard-Image verwendet `PUID` und `PGID` derzeit nicht aktiv. Die Variablen sind dennoch vorbereitet.
 * IP-Adressen, Domains und Netzwerkparameter werden zentral in `.env.common` verwaltet.
 * Die vollständige Netzwerkarchitektur ist in [docs/network-architecture.md](../docs/network-architecture.md) dokumentiert.
+
+## Image versions
+
+Images are pinned to dedicated tags (never `latest`). When updating an image in
+`compose.yml`, update this table as well.
+
+| Service | Image | Tag | Available tags |
+|---|---|---|---|
+| adguardhome | `adguard/adguardhome` | `v0.107.80` | [hub.docker.com](https://hub.docker.com/r/adguard/adguardhome/tags) |

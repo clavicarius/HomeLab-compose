@@ -24,7 +24,7 @@ services:
   adguardhome:
     container_name: adguard-homelab
     # https://hub.docker.com/r/adguard/adguardhome/tags
-    image: adguard/adguardhome:latest
+    image: adguard/adguardhome:v0.107.80
     restart: unless-stopped
     networks:
       homelab_macvlan:

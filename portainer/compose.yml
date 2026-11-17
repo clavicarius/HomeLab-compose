@@ -6,7 +6,7 @@
 
 services:
   portainer:
-    image: portainer/portainer-ce:lts
+    image: portainer/portainer-ce:2.39.8
     container_name: portainer-homelab
     restart: unless-stopped
     healthcheck:

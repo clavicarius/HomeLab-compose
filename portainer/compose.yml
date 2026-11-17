@@ -24,7 +24,7 @@ services:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.portainer.entrypoints=websecure"
-      - "traefik.http.routers.portainer.rule=Host(`${PORTAINER_HOST}.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.portainer.rule=${PORTAINER_HOST_RULE}"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
       - "traefik.docker.network=${NETWORK_NAME}"
       - "homelab.name=Portainer"

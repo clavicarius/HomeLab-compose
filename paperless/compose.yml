@@ -47,7 +47,7 @@ services:
     labels:
       - "traefik.enable=${TRAEFIK_ENABLED}"
       - "traefik.http.routers.paperless.entrypoints=websecure"
-      - "traefik.http.routers.paperless.rule=Host(`${PAPERLESS_HOST}.${HOMELAB_DOMAIN}`)"
+      - "traefik.http.routers.paperless.rule=${PAPERLESS_HOST_RULE}"
       - "traefik.http.services.paperless.loadbalancer.server.port=8000"
       - "traefik.docker.network=${NETWORK_NAME}"
       - "homelab.name=Paperless-ngx"

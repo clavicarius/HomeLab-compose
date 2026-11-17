@@ -187,3 +187,12 @@ Der SSH-Zugriff bleibt ueber den konfigurierten Host-Port
 
 * Gitea wird standardmäßig mit SQLite3 als Datenbank betrieben. Für größere Installationen empfiehlt sich ein externer Datenbankserver (z. B. PostgreSQL oder MySQL).
 * Alle projektspezifischen Einstellungen (Ports, IP-Adressen, Domains und Benutzerinformationen) werden zentral über die `.env` verwaltet.
+
+## Image versions
+
+Images are pinned to dedicated tags (never `latest`). When updating an image in
+`compose.yml`, update this table as well.
+
+| Service | Image | Tag | Available tags |
+|---|---|---|---|
+| gitea | `gitea/gitea` | `28` | [hub.docker.com](https://hub.docker.com/r/gitea/gitea/tags) |

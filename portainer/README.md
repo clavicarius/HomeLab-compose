@@ -40,3 +40,12 @@ direct access from the LAN, the HTTPS interface listens on port 9443.
 Portainer's configuration and database are stored at the host path configured
 by `PORTAINER_DATA_PATH`, which is mounted at `/data` inside the container. The Docker socket source is configurable in
 `.env.common` and lets Portainer manage the local Docker Engine.
+
+## Image versions
+
+Images are pinned to dedicated tags (never `latest`). When updating an image in
+`compose.yml`, update this table as well.
+
+| Service | Image | Tag | Available tags |
+|---|---|---|---|
+| portainer | `portainer/portainer-ce` | `2.39.8` | [hub.docker.com](https://hub.docker.com/r/portainer/portainer-ce/tags) |

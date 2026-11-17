@@ -155,3 +155,12 @@ mkcert home.arpa "*.home.arpa"
 ```
 
 5. Die mkcert-Root-CA auf den Clients importieren, die die Domains aufrufen sollen.
+
+## Image versions
+
+Images are pinned to dedicated tags (never `latest`). When updating an image in
+`compose.yml`, update this table as well.
+
+| Service | Image | Tag | Available tags |
+|---|---|---|---|
+| traefik | `traefik` | `v3.7` | [hub.docker.com](https://hub.docker.com/_/traefik/tags) |

@@ -33,3 +33,13 @@ Complete the WordPress setup at `https://${WORDPRESS_HOST}.${HOMELAB_DOMAIN}`.
 Back up both persistent data paths together. To update, run `docker compose
 pull` followed by `docker compose up -d`. Stop the stack with `docker compose
 down`; persistent data is retained.
+
+## Image versions
+
+Images are pinned to dedicated tags (never `latest`). When updating an image in
+`compose.yml`, update this table as well.
+
+| Service | Image | Tag | Available tags |
+|---|---|---|---|
+| wordpress | `wordpress` | `7-php8.3-apache` | [hub.docker.com](https://hub.docker.com/_/wordpress/tags) |
+| db | `mariadb` | `11.4` | [hub.docker.com](https://hub.docker.com/_/mariadb/tags) |

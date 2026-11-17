@@ -289,3 +289,16 @@ docker compose up -d --build
 `<HOMELAB_DOMAIN>` → `192.168.178.225`, dann `TRAEFIK_ENABLED=true` setzen.
 
 **Lokale Entwicklung ohne DNS:** Host-Ports (siehe Tabelle oben) oder Einträge in der Hosts-Datei. Details zum zentralen Routing stehen in [traefik/README.md](../traefik/README.md).
+
+## Image versions
+
+Images are pinned to dedicated tags (never `latest`). When updating an image in
+`compose.yml`, update this table as well.
+
+| Service | Image | Tag | Available tags |
+|---|---|---|---|
+| db | `mariadb` | `10.11` | [hub.docker.com](https://hub.docker.com/_/mariadb/tags) |
+| phpmyadmin | `phpmyadmin/phpmyadmin` | `5.2.3` | [hub.docker.com](https://hub.docker.com/r/phpmyadmin/phpmyadmin/tags) |
+| php56 | `php (build)` | `5.6-apache` | [hub.docker.com](https://hub.docker.com/_/php/tags) |
+| php74 | `php (build)` | `7.4-apache` | [hub.docker.com](https://hub.docker.com/_/php/tags) |
+| php85 | `php (build)` | `8.5-apache` | [hub.docker.com](https://hub.docker.com/_/php/tags) |

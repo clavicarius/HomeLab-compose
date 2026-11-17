@@ -41,3 +41,14 @@ Keep custom hook scripts executable so Paperless can run them.
 
 To update, run `docker compose pull` followed by `docker compose up -d`. Stop
 the stack with `docker compose down`; persistent data is retained.
+
+## Image versions
+
+Images are pinned to dedicated tags (never `latest`). When updating an image in
+`compose.yml`, update this table as well.
+
+| Service | Image | Tag | Available tags |
+|---|---|---|---|
+| paperless | `paperlessngx/paperless-ngx` | `3.3` | [hub.docker.com](https://hub.docker.com/r/paperlessngx/paperless-ngx/tags) |
+| postgres | `postgres` | `16-alpine` | [hub.docker.com](https://hub.docker.com/_/postgres/tags) |
+| redis | `redis` | `8-alpine` | [hub.docker.com](https://hub.docker.com/_/redis/tags) |

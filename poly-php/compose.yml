@@ -214,7 +214,7 @@ services:
   # Depends on: db (waits until MariaDB is healthy)
   # Healthcheck: curl http://localhost/ every 10 s.
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: phpmyadmin/phpmyadmin:5.2.3
     container_name: lamp-phpmyadmin
     ports:
       - "${PHPMYADMIN_PORT}:80"
